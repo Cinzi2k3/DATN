@@ -1,0 +1,46 @@
+.container{
+    margin-left: 170px;
+    margin-right: 170px;
+}
+.banner-marquee {
+    overflow: hidden;
+    position: relative;
+    padding: 0;
+    background: white;
+    border-radius: 40px;
+    margin-top: 18px;
+  }
+  
+  .scrolling-text {
+    display: inline-block;
+    white-space: nowrap;
+    position: relative;
+    font-size: 14px;
+    color: #555;
+    transition: transform 0.1s linear;
+  }
+  
+  .h2-title-xx {
+    font-weight: normal;
+    margin: 0;
+  }
+  .dropdown{
+    padding-top: 7px;
+    font-size: 18px;
+  }
+  .fa-solid {
+    margin-right: 10px
+  }
+  .phone{
+    font-size: 20px;
+    color: yellow;
+  }
+  .dropdown div {
+    outline: none; /* Xóa viền outline */
+  }
+  .vien{
+    display: flex; 
+    gap: 5px;
+    margin-left: 10px;
+  }
+

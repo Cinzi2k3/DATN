@@ -1,0 +1,23 @@
+.nav-container {
+    display: flex; /* Sử dụng flexbox */
+    justify-content: space-evenly; /* Chia đều khoảng cách giữa các mục */
+    align-items: center; /* Căn giữa theo trục dọc */
+  }
+  
+  .nav-item {
+    flex: 1; /* Đảm bảo các mục có kích thước bằng nhau */
+    text-align: center; /* Canh giữa văn bản trong mục */
+  }
+  
+  .nav-link {
+    color: #696969;
+    display: inline-block;
+    font-weight: 600;
+    padding: 10px 0;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+  }
+  
+  .nav-link:hover {
+    color: #1082ed;
+  }

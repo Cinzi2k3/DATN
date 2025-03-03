@@ -1,0 +1,92 @@
+.footer {
+    padding: 25px 180px 15px;
+    border-bottom: 0.5px dashed rgba(255, 255, 255, 0.2);
+  }
+  .footer1 {
+    padding: 0px 180px;
+    border-bottom: 0.5px dashed rgba(255, 255, 255, 0.2);
+  }
+  .fa-brands {
+    font-size: 35px;
+    color: #a2a1a1;
+    margin-right: 10px;
+  }
+  .about {
+    line-height: 1;
+  }
+  .about h6 {
+    font-size: 18px;
+  }
+  
+  .newsletter {
+    flex: 1;
+    text-align: left;
+    display: flex;
+    margin-left: 20px;
+
+  }
+  .newsletter h3 {
+    color: #ff7f50;
+    margin-bottom: 15px;
+  }
+  
+  .newsletter p {
+    color: #bbb;
+    margin-bottom: 15px;
+  }
+  .newsletter-input {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  .logo{
+    background-color: rgba(0, 0, 0, 0.2);
+    padding-top: 15px;
+    padding-bottom: 15px;
+    margin-right: 10px;
+  }
+  h6{
+    color: white;
+    font-size: 17px;
+    padding-top: 5px;
+  }
+  span{
+    font-size: 15px;
+    line-height: 2;
+  }
+  span:hover{
+    color: white;
+    cursor: pointer;
+  }
+  .duong2{
+    margin-left: 20px;
+  }
+  .duong3{
+    margin-left: 20px;
+  }
+  .duong4{
+    margin-left: 20px;
+  }
+  .footer1-col{
+    margin-top: 10px;
+  }
+  .face{
+    text-align: center;
+  }
+  .face i{
+    cursor: pointer;
+  }
+  span em{
+    margin-right: 5px;
+  }
+  .footer0{
+    text-align: center;
+    margin: 10px 0px 10px;
+  }
+  .visa{
+    display: flex;
+    margin: 15px 0px 15px 5px;
+  }
+  .visa img{
+    width: 50px;
+    margin-left: 5px;
+  }

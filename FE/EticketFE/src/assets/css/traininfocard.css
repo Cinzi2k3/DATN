@@ -1,0 +1,80 @@
+.container {
+    display: flex; 
+    margin: 15px 0px;
+    background-color: #fff;
+    box-shadow: 0 0 4px  #0003;
+    transition: box-shadow 0.5s ease-in-out; /* Sửa lại cú pháp */
+    
+}
+
+.container:hover {
+    box-shadow: 2px 4px 3px 2px #0000002a, 2px 2px 2px 2px #0000002a; /* Hiệu ứng đổ bóng khi hover */
+}
+.container2{
+    width: 1170px;
+
+}
+.container3{
+    background-color: #fff;
+    padding: 10px 10px;
+}
+.text-center {
+    text-align: center;
+  }
+  
+  .text-center1 {
+    text-align: center;
+    line-height: 1.5;
+  }
+  
+  .price {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: flex-end;
+  }
+  /* Thêm hiệu ứng hover cho nút */
+  .hover-button {
+    height: 50px;
+    width: 140px;
+    background-color: rgb(64, 158, 255);
+    color: white;
+    border: none;
+    transition: all 0.3s ease; /* Hiệu ứng chuyển đổi mượt mà */
+  }
+  
+  .hover-button:hover {
+    background-color: rgb(92, 166, 239); /* Đổi màu nền */
+    transform: scale(1.1); /* Tăng kích thước khi hover */
+    color: white;
+  }
+  
+  /* Thêm hiệu ứng hover cho giá */
+  .ticket-price {
+    font-size: 30px;
+    color: #ff5722;
+    transition: color 0.3s ease;
+  }
+  h3{
+    font-size: 24px;
+  }
+  .date{
+    color:#999
+  }
+  .ga{
+    color:#999
+  }
+  .time{
+    font-weight:  bold ;
+    font-size: 20px;
+  }
+  .cho{
+    background-color: rgb(91, 166, 241);
+    border-radius: 20px;
+    width:110px;
+    height: 30px;
+  }
+  .cho1{
+    text-align: center;
+    color: rgb(24, 83, 143);
+    width: 100%;
+  }

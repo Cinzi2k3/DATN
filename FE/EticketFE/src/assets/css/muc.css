@@ -1,0 +1,30 @@
+  .benefit-header {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .benefit {
+    padding: 10px;
+  }
+  
+  .v_field {
+    display: flex;
+    align-items: center;
+  }
+  
+  .v_field__text {
+    font-size: 20px;
+    font-weight: bold;
+  }
+  
+  .v_field__description {
+    font-size: 16px;
+    color: #666;
+  }
+  .v_field__content{
+    text-decoration: none;
+  }
+  .benefit a{
+    text-decoration: none;
+    color: black;
+  }

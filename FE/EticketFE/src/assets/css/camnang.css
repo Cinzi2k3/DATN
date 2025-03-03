@@ -1,0 +1,58 @@
+.custom-button {
+    white-space: normal !important; /* Cho phép chữ xuống dòng */
+    word-wrap: break-word; /* Bẻ dòng nếu từ quá dài */
+    text-align: left; /* Căn chữ sang trái */
+    padding: 10px; /* Khoảng cách bên trong nút */
+    min-height: 60px; /* Đảm bảo chiều cao tối thiểu */
+    display: flex; /* Sử dụng flexbox */
+    align-items: flex-start; /* Căn nội dung lên phía trên */
+    line-height: 1.3;
+    flex-direction: column; 
+    box-shadow: 10px;
+}
+.text-xl {
+    font-size: 40px;
+    font-weight: bold;
+}
+.text-gray-600 {
+    font-size: 20px;
+    color: #3f3b3b;
+    margin-bottom: 20px;
+}
+.w-full {
+    width: 100%;
+    height: 80px;
+    font-size: 20px;
+    display: flex;
+    font-weight: 400;
+}
+.mt-3 {
+    font-size: 19px;
+    line-height: 2;
+}
+.flex {
+    display: flex;
+    justify-content: space-between; /* Đặt khoảng cách giữa hai phần */
+    align-items: flex-start; /* Căn hàng đầu */
+}
+.max-w-full {
+    max-width: 350px; /* Giới hạn chiều rộng của hình ảnh */
+    height: auto; /* Giữ tỉ lệ hình ảnh */
+    margin-left: auto; /* Đẩy hình ảnh sát bên phải */}
+.custom-button {
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1); /* Thêm shadow */
+    border-radius: 8px; /* Góc bo tròn */
+    transition: box-shadow 0.3s ease; /* Hiệu ứng hover */
+}
+      
+.custom-button:hover {
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2); /* Shadow khi hover */
+}
+.cham{
+     margin-right: 10px;
+}
+      
+      
+
+      
+    

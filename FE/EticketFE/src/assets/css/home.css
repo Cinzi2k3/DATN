@@ -1,0 +1,91 @@
+/* Reset margin và padding mặc định */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Container chứa các item */
+  .benefit-header {
+    padding: 1px 0 23px;
+    background-color: #f7f7f7;
+  }
+  
+  /* Dùng flexbox để căn chỉnh các item */
+  .container {
+    display: flex;
+    justify-content: space-between;
+    max-width: 200px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+  }
+  
+  /* Định dạng cho từng item */
+  .benefit-item {
+    flex: 1;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 12px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s ease-in-out;
+
+  }
+  
+  .benefit-item:hover {
+    transform: scale(1.05);
+  }
+  
+  /* Căn chỉnh biểu tượng */
+  .v_field__icon-container {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 12px;
+  }
+  
+  /* Căn chỉnh biểu tượng và text */
+  .v_field__content {
+    text-align: center;
+    margin:5px
+  }
+  .v_field{
+      display: flex;
+  }
+  
+  .icon {
+    width: 40px;
+    height: 40px;
+  }
+  img{
+      margin-top: 15px;
+  }
+  
+  /* Định dạng cho text */
+  .v_field__text {
+    font-size: 20px;
+    font-weight: bold;
+    color: #3f3b3b;
+    margin-bottom: 8px;
+  }
+  
+  .v_field__description {
+    font-size: 16px;
+    color: #6c6c6c;
+  }
+  a{
+      text-decoration: none;
+  }
+  .el-row{
+    margin-top:-20px;
+  }
+  .el-card{
+    padding: 0;
+    height: 100%;
+  }
+@media (max-width:932px){
+  
+}
+  

@@ -1,0 +1,8 @@
+.day-card {
+    text-align: center;
+    cursor: pointer;
+  }
+  .day-card.selected {
+    color: #409eff;
+    border-bottom: 2px solid #409eff;
+  }
