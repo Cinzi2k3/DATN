@@ -8,11 +8,16 @@ use Illuminate\Database\Eloquent\Model;
 class PhanLoai extends Model
 {
     use HasFactory;
-    protected $primarykey = 'maphanloai';
+    protected $primaryKey = 'maphanloai';
     protected $table = 'phanloai';
     protected $fillable = [
         'maphanloai',
         'tenphanloai',
 
     ];
+    public function Gia()
+{
+    return $this->hasMany(Gia::class, 'maphanloai');
+}
+
 }

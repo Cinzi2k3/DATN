@@ -5,7 +5,7 @@
         <el-row :gutter="20" style="align-items: center">
           <!-- Phần thông tin tàu -->
           <el-col :span="6">
-            <p>Tàu chất lượng cao</p>
+            <p style="font-size: 20px;">{{ traintau }}</p>
             <h3>{{ trainCode }}</h3>
             <div class="cho">
             <p class="cho1">
@@ -44,7 +44,7 @@
 
           <!-- Phần thông tin ga đến -->
           <el-col :span="4" class="text-center">
-            <h3 class="ga">{{ searchgave }}</h3>
+            <h3 class="ga">{{ searchgaden }}</h3>
             <p class="time">{{ arrivalTime }}</p>
             <p class="date">{{ arrivalDate }}</p>
           </el-col>
@@ -65,14 +65,14 @@
 </template>
 
 <script setup>
-import { Right } from "@element-plus/icons-vue";
 
 // Props
 const props = defineProps({
   searchPerformed: Boolean,
   searchgadi: String,
-  searchgave: String,
+  searchgaden: String,
   selectedDay: String,
+  traintau: String,
   trainCode: String,
   availableSeats: Number,
   departureTime: String,

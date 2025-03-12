@@ -1,7 +1,7 @@
 {
   "Xin chào": "Hello",
-  "Đăng nhập": "Login",
-  "Đăng ký": "Register",
+  "Đăng nhập": "Sign in",
+  "Đăng ký": "Sign up",
   "Quên mật khẩu": "Forgot Password",
   "Tài khoản": "Account",
   "Đơn vị hỗ trợ hình thức thanh toán quét QR phí thanh toán là 0 đồng, ngoài hình thức thanh toán này quý khách lựa chọn thanh toán thẻ visa, ứng dụng ví sẽ mất phí do cổng thanh toán onepay thu, phí thanh toán sẽ không nằm trong giá vé, chúng tôi miễn trừ trách nhiệm về phí này. Giá vé hiển thị đã bao gồm phí dịch vụ vận hành hệ thống và thuế giá trị gia tăng từ 8%-10%. Đơn vị chúng tôi cam kết minh bạch giá cả và những khoản phí mà đơn vị thu, không có ẩn giá đến bước cuối mới hiển thị! Xin cảm ơn!" : "The unit supports the QR scanning payment method and the payment fee is 0 VND. In addition to this payment method, if you choose to pay with a visa card, the wallet application will incur a fee collected by the onepay payment gateway. The payment fee will not be included in the ticket price. We waive responsibility for this fee. The displayed ticket price includes system operating service fees and value added tax from 8% - 10%. Our unit is committed to transparency in prices and fees it collects, no hidden prices are displayed until the last step! Thank you!",
@@ -87,6 +87,12 @@
   "Các chương trình khuyến mãi sẽ tự động gửi đến bạn":"Promotions will be automatically sent to you",
   "Nhập email của bạn":"Enter your email",
   "Bản quyền thuộc về Vé tàu hoả Bắc Nam tại Saomaifly. Thiết kế bởi ĐỖ MẠNH CƯỜNG.":"Copyright belongs to North-South train tickets at Saomaifly. Designed by DO MANH CUONG.",
-  "Gửi":"Send"
+  "Gửi":"Send",
+  "Tạo tài khoản":"Create Account",
+  "Quên mật khẩu?":"Forgot Password?",
+  "Chào mừng bạn trở lại":"Welcome back",
+  "Để giữ liên lạc với chúng tôi, vui lòng đăng nhập bằng thông tin cá nhân của bạn":"To stay in touch with us, please log in with your personal information",
+  "Chào bạn":"Hello Friend",
+  "Nhập thông tin cá nhân của bạn và bắt đầu hành trình cùng chúng tôi":"Enter your personal information and start your journey with us"
 
 }

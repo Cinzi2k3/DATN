@@ -8,10 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class LoaiToa extends Model
 {
     use HasFactory;
-    protected $primarykey = 'maloaitoa';
+    protected $primaryKey = 'maloaitoa';
     protected $table = 'loaitoa';
     protected $fillable = [
         'maloaitoa',
         'tenloaitoa',
     ];
+    public function Toa(){
+        return $this ->hasMany(Toa::class, 'maloaitoa');
+    }
 }

@@ -8,11 +8,17 @@ use Illuminate\Database\Eloquent\Model;
 class LoaiCho extends Model
 {
     use HasFactory;
-    protected $primarykey = 'maloaicho';
+    protected $primaryKey = 'maloaicho';
     protected $table = 'loaicho';
     protected $fillable = [
         'maloaicho',
         'tenloaicho',
-        'matoa',
+        'maloaitoa',
     ];
+    public function Cho(){
+        return $this -> hasMany (Cho::class,'maloaicho');
+    }
+    public function LoaiToa(){
+        return $this -> belongsTo(LoaiToa::class,'maloaitoa');
+    }
 }

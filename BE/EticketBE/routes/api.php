@@ -3,21 +3,77 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\LoaiToaController;
+use App\Http\Controllers\LoaiChoController;
+use App\Http\Controllers\LoaiTauController;
+use App\Http\Controllers\ToaController;
+use App\Http\Controllers\TauController;
+use App\Http\Controllers\ChoController;
+use App\Http\Controllers\GaController;
+use App\Http\Controllers\TuyenDuongController;
+use App\Http\Controllers\LoaiVeController;
+use App\Http\Controllers\LichTrinhController;
+use App\Http\Controllers\PhanLoaiController;
+use App\Http\Controllers\VeController;
+use App\Http\Controllers\NguoiDungController;
+use App\Http\Controllers\GiaController;
+use App\Http\Controllers\DonHangController;
+use App\Http\Controllers\ThanhToanController;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
-
-
+//Đăng nhập, đăng kí
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
 
-Route::get('/loaitoa', [LoaiToaController::class, 'getLoaiToa']);
+//Thông tin người dùng
+Route::get('/user', [UserController::class, 'getUserByEmail']);
 
+//Loại toa
+Route::apiResource('loaitoa', LoaiToaController::class);
 
+//Toa
+Route::apiResource('toa', ToaController::class);
 
+//Loại Chỗ
+Route::apiResource('loaicho', LoaiChoController::class);
 
+//Loại tàu
+Route::apiResource('loaitau', LoaiTauController::class);
 
+//Tàu
+Route::apiResource('tau', TauController::class);
+
+//Cho
+Route::apiResource('cho', ChoController::class);
+
+//Ga
+Route::apiResource('ga', GaController::class);
+
+//Tuyến đường
+Route::apiResource('tuyenduong', TuyenDuongController::class);
+
+//Loại vé
+Route::apiResource('loaive', LoaiVeController::class);
+
+//Lịch trình
+Route::apiResource('lichtrinh', LichTrinhController::class);
+
+//Phân loại
+Route::apiResource('phanloai', PhanLoaiController::class);
+
+//Vé
+Route::apiResource('ve', VeController::class);
+
+//Người dùng
+Route::apiResource('nguoidung', NguoiDungController::class);
+
+//Gía
+Route::apiResource('gia', GiaController::class);
+
+//Đơn hàng
+Route::apiResource('donhang', DonHangController::class);
+
+//Thanh toán
+Route::apiResource('thanhtoan', ThanhToanController::class);

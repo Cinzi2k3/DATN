@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class LichTrinh extends Model
 {
     use HasFactory;
-    protected $primarykey = 'malichtrinh';
+    protected $primaryKey = 'malichtrinh';
     protected $table = 'lichtrinh';
     protected $fillable = [
         'malichtrinh',
@@ -17,4 +17,34 @@ class LichTrinh extends Model
         'thoigiandi',
         'thoigianden',
     ];
+public function Tau()
+{
+    return $this->belongsTo(Tau::class, 'matau');
+}
+public function TuyenDuong()
+{
+    return $this->belongsTo(TuyenDuong::class, 'matuyenduong');
+}
+public function Gia()
+{
+    return $this->hasOne(Gia::class, 'malichtrinh');
+}
+protected $casts = [
+    'thoigiandi' => 'datetime',
+    'thoigianden' => 'datetime',
+];
+
+public function getThoiGianDiAttribute($value)
+{
+    return \Carbon\Carbon::parse($value)->format('H:i d/m/Y');
+}
+
+public function getThoiGianDenAttribute($value)
+{
+    return \Carbon\Carbon::parse($value)->format('H:i d/m/Y');
+}
+public function Ve(){
+    return $this -> belongsToMany(Ve::class,'malichtrinh');
+}
+
 }

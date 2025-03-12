@@ -10,7 +10,7 @@
           Chọn chiều đi
         </h3>
         <h3 style="margin: 0; font-size: 20px; padding: 5px 5px 0 0px">
-          {{ searchgadi }} → {{ searchgave }}
+          {{ searchgadi }} → {{ searchgaden }}
         </h3>
       </div>
       <div
@@ -54,11 +54,12 @@
   </template>
   
   <script setup>
+import { ArrowLeft,ArrowRight } from "@element-plus/icons-vue";
  
   // Props
   const props = defineProps({
     searchgadi: String,
-    searchgave: String,
+    searchgaden: String,
     searchPerformed: Boolean,
     displayedDays: Array,
     selectedDay: String,

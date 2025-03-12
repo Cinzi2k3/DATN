@@ -1,85 +1,53 @@
 <template>
+  <div v-if="loading" class="loading-overlay">
+    <div class="spinner"></div>
+  </div>
   <div style="justify-items: center">
     <div style="width: 1170px">
       <div style="background-color: #e5eaf3">
         <el-row :gutter="20">
-          <div
-            style="
+          <div style="
               width: 380px;
               margin: 15px 15px 15px 25px;
               background-color: #fff;
-            "
-          >
-            <el-col
-              :span="24"
-              style="display: flex; align-items: center; margin-top: 10px"
-            >
+            ">
+            <el-col :span="24" style="display: flex; align-items: center; margin-top: 10px">
               <div style="flex: 1; margin-right: 10px">
                 <label style="opacity: 0.5; margin-left: 10px">Ga đi:</label>
-                <el-select
-                  v-model="gadi"
-                  placeholder="Chọn ga đi"
-                  style="width: 100%"
-                >
-                  <el-option
-                    v-for="station in stations"
-                    :key="station"
-                    :label="station"
-                    :value="station"
-                  />
+                <el-select v-model="gadi" placeholder="Chọn ga đi" style="width: 100%">
+                  <el-option v-for="station in stations" :key="station.maga" :label="station.tenga"
+                    :value="station.tenga" />
                 </el-select>
               </div>
-              <el-icon
-                style="font-size: 25px; cursor: pointer; margin: 0 10px"
-                @click="swapStations"
-              >
+              <el-icon style="font-size: 25px; cursor: pointer; margin: 0 10px" @click="swapStations">
                 <Refresh />
               </el-icon>
               <div style="flex: 1">
                 <label style="opacity: 0.5; margin-left: 10px">Ga đến:</label>
-                <el-select
-                  v-model="gave"
-                  placeholder="Chọn ga đến"
-                  style="width: 100%"
-                >
-                  <el-option
-                    v-for="station in stations"
-                    :key="station"
-                    :label="station"
-                    :value="station"
-                  />
+                <el-select v-model="gaden" placeholder="Chọn ga đến" style="width: 100%">
+                  <el-option v-for="station in stations" :key="station.maga" :label="station.tenga"
+                    :value="station.tenga" />
                 </el-select>
               </div>
             </el-col>
           </div>
 
-          <div
-            style="
+          <div style="
               width: 505px;
               background-color: #fff;
               margin: 15px 15px 15px 0px;
-            "
-          >
+            ">
             <el-row>
               <el-col :span="12" style="padding: 10px">
                 <div style="display: flex; align-items: center">
                   <el-icon style="font-size: 25px; margin-right: 10px">
                     <Calendar />
                   </el-icon>
-                  <label style="opacity: 0.5; margin-right: 10px"
-                    >Ngày đi:</label
-                  >
-                  <el-radio v-model="selectedTicket" label="one-way"
-                    >Một chiều</el-radio
-                  >
+                  <label style="opacity: 0.5; margin-right: 10px">Ngày đi:</label>
+                  <el-radio v-model="selectedTicket" label="one-way">Một chiều</el-radio>
                 </div>
-                <el-date-picker
-                  v-model="departureDate"
-                  type="date"
-                  @change="onDepartureDateChange"
-                  placeholder="Chọn ngày đi"
-                  style="width: 100%"
-                />
+                <el-date-picker v-model="departureDate" type="date" @change="onDepartureDateChange"
+                  placeholder="Chọn ngày đi" style="width: 100%" />
               </el-col>
 
               <el-col :span="12" style="padding: 10px">
@@ -87,39 +55,24 @@
                   <el-icon style="font-size: 25px; margin-right: 10px">
                     <Calendar />
                   </el-icon>
-                  <label style="opacity: 0.5; margin-right: 10px"
-                    >Ngày về:</label
-                  >
-                  <el-radio v-model="selectedTicket" label="round-trip"
-                    >Khứ hồi</el-radio
-                  >
+                  <label style="opacity: 0.5; margin-right: 10px">Ngày về:</label>
+                  <el-radio v-model="selectedTicket" label="round-trip">Khứ hồi</el-radio>
                 </div>
-                <el-date-picker
-                  v-model="returnDate"
-                  type="date"
-                  placeholder="Chọn ngày về"
-                  style="width: 100%"
-                  :disabled="selectedTicket !== 'round-trip'"
-                  @change="onReturnDateChange"
-                />
+                <el-date-picker v-model="returnDate" type="date" placeholder="Chọn ngày về" style="width: 100%"
+                  :disabled="selectedTicket !== 'round-trip'" @change="onReturnDateChange" />
               </el-col>
             </el-row>
           </div>
-          <div
-            style="
+          <div style="
               background-color: white;
               width: 150px;
               border-radius: 5px;
               margin-top: 15px;
               height: 85px;
-            "
-          >
+            ">
             <div class="position-relative">
-              <button
-                @click="toggleDropdown"
-                class="d-flex align-items-center justify-content-between w-100"
-                style="height: 85px; border: 0px; border-radius: 5px"
-              >
+              <button @click="toggleDropdown" class="d-flex align-items-center justify-content-between w-100"
+                style="height: 85px; border: 0px; border-radius: 5px">
                 <div class="d-flex align-items-center">
                   <i class="fa-solid fa-user me-2"></i>
                   <div class="d-flex flex-column align-items-start">
@@ -129,15 +82,9 @@
                 </div>
               </button>
 
-              <div
-                v-if="isOpen"
-                class="dropdown-menu show w-100 mt-2 p-0 border rounded shadow-sm"
-              >
-                <div
-                  v-for="category in ticketCategories"
-                  :key="category.id"
-                  class="d-flex align-items-center justify-content-between p-3 border-bottom"
-                >
+              <div v-if="isOpen" class="dropdown-menu show w-100 mt-2 p-0 border rounded shadow-sm">
+                <div v-for="category in ticketCategories" :key="category.id"
+                  class="d-flex align-items-center justify-content-between p-3 border-bottom">
                   <div>
                     <p class="mb-0 font-weight-bold">{{ category.label }}</p>
                     <p class="mb-0 text-muted small">
@@ -148,18 +95,12 @@
                     </p>
                   </div>
                   <div class="d-flex align-items-center">
-                    <button
-                      @click="decrement(category.id)"
-                      class="btn btn-sm btn-outline-secondary"
-                      :disabled="category.count <= 0"
-                    >
+                    <button @click="decrement(category.id)" class="btn btn-sm btn-outline-secondary"
+                      :disabled="category.count <= 0">
                       -
                     </button>
                     <span class="mx-2">{{ category.count }}</span>
-                    <button
-                      @click="increment(category.id)"
-                      class="btn btn-sm btn-outline-secondary"
-                    >
+                    <button @click="increment(category.id)" class="btn btn-sm btn-outline-secondary">
                       +
                     </button>
                   </div>
@@ -173,79 +114,62 @@
             </div>
           </div>
 
-          <button
-            style="
+          <button style="
               width: 80px;
               cursor: pointer;
               background-color: #409eff;
               border: 0px;
               margin: 15px 10px 15px 0px;
-            "
-            @click="searchTickets"
-          >
+            " @click="searchTickets" :disabled="loading">
             <h3 style="color: white; font-size: 20px">Tìm</h3>
           </button>
         </el-row>
       </div>
-      <SearchTicketResult
-        :searchgadi="searchgadi"
-        :searchgave="searchgave"
-        :searchPerformed="searchPerformed"
-        :displayedDays="displayedDays"
-        :selectedDay="selectedDay"
-        :availableDays="availableDays"
-        :currentPage="currentPage"
-        @update:selectedDay="selectedDay = $event"
-        @prevday="prevday"
-        @nextday="nextday"
-      />
+      <SearchTicketResult :searchgadi="searchgadi" :searchgaden="searchgaden" :searchPerformed="searchPerformed"
+        :displayedDays="displayedDays" :selectedDay="selectedDay" :availableDays="availableDays"
+        :currentPage="currentPage" @update:selectedDay="onDaySelected" @prevday="prevday" @nextday="nextday" />
 
-      <TrainInfoCard
-        :searchPerformed="searchPerformed"
-        :searchgadi="searchgadi"
-        :searchgave="searchgave"
-        :selectedDay="selectedDay"
-        :trainCode="'NA1'"
-        :availableSeats="88"
-        :departureTime="'6:30'"
-        :duration="'6h0p'"
-        :arrivalTime="'12:30'"
-        :arrivalDate="'03 tháng 11'"
-        :ticketPrice="'500.000đ'"
-      />
+      <div v-if="trainSchedules.length > 0">
+        <TrainInfoCard v-for="(train, index) in trainSchedules" :key="index" :searchPerformed="searchPerformed"
+          :searchgadi="searchgadi" :searchgaden="searchgaden" :selectedDay="train.ngaydi" :traintau="train.tenloaitau"
+          :trainCode="train.tentau" :availableSeats="train.sochocon" :departureTime="train.giodi"
+          :duration="train.thoigiandichuyen" :arrivalTime="train.gioden" :arrivalDate="train.ngayden"
+          :ticketPrice="`${train.gia.toLocaleString()} VND`" />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ElMessage,ElNotification } from "element-plus";
+import { ElMessage, ElNotification } from "element-plus";
 import { ref, computed, onMounted } from "vue";
-import SearchTicketResult from "@/components/Time.vue";
+import SearchTicketResult from "@/components/SearchTicketResult.vue";
 import TrainInfoCard from "@/components/TrainInfoCard.vue";
-import {Refresh,Calendar,ArrowLeft,ArrowRight,} from "@element-plus/icons-vue";
+import {
+  Refresh,
+  Calendar,
+  ArrowLeft,
+  ArrowRight,
+} from "@element-plus/icons-vue";
 import { useSearchStore } from "../stores/searchStore";
+import axios from "axios";
+const loading = ref(false);
 const searchStore = useSearchStore();
 const isOpen = ref(false);
 const gadi = ref(searchStore.gadi);
-const gave = ref(searchStore.gave);
+const gaden = ref(searchStore.gaden);
 const departureDate = ref(searchStore.departureDate);
 const returnDate = ref(searchStore.returnDate);
 const totalTickets = ref(searchStore.totalTickets);
 const searchgadi = ref(null);
-const searchgave = ref(null);
+const searchgaden = ref(null);
 const selectedDay = ref(null);
+const trainSchedules = ref([]);
 const searchPerformed = ref(false);
-const selectedTicket = ref("one-way");
+const selectedTicket = ref(searchStore.selectedTicket);
 const availableDays = ref([]);
 const currentPage = ref(0);
-const stations = ref([
-  "Hà Nội",
-  "Vinh",
-  "Huế",
-  "Sài Gòn",
-  "Nha Trang",
-  "Đà Nẵng",
-]);
+const stations = ref([]);
 
 const ticketCategories = ref([
   {
@@ -263,6 +187,28 @@ const ticketCategories = ref([
     discount: 25,
   },
 ]);
+const onDaySelected = async (newSelectedDay) => {
+  // Cập nhật ngày đi dựa trên ngày được chọn
+  departureDate.value = new Date(newSelectedDay);
+
+  // Cập nhật ngày đã chọn
+  selectedDay.value = newSelectedDay;
+
+  // Gọi lại hàm searchTickets để tìm kiếm lại vé
+  await searchTickets();
+};
+const fetchStations = async () => {
+  try {
+    const response = await axios.get("/ga");
+    if (response.data.success) {
+      stations.value = response.data.data; // Gán dữ liệu từ API vào stations
+    }
+  } catch (error) {
+    console.error("Có lỗi xảy ra khi tải dữ liệu ga:", error);
+  }
+};
+
+onMounted(fetchStations);
 
 const ticketDetails = computed(() => searchStore.searchData.ticketDetails);
 
@@ -286,15 +232,11 @@ const updateTicketDataInStore = () => {
     ...searchStore.searchData,
     ticketDetails: updatedDetails,
   });
-  console.log("Updated ticketDetails in Pinia:", searchStore.searchData.ticketDetails);
+  console.log(
+    "Updated ticketDetails in Pinia:",
+    searchStore.searchData.ticketDetails
+  );
 };
-
-onMounted(() => {
-  if (gadi.value && gave.value && departureDate.value) {
-    searchTickets();
-    syncTicketCounts();
-  }
-});
 
 const toggleDropdown = () => {
   isOpen.value = !isOpen.value;
@@ -304,9 +246,11 @@ const increment = (id) => {
   const category = ticketCategories.value.find((item) => item.id === id);
   // Nếu là "child" và không có vé "adult", ngăn không cho tăng
   if (id === "child") {
-    const adultCategory = ticketCategories.value.find((item) => item.id === "adult");
+    const adultCategory = ticketCategories.value.find(
+      (item) => item.id === "adult"
+    );
     if (adultCategory.count === 0) {
-      ElNotification .error("Trẻ em phải đi cùng với người lớn");
+      ElNotification.error("Trẻ em phải đi cùng với người lớn");
       return;
     }
   }
@@ -321,9 +265,11 @@ const decrement = (id) => {
   const category = ticketCategories.value.find((item) => item.id === id);
   // Nếu là "adult" và số lượng "child" > 0, không cho phép giảm "adult" về 0
   if (id === "adult") {
-    const childCategory = ticketCategories.value.find((item) => item.id === "child");
+    const childCategory = ticketCategories.value.find(
+      (item) => item.id === "child"
+    );
     if (category.count === 1 && childCategory.count > 0) {
-      ElNotification .error("Trẻ em phải đi cùng với người lớn");
+      ElNotification.error("Trẻ em phải đi cùng với người lớn");
       return;
     }
   }
@@ -341,10 +287,16 @@ const calculateTotal = () => {
   );
 };
 
-const generateAvailableDays = (startDate) => {
+const formatDateToYMD = (date) => {
+  const d = new Date(date);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const generateAvailableDays = (centerDate) => {
   const days = [];
-  const start = new Date(startDate);
-  const endDate = new Date(start);
   const weekdays = [
     "Chủ nhật",
     "Thứ hai",
@@ -354,30 +306,37 @@ const generateAvailableDays = (startDate) => {
     "Thứ sáu",
     "Thứ bảy",
   ];
-  endDate.setMonth(start.getMonth() + 1);
+  const start = new Date(centerDate);
+  const end = new Date(centerDate);
+  // Lùi lại 15 ngày
+  start.setDate(start.getDate() - 15);
+  // Tiến thêm 15 ngày
+  end.setDate(end.getDate() + 15);
 
-  while (start < endDate) {
-    const formattedDate = start.toLocaleDateString("vi-VN").replace(/\//g, "-");
+  while (start <= end) {
+    const formattedDate = formatDateToYMD(start);
     days.push({
       date: formattedDate,
       weekday: weekdays[start.getDay()],
     });
     start.setDate(start.getDate() + 1);
   }
+
   return days;
 };
 
 const onDepartureDateChange = (date) => {
   departureDate.value = date;
-
   // Kiểm tra nếu ngày về không hợp lệ
   if (returnDate.value && !isValidReturnDate(date, returnDate.value)) {
     ElMessage.error("Ngày đi không được lớn hơn hoặc bằng ngày về.");
     returnDate.value = null; // Reset ngày về
   }
-
-  // Cập nhật danh sách ngày có sẵn
+  // Cập nhật danh sách ngày xung quanh ngày được chọn
   availableDays.value = generateAvailableDays(departureDate.value);
+  // Đặt currentPage sao cho ngày được chọn nằm ở giữa
+  const selectedIndex = availableDays.value.findIndex((day) => day.date === formatDateToYMD(date));
+  currentPage.value = Math.max(0, selectedIndex - 3);
 };
 
 // Quản lý danh sách ngày hiển thị
@@ -411,64 +370,83 @@ const prevday = () => {
   }
 };
 
-const searchTickets = () => {
-  if (gadi.value && gave.value && departureDate.value) {
-    searchgadi.value = gadi.value;
-    searchgave.value = gave.value;
-    searchPerformed.value = true;
+const searchTickets = async () => {
+  try {
+    loading.value = true;
+    await new Promise((resolve) => setTimeout(resolve, 500)); // Giả lập thời gian tải
 
-    if (selectedTicket.value === "one-way" && departureDate.value) {
-      availableDays.value = generateAvailableDays(departureDate.value);
-    } else if (
-      selectedTicket.value === "round-trip" &&
-      departureDate.value &&
-      returnDate.value
-    ) {
-      availableDays.value = generateAvailableDays(departureDate.value);
-    } else if (!returnDate.value) {
-      searchPerformed.value = false;
-      ElMessage.error("Vui lòng chọn ngày về.");
-    }
+    if (gadi.value && gaden.value && departureDate.value  ) {
+      // Cập nhật giá trị ga đi và ga đến
+      searchgadi.value = gadi.value;
+      searchgaden.value = gaden.value;
+      searchPerformed.value = true;
 
-    if (availableDays.value.length > 0) {
-      selectedDay.value = availableDays.value[0].date; // Chọn ngày đầu tiên trong danh sách
+      // Kiểm tra loại vé
+      if (selectedTicket.value === "one-way" && departureDate.value) {
+        // Sinh danh sách các ngày có sẵn cho vé một chiều
+        availableDays.value = generateAvailableDays(departureDate.value);
+      } else if (
+        selectedTicket.value === "round-trip" &&
+        departureDate.value &&
+        returnDate.value
+      ) {
+        // Sinh danh sách các ngày có sẵn cho vé khứ hồi
+        availableDays.value = generateAvailableDays(departureDate.value);
+      } else if (!returnDate.value) {
+        // Thông báo nếu không chọn ngày về cho vé khứ hồi
+        searchPerformed.value = false;
+        ElMessage.error("Vui lòng chọn ngày về.");
+        loading.value = false;
+        return;
+      }
+
+      if (availableDays.value.length > 0) {
+        selectedDay.value = availableDays.value[15].date;
+      }
+      const response = await axios.get("/lichtrinh", {
+        params: {
+          gadi: gadi.value,
+          gaden: gaden.value,
+          ngaydi: formatDateToYMD(departureDate.value),
+        },
+      });
+      if (response.data.success && response.data.data.length > 0) {
+        trainSchedules.value = response.data.data; // Lưu danh sách lịch trình vào biến trainSchedules
+      } else {
+        ElMessage.error("Không tìm thấy chuyến tàu.");
+        trainSchedules.value = [];
+      }
+    } else {
+      // Kiểm tra xem có thiếu thông tin nào không
+      if (!gadi.value) {
+        ElMessage.error("Vui lòng chọn ga đi.");
+      } else if (!gaden.value) {
+        ElMessage.error("Vui lòng chọn ga đến.");
+      } else if (!departureDate.value) {
+        ElMessage.error("Vui lòng chọn ngày đi.");
+      }
     }
-    console.log(selectedDay.value);
-  } else {
-    if (!gadi.value) {
-      ElMessage.error("Vui lòng chọn ga đi.");
-    } else if (!gave.value) {
-      ElMessage.error("Vui lòng chọn ga đến.");
-    } else if (!departureDate.value) {
-      ElMessage.error("Vui lòng chọn ngày đi.");
-    }
+  } catch (error) {
+    console.error("Lỗi khi tìm kiếm vé:", error);
+    ElMessage.error("Đã xảy ra lỗi khi tìm kiếm vé.");
+  } finally {
+    loading.value = false;
   }
 };
+onMounted(() => {
+  if (gadi.value && gaden.value && formatDateToYMD(departureDate.value)) {
+    searchTickets();
+    syncTicketCounts();
+  }
+});
 
 const swapStations = () => {
   const temp = gadi.value;
-  gadi.value = gave.value;
-  gave.value = temp;
+  gadi.value = gaden.value;
+  gaden.value = temp;
 };
 </script>
 
 <style scoped>
-.day-card {
-  text-align: center;
-  cursor: pointer;
-}
-
-.day-card.selected {
-  color: #409eff;
-  border-bottom: 2px solid #409eff;
-}
-.text-center {
-  text-align: center;
-}
-.text-center2 {
-  margin-left: 100px;
-}
-.text-center1 {
-  padding-top: 10px;
-}
+@import url(@/assets/css/eticket.css);
 </style>

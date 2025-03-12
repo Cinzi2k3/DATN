@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Home from '@/views/Home.vue';
 import Buyeticket from '@/views/Buyeticket.vue';
-import dn from '@/views/dn.vue';
-import dk from '@/views/dk.vue';
+import Signin from '@/views/Signin.vue';
+
 
 // Định nghĩa các route
 const routes = [
@@ -17,15 +17,10 @@ const routes = [
     component : Buyeticket
   },
   {
-    path: '/dn',
-    name: 'dn',
-    component: dn
+    path: '/Signin',
+    name: 'Signin',
+    component: Signin
   },
-  {
-    path: '/dk',
-    name: 'dk',
-    component: dk
-  }
 ];
 
 // Tạo instance router

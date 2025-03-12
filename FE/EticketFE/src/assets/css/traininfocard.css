@@ -50,7 +50,7 @@
   
   /* Thêm hiệu ứng hover cho giá */
   .ticket-price {
-    font-size: 30px;
+    font-size: 25px;
     color: #ff5722;
     transition: color 0.3s ease;
   }

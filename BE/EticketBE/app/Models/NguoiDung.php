@@ -8,13 +8,18 @@ use Illuminate\Database\Eloquent\Model;
 class NguoiDung extends Model
 {
     use HasFactory;
-    protected $primarykey = 'manguoidung';
+    protected $primaryKey = 'manguoidung';
     protected $table = 'nguoidung';
     protected $fillable = [
         'manguoidung',
-        'ten',
-        'email',
-        'matkhau',
+        'userid',
+        'diachi',
+        'ngaysinh',
         'sdt',
+        'gioitinh'
     ];
+    public function Ve()
+    {
+        return $this->hasMany(Ve::class, 'manguoidung');
+    }
 }

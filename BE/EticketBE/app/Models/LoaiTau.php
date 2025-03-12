@@ -8,10 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class LoaiTau extends Model
 {
     use HasFactory;
-    protected $primarykey = 'maloaitau';
+    protected $primaryKey = 'maloaitau';
     protected $table = 'loaitau';
     protected $fillable = [
         'maloaitau',
-        'tenloai',
+        'tenloaitau',
     ];
+    public function Tau(){
+        return $this ->hasMany(Tau::class,'maloaitau');
+    }
 }

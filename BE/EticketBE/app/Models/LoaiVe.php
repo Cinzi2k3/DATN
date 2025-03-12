@@ -8,10 +8,19 @@ use Illuminate\Database\Eloquent\Model;
 class LoaiVe extends Model
 {
     use HasFactory;
-    protected $primarykey = 'maloaive';
+    protected $primaryKey = 'maloaive';
     protected $table = 'loaive';
     protected $fillable = [
         'maloaive',
         'tenloaive',
     ];
+    public function Gia()
+{
+    return $this->hasMany(Gia::class, 'maloaive');
+}
+public function Ve()
+{
+    return $this->hasMany(Ve::class, 'maloaive');
+}
+
 }
