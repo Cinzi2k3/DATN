@@ -52,8 +52,8 @@
           <!-- Phần giá vé -->
           <el-col :span="6">
             <div class="price">
-              <el-button class="hover-button">
-                <h4>Đặt</h4>
+              <el-button class="hover-button" @click="openDialog">
+                <h4 >Đặt</h4>
               </el-button>
               <h2 class="ticket-price">{{ ticketPrice }}</h2>
             </div>
@@ -61,12 +61,35 @@
         </el-row>
       </div>
     </div>
+    <Boking 
+      v-model:visible="dialogVisible" 
+      @submit="handleSubmit" 
+      :trainCode="trainCode" 
+      :traintau="traintau"
+      :searchgadi="searchgadi"
+      :searchgaden="searchgaden"
+      :selectedDay="selectedDay"
+      :totalTickets="totalTickets"
+      :ticketDetails="ticketDetails"
+    />
   </div>
 </template>
 
 <script setup>
+import { ref } from "vue";
+import Boking from "@/components/Boking.vue";
 
-// Props
+const dialogVisible = ref(false);
+
+const openDialog = () => {
+  dialogVisible.value = true;
+};
+
+const handleSubmit = (formData) => {
+  console.log("Form Data Submitted:", formData);
+  // Xử lý thêm logic khi người dùng submit form
+};
+
 const props = defineProps({
   searchPerformed: Boolean,
   searchgadi: String,
@@ -80,6 +103,8 @@ const props = defineProps({
   arrivalTime: String,
   arrivalDate: String,
   ticketPrice: String,
+  totalTickets: Number,
+  ticketDetails: Array,
 });
 </script>
 

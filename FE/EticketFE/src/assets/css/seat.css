@@ -1,0 +1,249 @@
+.car-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.seat-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+}
+
+.seat-row {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+  margin-bottom: -20px;
+}
+.top-rows + .bottom-rows {
+  margin-top: 30px; /* Khoảng cách giữa hàng 2 và hàng 3 */
+}
+
+.seat-container {
+  position: relative;
+  width: 55px;
+  height: 65px;
+  cursor: pointer;
+}
+
+.seat {
+  width: 100%;
+  height: 80%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.2s;
+}
+
+/* Left backrest */
+.seat-backrest {
+  position: absolute;
+  left: 0; /* Changed from -5px to allow 30% overlap */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 7px;
+  height: 75%;
+  background-color: #f0f8ff;
+  border: 1px solid #c0d6e4;
+  border-radius: 5px;
+  z-index: 2; /* Added to ensure backrest appears above square */
+}
+
+/* Top armrest */
+.seat-top-armrest {
+  position: absolute;;
+  top: 2px;
+  left: 45%;
+  transform: translateX(-86%);
+  width: 40%;
+  height: 6.6px;
+  background-color: #f0f8ff;
+  border: 1px solid #c0d6e4;
+  border-radius: 3px;
+  z-index: 2; /* Added to ensure armrest appears above square */
+}
+
+/* Bottom armrest */
+.seat-bottom-armrest {
+  position: absolute;
+  bottom: 2px;
+  left: 45%;
+  transform: translateX(-85%);
+  width: 40%;
+  height: 7px;
+  background-color: #f0f8ff;
+  border: 1px solid #c0d6e4;
+  border-radius: 3px;
+  z-index: 2; /* Added to ensure armrest appears above square */
+}
+
+/* Main square seat */
+.seat-square {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  height: 80%;
+  background-color: #f0f8ff;
+  border: 1px solid #c0d6e4;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1; /* Added to ensure square is behind armrests and backrest */
+}
+
+.seat:hover:not(.unavailable) .seat-square,
+.seat:hover:not(.unavailable) .seat-backrest,
+.seat:hover:not(.unavailable) .seat-top-armrest,
+.seat:hover:not(.unavailable) .seat-bottom-armrest {
+  background-color: #e6f2ff;
+}
+
+/* Selected seat */
+.seat.selected .seat-square,
+.seat.selected .seat-backrest,
+.seat.selected .seat-top-armrest,
+.seat.selected .seat-bottom-armrest {
+  background-color: #4dabf7;
+  border-color: #339af0;
+}
+
+/* Unavailable seat */
+.seat.unavailable .seat-square,
+.seat.unavailable .seat-backrest,
+.seat.unavailable .seat-top-armrest,
+.seat.unavailable .seat-bottom-armrest {
+  background-color: #e9ecef;
+  border-color: #ced4da;
+  cursor: not-allowed;
+}
+
+.seat-number {
+  font-weight: bold;
+  font-size: 1rem;
+  color: #333;
+}
+
+.seat-price {
+  font-size: 0.7rem;
+  color: #666;
+}
+
+.seat.selected .seat-number,
+.seat.selected .seat-price {
+  color: white;
+}
+
+.seat.unavailable .seat-number,
+.seat.unavailable .seat-price {
+  color: #adb5bd;
+}
+
+/* Legend styling */
+.legend {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  gap: 20px;
+}
+
+.legend-item {
+  position: relative;
+  width: 30px;
+  height: 30px;
+}
+
+.legend-backrest {
+  position: absolute;
+  left: -1px; /* Changed from -3px to allow 30% overlap */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 70%;
+  background-color: #f0f8ff;
+  border: 1px solid #c0d6e4;
+  border-right: none;
+  border-radius: 2px 0 0 2px;
+  z-index: 2; /* Added to ensure backrest appears above square */
+}
+
+.legend-top {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 3px;
+  background-color: #f0f8ff;
+  border: 1px solid #c0d6e4;
+  border-bottom: none;
+  border-radius: 2px 2px 0 0;
+  z-index: 2; /* Added to ensure armrest appears above square */
+}
+
+.legend-square {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  height: 80%;
+  background-color: #f0f8ff;
+  border: 1px solid #c0d6e4;
+  border-radius: 3px;
+  z-index: 1; /* Added to ensure square is behind armrests and backrest */
+}
+
+.legend-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 3px;
+  background-color: #f0f8ff;
+  border: 1px solid #c0d6e4;
+  border-top: none;
+  border-radius: 0 0 2px 2px;
+  z-index: 2; /* Added to ensure armrest appears above square */
+}
+
+/* Legend variations */
+.legend-item.selected .legend-backrest,
+.legend-item.selected .legend-top,
+.legend-item.selected .legend-square,
+.legend-item.selected .legend-bottom {
+  background-color: #4dabf7;
+  border-color: #339af0;
+}
+
+.legend-item.unavailable .legend-backrest,
+.legend-item.unavailable .legend-top,
+.legend-item.unavailable .legend-square,
+.legend-item.unavailable .legend-bottom {
+  background-color: #e9ecef;
+  border-color: #ced4da;
+}
+
+.btn-primary {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+}
+
+.btn-primary:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+  

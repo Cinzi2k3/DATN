@@ -134,7 +134,9 @@
           :searchgadi="searchgadi" :searchgaden="searchgaden" :selectedDay="train.ngaydi" :traintau="train.tenloaitau"
           :trainCode="train.tentau" :availableSeats="train.sochocon" :departureTime="train.giodi"
           :duration="train.thoigiandichuyen" :arrivalTime="train.gioden" :arrivalDate="train.ngayden"
-          :ticketPrice="`${train.gia.toLocaleString()} VND`" />
+          :ticketPrice="`${train.gia.toLocaleString()} VND`"
+          :totalTickets="totalTickets"
+          :ticketDetails="ticketDetails" />
       </div>
     </div>
   </div>

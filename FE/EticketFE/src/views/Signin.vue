@@ -80,10 +80,8 @@ const name = ref("");
 const email = ref("");
 const password = ref("");
 const router = useRouter();
-const loading = ref(false); // Trạng thái tải
+const loading = ref(false); 
 
-
-//đăng kí
 const signup = async () => {
   loading.value = true;
   try {
@@ -98,7 +96,7 @@ const signup = async () => {
   } catch (error) {
     ElNotification.error("Có lỗi xảy ra trong quá trình đăng kí");
   } finally {
-    loading.value = false; // Kết thúc yêu cầu API
+    loading.value = false; 
   }
 };
 

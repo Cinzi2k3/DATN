@@ -1,0 +1,198 @@
+.car-container {
+    max-width: 900px; 
+    margin: 0 auto;
+  }
+  
+  .bed-grid {
+    border: 1px solid #e0e0e0;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+  }
+  
+  .compartment-label {
+    margin-right: 30px;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #3c4b64;
+    margin-bottom: 10px;
+  }
+  
+  .bed-row {
+    margin-bottom: 10px;
+  }
+  
+  .row-label {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #3c4b64;
+    text-align: right;
+    padding-right: 10px;
+  }
+  
+  .compartment {
+    display: flex;
+    align-items: center;
+    padding: 0 ;
+  }
+  
+  .bed-container {
+    position: relative;
+    width: 55px;
+    height: 65px;
+    cursor: pointer;
+  }
+  
+  /* Khoảng cách giữa 2 ghế trong cùng 1 khoang */
+  .compartment .bed-container + .bed-container {
+    margin-left: 10px; /* Khoảng cách 10px giữa 2 ghế trong khoang */
+  }
+  
+  /* Khoảng cách giữa các khoang */
+  .compartment + .compartment {
+    margin-left: 3px; /* Khoảng cách 5px giữa khoang này và khoang tiếp theo */
+  }
+  
+  .divider {
+    width: 3px;
+    height: 65px;
+    background-color: #c0d6e4;
+    margin: 0 12px; /* Căn giữa trong khoảng cách 5px giữa các khoang */
+  }
+  
+  .bed {
+    width: 100%;
+    height: 100%;
+    background-color: #f0f8ff;
+    border: 1px solid #c0d6e4;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s;
+    position: relative;
+    z-index:1
+  }
+  
+  .bed:before {
+    content: "";
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 10px;
+    background-color: #f0f8ff;
+    border: 1px solid #c0d6e4;
+    border-radius: 3px 3px 0 0;
+    z-index: 2;
+  }
+  
+  .bed:hover:not(.unavailable) {
+    background-color: #e6f2ff;
+    transform: translateY(-2px);
+  }
+  
+  .bed.selected {
+    background-color: #4dabf7;
+    color: white;
+    border-color: #339af0;
+  }
+  
+  .bed.selected:before {
+    background-color: #4dabf7;
+    border-color: #339af0;
+  }
+  
+  .bed.unavailable {
+    background-color: #e9ecef;
+    border-color: #ced4da;
+    color: #adb5bd;
+    cursor: not-allowed;
+  }
+  
+  .bed.unavailable:before {
+    background-color: #e9ecef;
+    border-color: #ced4da;
+  }
+  
+  .bed-number {
+    font-weight: bold;
+    font-size: 1.1rem;
+  }
+  
+  .bed-price {
+    font-size: 0.7rem;
+    color: #666;
+  }
+  
+  .bed.selected .bed-price {
+    color: #e6f2ff;
+  }
+  
+  .legend {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+
+  .beds {
+    width: 60%;
+    height: 100%;
+    background-color: #f0f8ff;
+    border: 1px solid #c0d6e4;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s;
+    position: relative;
+    z-index:1
+  }
+  
+  .beds:before {
+    content: "";
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 10px;
+    background-color: #f0f8ff;
+    border: 1px solid #c0d6e4;
+    border-radius: 3px 3px 0 0;
+    z-index: 2;
+  }
+  
+  .beds.available {
+    background-color: #f0f8ff;
+  }
+  
+  .beds.selected {
+    background-color: #4dabf7;
+    border-color: #339af0;
+    width: 40%;
+  }
+  .beds.selected:before {
+    background-color: #4dabf7;
+    border-color: #339af0;
+  }
+  
+  .beds.unavailable {
+    background-color: #e9ecef;
+  }
+  .beds.unavailable:before {
+    background-color: #e9ecef;
+  }
+  .col-2{
+    padding-right: 2%;
+    font-size: 17px;
+  }
+  .col{
+    font-size: 17px;
+  }

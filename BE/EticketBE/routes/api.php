@@ -34,7 +34,10 @@ Route::get('/user', [UserController::class, 'getUserByEmail']);
 Route::apiResource('loaitoa', LoaiToaController::class);
 
 //Toa
-Route::apiResource('toa', ToaController::class);
+Route::get('/toa', [ToaController::class, 'index']); // Route để lấy danh sách toa
+Route::get('/chotoa', [ToaController::class, 'chotoa']);
+Route::get('/cho/{matoa}', [ToaController::class, 'getSeatsByToa']);
+
 
 //Loại Chỗ
 Route::apiResource('loaicho', LoaiChoController::class);
