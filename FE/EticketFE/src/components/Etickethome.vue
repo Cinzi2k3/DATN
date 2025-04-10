@@ -52,7 +52,7 @@
               <i class="fa-solid fa-user me-2"></i>
               <div class="d-flex flex-column align-items-start">
                 <span>Số lượng vé</span>
-                <span>{{ totalTickets }} vé</span>
+                <span>{{ tempTotalTickets }} vé</span>
               </div>
             </div>
           </button>
@@ -140,96 +140,23 @@ import { Refresh, Calendar } from "@element-plus/icons-vue";
 import { useRouter } from "vue-router";
 import { useSearchStore } from "@/stores/searchStore.js";
 import axios from "axios";
+import { useSwapStations } from "@/composables/useSwapStations";
+import { useDown } from "@/composables/useDown";
+import { useFetchStations } from "@/composables/useFetchStations";
+import { useTicketManagement } from "../composables/useTicketManagement";
 
 const loading = ref(false);
 const router = useRouter();
 const searchStore = useSearchStore();
-const isOpen = ref(false);
 const gadi = ref("");
 const gaden = ref("");
 const departureDate = ref("");  
 const returnDate = ref("");
 const selectedTicket = ref("one-way");
-const stations = ref([]);
-
-const ticketCategories = ref([
-  {
-    id: "adult",
-    label: "Người lớn",
-    description: "Từ 11 - 59 tuổi",
-    count: 1,
-    discount: null,
-  },
-  {
-    id: "child",
-    label: "Trẻ em",
-    description: "6 - 10 tuổi",
-    count: 0,
-    discount: 25,
-  },
-]);
-
-const totalTickets = ref(1);
-
-const fetchStations = async () => {
-  try {
-    const response = await axios.get("/ga");
-    if (response.data.success) {
-      stations.value = response.data.data;
-    }
-  } catch (error) {
-    console.error("Có lỗi xảy ra khi tải dữ liệu ga:", error);
-  }
-};
-
-onMounted(fetchStations);
-
-// Logic dropdown số lượng vé
-const toggleDropdown = () => {
-  isOpen.value = !isOpen.value;
-};
-
-const increment = (id) => {
-  const category = ticketCategories.value.find((item) => item.id === id);
-  if (id === "child") {
-    const adultCategory = ticketCategories.value.find(
-      (item) => item.id === "adult"
-    );
-    if (adultCategory.count === 0) {
-      ElNotification.error("Trẻ em phải đi cùng với người lớn");
-      return;
-    }
-  }
-  if (category) {
-    category.count++;
-    calculateTotal();
-  }
-};
-
-const decrement = (id) => {
-  const category = ticketCategories.value.find((item) => item.id === id);
-  if (id === "adult") {
-    const childCategory = ticketCategories.value.find(
-      (item) => item.id === "child"
-    );
-    if (category.count === 1 && childCategory.count > 0) {
-      ElNotification.error("Trẻ em phải đi cùng với người lớn");
-      return;
-    }
-  }
-  if (category && category.count > 0) {
-    category.count--;
-    calculateTotal();
-  }
-};
-
-
-const calculateTotal = () => {
-  totalTickets.value = ticketCategories.value.reduce(
-    (sum, category) => sum + category.count,
-    0
-  );
-};
+const {swapStations} = useSwapStations(gadi, gaden)
+const { isOpen, toggleDropdown } = useDown();
+const {fetchStations, stations} = useFetchStations();
+const { ticketCategories, totalTickets,tempTotalTickets, increment, decrement, calculateTempTotal,updateTicketDataInStore } = useTicketManagement();
 
 const onDepartureDateChange = (date) => {
   departureDate.value = date;
@@ -259,6 +186,7 @@ const searchTickets = async () => {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     if (gadi.value && gaden.value && departureDate.value) {
+      totalTickets.value = tempTotalTickets.value;
       // Chuẩn bị dữ liệu tìm kiếm
       const ticketDetails = ticketCategories.value.map((category) => ({
         type: category.label,
@@ -292,12 +220,8 @@ const searchTickets = async () => {
   }
 };
 
+onMounted(fetchStations);
 
-const swapStations = () => {
-    const temp = gadi.value;
-    gadi.value = gaden.value;
-    gaden.value = temp;
-};
 </script>
 
 <style scoped>

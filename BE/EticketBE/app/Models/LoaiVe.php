@@ -13,6 +13,7 @@ class LoaiVe extends Model
     protected $fillable = [
         'maloaive',
         'tenloaive',
+        'hesogia'
     ];
     public function Gia()
 {

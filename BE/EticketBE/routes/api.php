@@ -20,6 +20,7 @@ use App\Http\Controllers\NguoiDungController;
 use App\Http\Controllers\GiaController;
 use App\Http\Controllers\DonHangController;
 use App\Http\Controllers\ThanhToanController;
+use App\Http\Controllers\DatVeController;
 
 //Đăng nhập, đăng kí
 Route::post('/login', [AuthController::class, 'login']);
@@ -36,7 +37,6 @@ Route::apiResource('loaitoa', LoaiToaController::class);
 //Toa
 Route::get('/toa', [ToaController::class, 'index']); // Route để lấy danh sách toa
 Route::get('/chotoa', [ToaController::class, 'chotoa']);
-Route::get('/cho/{matoa}', [ToaController::class, 'getSeatsByToa']);
 
 
 //Loại Chỗ
@@ -80,3 +80,6 @@ Route::apiResource('donhang', DonHangController::class);
 
 //Thanh toán
 Route::apiResource('thanhtoan', ThanhToanController::class);
+
+//Đặt vé
+Route::get('/datve', [DatVeController::class, 'DatVe']);

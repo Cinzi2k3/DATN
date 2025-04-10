@@ -22,14 +22,14 @@
           <div v-for="compartment in numCompartments" :key="`compartment-${tier}-${compartment}`" class="col compartment d-flex align-items-center">
             <div 
               v-for="bed in getBedsForCompartment(rows + 1 - tier, compartment)" 
-              :key="`bed-${bed.macho}`" 
+              :key="`bed-${bed.sohieu}`" 
               class="bed-container"
-              @click="toggleBedSelection(bed.macho)"
+              @click="toggleBedSelection(bed.sohieu)"
             >
               <div 
                 class="bed" 
                 :class="{ 
-                  'selected': isBedSelected(bed.macho),
+                  'selected': isBedSelected(bed.sohieu),
                   'unavailable': bed.trangthai === 'Đã đặt'
                 }"
               >
@@ -43,11 +43,11 @@
       </div>
     </div>
 
-    <div v-if="seats && seats.length > 0" class="mt-4 text-center">
-      <p>Số ghế đã chọn: {{ selectedSeats.length }} / {{ totalTickets }}</p>
+    <div v-if="beds && beds.length > 0" class="mt-4 text-center">
+      <p>Số giường đã chọn: {{ totalSelected }} / {{ totalTickets }}</p>
       <button
         class="btn btn-primary" 
-        :disabled="selectedSeats.length === 0 || selectedSeats.length > totalTickets"
+        :disabled="totalSelected === 0 || totalSelected > totalTickets"
         @click="bookTickets"
       >
         Đặt vé
@@ -72,55 +72,66 @@
 </template>
 
 <script setup>
-import { ref, defineProps, computed } from 'vue';
+import { ElNotification } from 'element-plus';
+import { defineProps, computed, defineEmits } from 'vue';
 
 const props = defineProps({
   car: Object,
-  beds: Array, // Danh sách giường từ API với tang và khoang
-  totalTickets:{
-    type: Number,
-    default: 1
-  }
+  beds: Array,
+  totalTickets: { type: Number, default: 1 },
+  selectedBeds: { type: Array, default: () => [] },
+  totalSelected: Number,
+  ticketDetails: Array,
 });
 
-const selectedBeds = ref([]);
+const emit = defineEmits(['update:selected-beds', 'book']);
 
-// Số tầng cố định
 const rows = 2;
 
-// Tính số khoang tối đa từ dữ liệu
 const numCompartments = computed(() => {
   if (!props.beds || props.beds.length === 0) return 0;
-  return Math.max(...props.beds.map(bed => parseInt(bed.khoang))); // Lấy số khoang lớn nhất
+  return Math.max(...props.beds.map(bed => parseInt(bed.khoang) || 0));
 });
 
-// Lấy danh sách giường cho từng tầng và khoang
 const getBedsForCompartment = (tang, khoang) => {
-  return props.beds
+  return (props.beds || [])
     .filter(bed => parseInt(bed.tang) === tang && parseInt(bed.khoang) === khoang)
-    .sort((a, b) => a.sohieu.localeCompare(b.sohieu)); // Sắp xếp theo sohieu nếu cần
+    .sort((a, b) => a.sohieu.localeCompare(b.sohieu));
 };
 
-// Kiểm tra giường có được chọn không
-const isBedSelected = (macho) => {
-  return selectedBeds.value.includes(macho);
+const isBedSelected = (bedNumber) => {
+  return props.selectedBeds.includes(bedNumber);
 };
 
-// Chọn/bỏ chọn giường
-const toggleBedSelection = (macho) => {
-  const bed = props.beds.find(b => b.macho === macho);
+const toggleBedSelection = (bedNumber) => {
+  const bed = props.beds?.find(b => b.sohieu === bedNumber);
   if (!bed || bed.trangthai === 'Đã đặt') return;
-  
-  const index = selectedBeds.value.indexOf(macho);
+
+  const newSelectedBeds = [...props.selectedBeds];
+  const index = newSelectedBeds.indexOf(bedNumber);
+
   if (index === -1) {
-    selectedBeds.value.push(macho);
+    if (props.totalSelected < props.totalTickets) {
+      newSelectedBeds.push(bedNumber);
+    } else {
+      ElNotification.error(`Bạn chỉ có thể chọn tối đa ${props.totalTickets} giường trên toàn tàu!`);
+      return;
+    }
   } else {
-    selectedBeds.value.splice(index, 1);
+    newSelectedBeds.splice(index, 1);
+  }
+
+  emit('update:selected-beds', newSelectedBeds);
+};
+
+const bookTickets = () => {
+  if (props.selectedBeds.length > 0) {
+    emit('book', { carType: props.car.type, beds: props.selectedBeds }); // Truyền tên toa và danh sách giường
+    ElNotification.success('Đặt vé thành công!');
   }
 };
 </script>
 
 <style scoped>
 @import url(@/assets/css/bed.css);
-
 </style>

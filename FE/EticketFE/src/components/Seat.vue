@@ -8,12 +8,10 @@
       <p>Không có ghế nào trong toa này.</p>
     </div>
     <div v-else class="seat-grid">
-      <!-- Tạo 4 hàng cố định -->
       <div v-for="row in rows" :key="`row-${row}`" class="seat-row" :class="{'top-rows': row <= 2, 'bottom-rows': row > 2}">
-        <!-- Lặp qua danh sách ghế đã được lọc theo hàng -->
         <div 
           v-for="seat in getSeatsForRow(row)" 
-          :key="`seat-${seat.macho}`" 
+          :key="`seat-${seat.sohieu}`" 
           class="seat-container"
           @click="toggleSeatSelection(seat.sohieu)"
         >
@@ -21,14 +19,14 @@
             class="seat" 
             :class="{ 
               'selected': isSeatSelected(seat.sohieu),
-              'unavailable': seat.trangthai === 'Đã đặt'
+              'unavailable': seat.trangthai === 'dadat'
             }"
           >
             <div class="seat-backrest"></div>
             <div class="seat-top-armrest"></div>
             <div class="seat-square">
               <div class="seat-number">{{ seat.sohieu }}</div>
-              <div v-if="seat.trangthai === 'Trống'" class="seat-price">{{ seat.gia || '372k' }}</div>
+              <div v-if="seat.trangthai === 'controng'" class="seat-price">{{ seat.gia || '372k' }}</div>
             </div>
             <div class="seat-bottom-armrest"></div>
           </div>
@@ -36,12 +34,11 @@
       </div>
     </div>
 
-    <!-- Hiển thị số ghế đã chọn và nút đặt vé -->
     <div v-if="seats && seats.length > 0" class="mt-4 text-center">
-      <p>Số ghế đã chọn: {{ selectedSeats.length }} / {{ totalTickets }}</p>
+      <p>Số ghế đã chọn: {{ totalSelected }} / {{ totalTickets }}</p>
       <button
         class="btn btn-primary" 
-        :disabled="selectedSeats.length === 0 || selectedSeats.length > totalTickets"
+        :disabled="totalSelected === 0 || totalSelected > totalTickets"
         @click="bookTickets"
       >
         Đặt vé
@@ -81,70 +78,58 @@
 </template>
 
 <script setup>
-import { ElMessage, ElNotification } from 'element-plus';
-import { ref, defineProps, computed, defineEmits } from 'vue';
+import { ElNotification } from 'element-plus';
+import { defineProps, computed, defineEmits } from 'vue';
 
 const props = defineProps({
   car: Object,
-  seats: Array, // Danh sách ghế từ API
-  totalTickets: { // Thêm lại prop totalTickets
-    type: Number,
-    default: 1,
-  },
+  seats: Array,
+  totalTickets: { type: Number, default: 1 },
+  selectedSeats: { type: Array, default: () => [] },
+  totalSelected: Number,
+  ticketDetails: Array,
 });
 
-const emit = defineEmits(['book']); // Định nghĩa emit cho sự kiện đặt vé
-const selectedSeats = ref([]); // Danh sách ghế được chọn
+const emit = defineEmits(['update:selected-seats', 'book']);
 
-// Số hàng cố định
 const rows = 4;
+const columns = computed(() => Math.ceil((props.seats?.length || 0) / rows));
+const seatsPerRow = computed(() => columns.value);
 
-// Tính số cột động dựa trên số lượng ghế
-const columns = computed(() => {
-  return Math.ceil(props.seats.length / rows);
-});
-
-// Tính số ghế trên mỗi hàng
-const seatsPerRow = computed(() => {
-  return columns.value;
-});
-
-// Lấy danh sách ghế cho từng hàng
 const getSeatsForRow = (row) => {
   const startIndex = (row - 1) * seatsPerRow.value;
   const endIndex = startIndex + seatsPerRow.value;
-  return props.seats.filter((seat, index) => {
-    return index >= startIndex && index < endIndex;
-  });
+  return (props.seats || []).filter((_, index) => index >= startIndex && index < endIndex);
 };
 
-// Kiểm tra ghế có được chọn không
 const isSeatSelected = (seatNumber) => {
-  return selectedSeats.value.includes(seatNumber);
+  return props.selectedSeats.includes(seatNumber);
 };
 
-// Chọn/bỏ chọn ghế với giới hạn số lượng
 const toggleSeatSelection = (seatNumber) => {
-    console.log("Selected seats:", selectedSeats.value);
-    const seat = props.seats.find(s => s.sohieu === seatNumber);
-  if (!seat || seat.trangthai === 'Đã đặt') return;
+  const seat = props.seats?.find(s => s.sohieu === seatNumber);
+  if (!seat || seat.trangthai === 'dadat') return;
 
-  const index = selectedSeats.value.indexOf(seatNumber);
+  const newSelectedSeats = [...props.selectedSeats];
+  const index = newSelectedSeats.indexOf(seatNumber);
+
   if (index === -1) {
-    if (selectedSeats.value.length < props.totalTickets) {
-      selectedSeats.value.push(seatNumber);
+    if (props.totalSelected < props.totalTickets) {
+      newSelectedSeats.push(seatNumber);
     } else {
-      ElNotification.error(`Bạn chỉ có thể chọn tối đa ${props.totalTickets} ghế!`);
+      ElNotification.error(`Bạn chỉ có thể chọn tối đa ${props.totalTickets} ghế trên toàn tàu!`);
+      return;
     }
   } else {
-    selectedSeats.value.splice(index, 1);
+    newSelectedSeats.splice(index, 1);
   }
+
+  emit('update:selected-seats', newSelectedSeats);
 };
 
-// Xử lý đặt vé
 const bookTickets = () => {
-  if (selectedSeats.value.length > 0) {
-    emit('book', selectedSeats.value); // Emit danh sách ghế đã chọn lên cha
+  if (props.selectedSeats.length > 0) {
+    emit('book', { carType: props.car.type, seats: props.selectedSeats }); // Truyền tên toa và danh sách ghế
     ElNotification.success('Đặt vé thành công!');
   }
 };

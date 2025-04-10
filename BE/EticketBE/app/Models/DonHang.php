@@ -13,10 +13,9 @@ class DonHang extends Model
     protected $fillable = [
         'madonhang',
         'manguoidung',
-        'mave',
         'ngaydat',
-        'soluongve',
-        'phuongthuc',
+        'tongtien',
+        'trangthai',
     ];
     public function NguoiDung(){
         return $this -> belongsTo(NguoiDung::class,'manguoidung');

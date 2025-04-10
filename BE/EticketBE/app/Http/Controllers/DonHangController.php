@@ -13,7 +13,6 @@ class DonHangController extends Controller
     public function index()
     {
         $donHangs = DonHang::with(['NguoiDung', 'Ve'])->get(); // Lấy tất cả đơn hàng với các quan hệ liên quan
-
         return response()->json([
             'success' => true,
             'data' => $donHangs

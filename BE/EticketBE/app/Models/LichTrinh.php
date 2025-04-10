@@ -29,6 +29,10 @@ public function Gia()
 {
     return $this->hasOne(Gia::class, 'malichtrinh');
 }
+public function DatVe()
+{
+    return $this->hasOne(DatVe::class, 'malichtrinh');
+}
 protected $casts = [
     'thoigiandi' => 'datetime',
     'thoigianden' => 'datetime',

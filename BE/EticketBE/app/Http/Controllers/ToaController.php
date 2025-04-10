@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Toa;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
 
 class ToaController extends Controller
 {
@@ -48,8 +50,13 @@ class ToaController extends Controller
 public function chotoa(Request $request): JsonResponse
 {
     $trainCode = $request->query('trainCode');
-    $query = Toa::with(['loaitoa', 'tau', 'cho']);  // Đảm bảo đã bao gồm quan hệ với ghế `cho`
+    $malichtrinh = $request->query('malichtrinh'); // Lấy mã lịch trình
+    \Log::info('malichtrinh received:', ['malichtrinh' => $malichtrinh]);
 
+    // Truy vấn các toa, bao gồm cả quan hệ với loaitoa, tau và cho (ghế)
+    $query = Toa::with(['loaitoa', 'tau', 'cho']);
+
+    // Lọc theo mã tàu nếu có
     if ($trainCode) {
         $query->whereHas('tau', function ($q) use ($trainCode) {
             $q->where('tentau', $trainCode);
@@ -58,6 +65,7 @@ public function chotoa(Request $request): JsonResponse
 
     $toa = $query->get();
 
+    // Nếu không tìm thấy toa, trả về thông báo lỗi
     if ($toa->isEmpty()) {
         return response()->json([
             'success' => false,
@@ -65,13 +73,25 @@ public function chotoa(Request $request): JsonResponse
         ], 404);
     }
 
+    // Lấy danh sách ghế đã đặt từ bảng `datve` cho mã lịch trình (malichtrinh)
+    $gheDaDat = DB::table('datve')
+        ->where('malichtrinh', $malichtrinh)
+        ->pluck('macho') // Lấy danh sách mã ghế đã đặt
+        ->toArray();
+        
+
+    // Trả về dữ liệu theo định dạng yêu cầu
     return response()->json([
         'success' => true,
-        'data' => $toa->map(function ($toa) {
-            // Tính toán số ghế trống, ghế đã đặt
+        'data' => $toa->map(function ($toa) use ($gheDaDat) {
+            // Tính toán số ghế trống và ghế đã đặt
             $socho = $toa->cho->count();
-            $sochocon = $toa->cho->whereIn('trangthai', ['Trống', 0])->count();
-            $sochodadat = $toa->cho->whereNotIn('trangthai', ['Trống', 0])->count();
+            $sochocon = $toa->cho->whereNotIn('macho', $gheDaDat)->count(); // Ghế trống (chưa đặt)
+            $sochodadat = $toa->cho->whereIn('macho', $gheDaDat)->count(); // Ghế đã đặt
+
+            $toa->update([
+                'socho' => $socho,
+            ]);
 
             return [
                 'matoa' => $toa->matoa,
@@ -82,11 +102,14 @@ public function chotoa(Request $request): JsonResponse
                 'socho' => $socho,  // Tổng số ghế
                 'sochocon' => $sochocon,  // Số ghế trống
                 'sochodadat' => $sochodadat,  // Số ghế đã đặt
-                'cho' => $toa->cho->map(function ($seat) {
+                'cho' => $toa->cho->map(function ($seat) use ($gheDaDat) {
+                    // Kiểm tra trạng thái ghế từ bảng `datve`
+                    $trangthai = in_array($seat->macho, $gheDaDat) ? 'dadat' : 'controng';
+
                     return [
                         'macho' => $seat->macho,
                         'sohieu' => $seat->sohieu,
-                        'trangthai' => $seat->trangthai,
+                        'trangthai' => $trangthai,  // Trạng thái ghế
                         'tang' => $seat->tang,
                         'khoang' => $seat->khoang,
                     ];
@@ -96,124 +119,4 @@ public function chotoa(Request $request): JsonResponse
     ], 200);
 }
 
-
-public function getSeatsByToa($matoa): JsonResponse
-{
-    $cho = \App\Models\Cho::where('matoa', $matoa)->get();
-
-    if ($cho->isEmpty()) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Không tìm thấy ghế nào!'
-        ], 404);
-    }
-
-    return response()->json([
-        'success' => true,
-        'data' => $cho->map(function ($seat) {
-            return [
-                'macho' => $seat->macho,
-                'sohieu' => $seat->sohieu,
-                'trangthai' => $seat->trangthai,
-                'tang' => $seat->tang,
-                'khoang' => $seat->khoang,
-            ];
-        }),
-    ], 200);
-}
-
-
-
-
-
-    // Lấy thông tin toa cụ thể theo mã toa (matoa)
-    public function show($id): JsonResponse
-    {
-        $toa = Toa::find($id);
-
-        if (!$toa) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Không tìm thấy toa!'
-            ], 404);
-        }
-
-        return response()->json([
-            'success' => true,
-            'data' => $toa
-        ], 200);
-    }
-
-    // Thêm toa mới
-    public function store(Request $request): JsonResponse
-    {
-        $validated = $request->validate([
-            'matoa' => 'required|integer|unique:toa,matoa',
-            'maloaitoa' => 'required|integer|exists:loaitoa,maloaitoa',
-            'tentoa' => 'required|string|max:255',
-            'sotang' => 'required|integer|min:1',
-            'socho' => 'required|integer|min:1',
-            'sochocon' => 'required|integer|min:1',
-            'sochodadat' => 'required|integer|min:1',
-        ]);
-
-        $toa = Toa::create($validated);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Thêm toa thành công!',
-            'data' => $toa
-        ], 201);
-    }
-
-    // Cập nhật thông tin toa
-    public function update(Request $request, $id): JsonResponse
-    {
-        $toa = Toa::find($id);
-
-        if (!$toa) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Không tìm thấy toa!'
-            ], 404);
-        }
-
-        $validated = $request->validate([
-            'maloaitoa' => 'required|integer|exists:loaitoa,maloaitoa',
-            'tentoa' => 'required|string|max:255',
-            'sotang' => 'sometimes|required|integer|min:1',
-            'socho' => 'sometimes|required|integer|min:1',
-            'sochocon' => 'sometimes|required|integer|min:1',
-            'sochodadat' => 'sometimes|required|integer|min:1',
-            
-        ]);
-
-        $toa->update($validated);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Cập nhật toa thành công!',
-            'data' => $toa
-        ], 200);
-    }
-
-    // Xóa toa
-    public function destroy($id): JsonResponse
-    {
-        $toa = Toa::find($id);
-
-        if (!$toa) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Không tìm thấy toa!'
-            ], 404);
-        }
-
-        $toa->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Xóa toa thành công!'
-        ], 200);
-    }
 }

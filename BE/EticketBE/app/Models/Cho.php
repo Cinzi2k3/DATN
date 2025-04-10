@@ -16,7 +16,6 @@ class Cho extends Model
         'matoa',
         'matau',
         'sohieu',
-        'trangthai',
         'tang',
         'khoang'
     ];
@@ -31,5 +30,8 @@ class Cho extends Model
     }
     public function Ve(){
         return $this -> hasOne(Ve::class,'macho');
+    }
+    public function DatVe(){
+        return $this -> hasOne(DatVe::class,'macho');
     }
 }

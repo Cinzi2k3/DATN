@@ -1,7 +1,7 @@
 <template>
     <div class="hea">
       <el-icon><HomeFilled /></el-icon>
-      <a href="/" class="no-underline">Trang chủ / Vé đi </a>
+      <a href="/" class="no-underline">{{  $t('Trang chủ') }}</a>
     </div>
     <div class="eticket">
       <Eticket />
@@ -10,8 +10,8 @@
 
 <script setup>
 import Eticket from "@/components/Eticket.vue";
-
 import { HomeFilled } from "@element-plus/icons-vue";
+
 </script>
 
 <style scoped>

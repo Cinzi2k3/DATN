@@ -24,7 +24,9 @@ const pinia = createPinia();
 app.use(pinia);
 app.use(i18n);
 app.use(ElementPlus);
+
 const authStore = useAuthStore();
 authStore.checkAuth(); // Kiểm tra trạng thái đăng nhập
+
 app.use(router);
 app.mount('#app');

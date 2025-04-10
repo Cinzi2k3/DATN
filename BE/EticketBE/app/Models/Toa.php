@@ -15,10 +15,9 @@ class Toa extends Model
         'maloaitoa',
         'matau',
         'tentoa',
-        'sotang',
         'socho',
-        'sochodadat',
-        'sochocon',
+        'created_at',
+        'updated_at',
     ];
     public function LoaiToa(){
         return $this -> belongsTo(LoaiToa::class, 'maloaitoa');

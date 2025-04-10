@@ -12,15 +12,16 @@ class DatVe extends Model
     protected $table = 'datve';
     protected $fillable = [
         'madatve',
-        'matau',
-        'matoa',
+        'macho',
+        'malichtrinh',
+        'trangthai'
     ];
-    public function Tau()
+    public function Cho()
     {
-        return $this->belongsTo(Tau::class, 'matau');
+        return $this->belongsTo(Cho::class, 'macho');
     }
-    public function Toa()
+    public function LichTrinh()
     {
-        return $this->belongsTo(Toa::class, 'matoa');
+        return $this->belongsTo(LichTrinh::class, 'malichtrinh');
     }
 }

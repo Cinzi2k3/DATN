@@ -12,7 +12,7 @@ class ThanhToan extends Model
     protected $table = 'thanhtoan';
     protected $fillable = [
         'mathanhtoan',
-        'mave',
+        'madonhang',
         'manguoidung',
         'sotien',
         'phuongthuc',

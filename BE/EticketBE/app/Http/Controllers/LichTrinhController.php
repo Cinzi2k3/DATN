@@ -6,6 +6,7 @@ use App\Models\LichTrinh;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use DB;
 
 class LichTrinhController extends Controller
 {
@@ -39,10 +40,16 @@ class LichTrinhController extends Controller
     
     // Dùng phương thức map để xử lý các lịch trình
     $data = $lichTrinhs->map(function ($lichTrinh) {
-        // Tính tổng số ghế còn lại trong tàu
-        $tongSoGheCon = $lichTrinh->Tau->Toa->sum(function ($toa) {
-            return $toa->sochocon(); 
-        });
+        // Tính tổng số ghế của tàu (từ tất cả các toa)
+        $tongSoGhe = $lichTrinh->Tau->Toa->sum('socho');
+
+        // Đếm số ghế đã đặt cho lịch trình này từ bảng ghe_lichtrinh
+        $soGheDaDat = DB::table('datve')
+            ->where('malichtrinh', $lichTrinh->malichtrinh)
+            ->count();
+
+        // Tính số ghế còn lại
+        $tongSoGheCon = $tongSoGhe - $soGheDaDat;
         
         // Tính thời gian di chuyển
         $thoiGianDi = Carbon::parse($lichTrinh->thoigiandi);

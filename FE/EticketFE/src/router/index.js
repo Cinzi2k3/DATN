@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Home from '@/views/Home.vue';
 import Buyeticket from '@/views/Buyeticket.vue';
 import Signin from '@/views/Signin.vue';
+import Payment from '@/views/Payment.vue';
 // import Boking from '@/views/Boking.vue';
 
 
@@ -22,11 +23,11 @@ const routes = [
     name: 'Signin',
     component: Signin
   },
-  // {
-  //   path: '/Boking',
-  //   name: 'Boking',
-  //   component: Boking
-  // },
+  {
+    path: '/Payment',
+    name: 'Payment',
+    component: Payment
+  },
 ];
 
 // Tạo instance router

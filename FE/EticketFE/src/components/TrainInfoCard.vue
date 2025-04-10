@@ -71,6 +71,9 @@
       :selectedDay="selectedDay"
       :totalTickets="totalTickets"
       :ticketDetails="ticketDetails"
+      :departureTime="departureTime"
+      :arrivalTime="arrivalTime"
+      :malichtrinh="malichtrinh"
     />
   </div>
 </template>
@@ -105,6 +108,7 @@ const props = defineProps({
   ticketPrice: String,
   totalTickets: Number,
   ticketDetails: Array,
+  malichtrinh: String,
 });
 </script>
 

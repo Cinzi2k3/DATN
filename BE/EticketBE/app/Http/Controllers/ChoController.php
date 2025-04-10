@@ -19,7 +19,6 @@ class ChoController extends Controller
                 return [
                     'macho' => $item->macho,
                     'sohieu' => $item->sohieu,
-                    'trangthai' => $item->trangthai,
                     'tenloaicho' => $item->LoaiCho->tenloaicho ?? null,
                     'tentoa' => $item->Toa->tentoa ?? null,
                     'tentau' => $item->Tau->tentau ?? null,

@@ -42,7 +42,7 @@
                 <i class="fa-solid fa-user"></i>
                 <p class="username-container">
                   <span v-if="authStore.isLoggedIn">{{authStore.userName}}</span>
-                  <span v-else>Tài khoản</span>
+                  <span v-else>{{  $t('Tài khoản') }}</span>
                 </p>
               </div>
               <template #dropdown>
@@ -105,9 +105,10 @@ import { useAuthStore } from "@/stores/authStore.js";
 import { Phone } from "@element-plus/icons-vue";
 import { ElNotification } from "element-plus";
 import { ref, onMounted, onUnmounted } from "vue";
-import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
+import { useLanguage } from "@/composables/useLanguage";
 
+const { locale, changeLanguage } = useLanguage();
 const authStore = useAuthStore();
 const loading = ref(false); // Trạng thái tải
 const router = useRouter();
@@ -136,12 +137,6 @@ const resumeScrolling = () => startScrolling();
 onMounted(() => startScrolling());
 onUnmounted(() => stopScrolling());
 
-const { locale } = useI18n(); // Lấy locale từ i18n
-
-// Hàm thay đổi ngôn ngữ
-const changeLanguage = (lang) => {
-  locale.value = lang; // Đặt giá trị ngôn ngữ
-};
 
 const signin = async () => {
   if (loading.value) return; // Ngăn người dùng click liên tục
