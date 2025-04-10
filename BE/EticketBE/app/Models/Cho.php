@@ -17,7 +17,8 @@ class Cho extends Model
         'matau',
         'sohieu',
         'tang',
-        'khoang'
+        'khoang',
+        'gia'
     ];
     public function LoaiCho(){
         return $this -> belongsTo(LoaiCho::class,'maloaicho');

@@ -127,12 +127,13 @@
 
 .seat-number {
   font-weight: bold;
-  font-size: 1rem;
+  font-size: 0,9rem;
   color: #333;
 }
 
 .seat-price {
-  font-size: 0.7rem;
+  margin-top: -3px;
+  font-size: 0.8rem;
   color: #666;
 }
 

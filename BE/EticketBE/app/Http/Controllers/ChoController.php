@@ -22,6 +22,7 @@ class ChoController extends Controller
                     'tenloaicho' => $item->LoaiCho->tenloaicho ?? null,
                     'tentoa' => $item->Toa->tentoa ?? null,
                     'tentau' => $item->Tau->tentau ?? null,
+                    'gia' => $item->gia ?? null,
                 ];
             })
         ], 200);

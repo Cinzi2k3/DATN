@@ -8,10 +8,8 @@
             <p style="font-size: 20px;">{{ traintau }}</p>
             <h3>{{ trainCode }}</h3>
             <div class="cho">
-            <p class="cho1">
-              Còn {{ availableSeats }} chỗ
-            </p>
-          </div>
+              <p class="cho1">Còn {{ availableSeats }} chỗ</p>
+            </div>
           </el-col>
 
           <!-- Phần thông tin ga đi -->
@@ -23,21 +21,14 @@
 
           <!-- Mũi tên giữa ga đi và ga đến -->
           <el-col :span="4" class="text-center1">
-            <h3 >{{ duration }}</h3>
+            <h3>{{ duration }}</h3>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 100 20"
               width="120"
-              height="2 0"
+              height="20"
             >
-              <line
-                x1="0"
-                y1="10"
-                x2="90"
-                y2="10"
-                stroke="black"
-                stroke-width="2"
-              />
+              <line x1="0" y1="10" x2="90" y2="10" stroke="black" stroke-width="2" />
               <polygon points="90,5 100,10 90,15" fill="black" />
             </svg>
           </el-col>
@@ -53,7 +44,7 @@
           <el-col :span="6">
             <div class="price">
               <el-button class="hover-button" @click="openDialog">
-                <h4 >Đặt</h4>
+                <h4>Đặt</h4>
               </el-button>
               <h2 class="ticket-price">{{ ticketPrice }}</h2>
             </div>
@@ -61,10 +52,10 @@
         </el-row>
       </div>
     </div>
-    <Boking 
-      v-model:visible="dialogVisible" 
-      @submit="handleSubmit" 
-      :trainCode="trainCode" 
+    <Boking
+      v-model:visible="dialogVisible"
+      @submit="handleSubmit"
+      :trainCode="trainCode"
       :traintau="traintau"
       :searchgadi="searchgadi"
       :searchgaden="searchgaden"
@@ -74,6 +65,8 @@
       :departureTime="departureTime"
       :arrivalTime="arrivalTime"
       :malichtrinh="malichtrinh"
+      :isReturnTrip="isReturnTrip"
+      @proceed-to-return="proceedToReturn"
     />
   </div>
 </template>
@@ -83,15 +76,6 @@ import { ref } from "vue";
 import Boking from "@/components/Boking.vue";
 
 const dialogVisible = ref(false);
-
-const openDialog = () => {
-  dialogVisible.value = true;
-};
-
-const handleSubmit = (formData) => {
-  console.log("Form Data Submitted:", formData);
-  // Xử lý thêm logic khi người dùng submit form
-};
 
 const props = defineProps({
   searchPerformed: Boolean,
@@ -109,7 +93,24 @@ const props = defineProps({
   totalTickets: Number,
   ticketDetails: Array,
   malichtrinh: String,
+  isReturnTrip: Boolean, // Thêm prop để biết đây là vé khứ hồi
 });
+
+const emit = defineEmits(["select-train", "proceed-to-return"]);
+
+const openDialog = () => {
+  dialogVisible.value = true;
+};
+
+const handleSubmit = (formData) => {
+  console.log("Form Data Submitted:", formData);
+  // Phát sự kiện để báo cho parent biết tàu đã được chọn
+  emit("select-train", { ...props, ...formData });
+};
+
+const proceedToReturn = () => {
+  emit("proceed-to-return"); // Phát sự kiện để chuyển sang lịch trình ngày về
+};
 </script>
 
 <style scoped>

@@ -91,14 +91,15 @@ export function useDateManagement(departureDate, returnDate, searchTickets) {
 
   // Xử lý khi chọn một ngày trong lịch
   const onDaySelected = async (newSelectedDay) => {
-    // Cập nhật ngày đi theo ngày được chọn
     departureDate.value = new Date(newSelectedDay);
-
-    // Cập nhật ngày được chọn
     selectedDay.value = newSelectedDay;
-
-    // Gọi hàm tìm kiếm vé để cập nhật danh sách vé
     await searchTickets();
+  };
+
+  const returnSelected = async (newSelectedDay, searchReturnTicketsByDate) => {
+    returnDate.value = new Date(newSelectedDay);
+    selectedDay.value = newSelectedDay;
+    await searchReturnTicketsByDate(newSelectedDay); // Tìm kiếm lại lịch trình cho ngày về
   };
 
   // Chuyển sang trang tiếp theo của danh sách ngày
@@ -125,6 +126,7 @@ export function useDateManagement(departureDate, returnDate, searchTickets) {
     availableDays,
     currentPage,
     selectedDay,
+    returnSelected,
     formatDateToYMD,
     generateAvailableDays,
     isValidReturnDate,
@@ -133,6 +135,7 @@ export function useDateManagement(departureDate, returnDate, searchTickets) {
     onDaySelected,
     nextday,
     prevday,
-    displayedDays
+    displayedDays,
+
   };
 }

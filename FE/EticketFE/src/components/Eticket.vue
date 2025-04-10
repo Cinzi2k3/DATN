@@ -124,42 +124,79 @@
           </button>
         </el-row>
       </div>
-      <SearchTicketResult :searchgadi="searchgadi" :searchgaden="searchgaden" :searchPerformed="searchPerformed"
-        :displayedDays="displayedDays" :selectedDay="selectedDay" :availableDays="availableDays"
-        :currentPage="currentPage" @update:selectedDay="onDaySelected" @prevday="prevday" @nextday="nextday" />
+      <div v-if="searchPerformed">
+        <!-- Vé một chiều -->
+        <div v-if="selectedTicket === 'one-way'">
+          <SearchTicketResult :searchgadi="searchgadi" :searchgaden="searchgaden" :searchPerformed="searchPerformed"
+            :displayedDays="displayedDays" :selectedDay="selectedDay" :availableDays="availableDays"
+            :currentPage="currentPage" @update:selectedDay="onDaySelected" @prevday="prevday" @nextday="nextday" />
+          <div v-if="trainSchedules.length > 0">
+            <TrainInfoCard v-for="(train, index) in trainSchedules" :key="index" :searchPerformed="searchPerformed"
+              :searchgadi="searchgadi" :searchgaden="searchgaden" :selectedDay="train.ngaydi"
+              :traintau="train.tenloaitau" :trainCode="train.tentau" :availableSeats="train.sochocon"
+              :departureTime="train.giodi" :duration="train.thoigiandichuyen" :arrivalTime="train.gioden"
+              :arrivalDate="train.ngayden" :ticketPrice="`${train.gia.toLocaleString()} VND`"
+              :totalTickets="totalTickets" :ticketDetails="ticketDetails" :malichtrinh="train.malichtrinh"
+              :isReturnTrip="false" @select-train="handleTrainSelection" />
+          </div>
+        </div>
 
-      <div v-if="trainSchedules.length > 0">
-        <TrainInfoCard v-for="(train, index) in trainSchedules" :key="index" :searchPerformed="searchPerformed"
-          :searchgadi="searchgadi" :searchgaden="searchgaden" :selectedDay="train.ngaydi" :traintau="train.tenloaitau"
-          :trainCode="train.tentau" :availableSeats="train.sochocon" :departureTime="train.giodi"
-          :duration="train.thoigiandichuyen" :arrivalTime="train.gioden" :arrivalDate="train.ngayden"
-          :ticketPrice="`${train.gia.toLocaleString()} VND`" 
-          :totalTickets="totalTickets"
-          :ticketDetails="ticketDetails"
-          :malichtrinh="train.malichtrinh" />
+        <!-- Vé khứ hồi: Ngày đi -->
+        <div v-if="selectedTicket === 'round-trip' && bookingStep === 'departure'">
+          <div class="text-put">{{ $t('Chọn vé cho chiều đi') }}</div>
+          <SearchTicketResult :searchgadi="searchgadi" :searchgaden="searchgaden" :searchPerformed="searchPerformed"
+            :displayedDays="displayedDays" :selectedDay="selectedDay" :availableDays="availableDays"
+            :currentPage="currentPage" @update:selectedDay="onDaySelected" @prevday="prevday" @nextday="nextday" />
+          <div v-if="trainSchedules.length > 0">
+            <TrainInfoCard v-for="(train, index) in trainSchedules" :key="index" :searchPerformed="searchPerformed"
+              :searchgadi="searchgadi" :searchgaden="searchgaden" :selectedDay="train.ngaydi"
+              :traintau="train.tenloaitau" :trainCode="train.tentau" :availableSeats="train.sochocon"
+              :departureTime="train.giodi" :duration="train.thoigiandichuyen" :arrivalTime="train.gioden"
+              :arrivalDate="train.ngayden" :ticketPrice="`${train.gia.toLocaleString()} VND`"
+              :totalTickets="totalTickets" :ticketDetails="ticketDetails" :malichtrinh="train.malichtrinh"
+              :isReturnTrip="true" @select-train="selectDepartureTrain" @proceed-to-return="proceedToReturn" />
+          </div>
+        </div>
+
+        <!-- Vé khứ hồi: Ngày về -->
+        <div v-if="selectedTicket === 'round-trip' && bookingStep === 'return'">
+          <div class="text-put">{{ $t('Chọn vé cho chiều về') }}</div>
+          <SearchTicketResult :searchgadi="searchgadi" :searchgaden="searchgaden" :searchPerformed="searchPerformed"
+            :displayedDays="displayedDays" :selectedDay="selectedDay" :availableDays="availableDays"
+            :currentPage="currentPage" @update:selectedDay="newDay => returnSelected(newDay, searchReturnTicketsByDate)"
+            @prevday="prevday" @nextday="nextday" />
+          <div v-if="trainSchedules.length > 0">
+            <TrainInfoCard v-for="(train, index) in trainSchedules" :key="index" :searchPerformed="searchPerformed"
+              :searchgadi="searchgadi" :searchgaden="searchgaden" :selectedDay="train.ngaydi"
+              :traintau="train.tenloaitau" :trainCode="train.tentau" :availableSeats="train.sochocon"
+              :departureTime="train.giodi" :duration="train.thoigiandichuyen" :arrivalTime="train.gioden"
+              :arrivalDate="train.ngayden" :ticketPrice="`${train.gia.toLocaleString()} VND`"
+              :totalTickets="totalTickets" :ticketDetails="ticketDetails" :malichtrinh="train.malichtrinh"
+              :isReturnTrip="true" @select-train="selectReturnTrain" />
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted, watch } from "vue";
+import { onMounted, watch, ref } from "vue";
 import SearchTicketResult from "@/components/SearchTicketResult.vue";
 import TrainInfoCard from "@/components/TrainInfoCard.vue";
-import {
-  Refresh,
-  Calendar,
-  ArrowLeft,
-  ArrowRight,
-} from "@element-plus/icons-vue";
-
+import {Refresh, Calendar, ArrowLeft, ArrowRight,} from "@element-plus/icons-vue";
 import { useTicketManagement } from '@/composables/useTicketManagement';
 import { useDateManagement } from '@/composables/useDateManagement';
 import { useSearchTickets } from '@/composables/useSearchTickets';
 import { useSwapStations } from "@/composables/useSwapStations";
 import { useDown } from "@/composables/useDown";
 import { useFetchStations } from "@/composables/useFetchStations";
-const {stations,fetchStations} = useFetchStations();
+import { useRouter } from "vue-router";
+import { ElNotification } from "element-plus";
+
+const { stations, fetchStations } = useFetchStations();
+const router = useRouter();
+const departureBookingData = ref(null); // Lưu dữ liệu đặt vé ngày đi
 
 // Sử dụng composable để quản lý vé
 const {
@@ -185,7 +222,7 @@ const {
 } = useTicketManagement();
 
 
-const {swapStations} = useSwapStations(gadi, gaden);
+const { swapStations } = useSwapStations(gadi, gaden);
 const { isOpen, toggleDropdown } = useDown();
 
 // Sử dụng composable để quản lý ngày
@@ -197,13 +234,21 @@ const {
   onDepartureDateChange,
   onReturnDateChange,
   onDaySelected,
+  returnSelected,
   nextday,
   prevday,
   displayedDays
 } = useDateManagement(departureDate, returnDate, () => searchTickets());
 
 // Sử dụng composable để quản lý tìm kiếm vé
-const { searchTickets } = useSearchTickets(
+const {
+  searchTickets,
+  bookingStep,
+  departureTrainSelected,
+  selectDepartureTrain: selectDepartureTrainBase,
+  selectReturnTrain: selectReturnTrainBase,
+  searchReturnTicketsByDate,
+} = useSearchTickets(
   loading,
   gadi,
   gaden,
@@ -218,23 +263,54 @@ const { searchTickets } = useSearchTickets(
   searchPerformed,
   trainSchedules,
   formatDateToYMD,
-  updateTicketDataInStore
+  updateTicketDataInStore,
 );
 
-onMounted(() => {
-  fetchStations();
+const selectDepartureTrain = (trainData) => {
+  departureBookingData.value = trainData; // Lưu dữ liệu đặt vé ngày đi
+  selectDepartureTrainBase(trainData); // Gọi hàm từ useSearchTickets
+};
+
+const proceedToReturn = () => {
+  // Đã xử lý trong selectDepartureTrain từ useSearchTickets
+};
+
+const selectReturnTrain = (trainData) => {
+  const returnBookingData = trainData;
+  const combinedBookingData = {
+    departure: departureBookingData.value,
+    return: returnBookingData,
+  };
+  console.log("Combined Booking Data:", combinedBookingData);
+  ElNotification.success('Đặt vé thành công ! Vui lòng thanh toán để hoàn tất !');
+
+  // Chuyển hướng sang trang Pay với dữ liệu cả hai chuyến
+  router.push({
+    name: "Payment",
+    query: { data: JSON.stringify(combinedBookingData) },
+  });
+};
+
+const initializeSearchIfNeeded = () => {
   if (gadi.value && gaden.value && formatDateToYMD(departureDate.value)) {
     searchTickets();
     syncTicketCounts();
   }
+};
+
+const resetSearchState = () => {
+  searchPerformed.value = false; // Reset để không hiển thị kết quả cũ
+  trainSchedules.value = []; // Xóa danh sách tàu cũ
+};
+
+onMounted(() => {
+  fetchStations();
+  initializeSearchIfNeeded();
 });
 
-watch(totalTickets, ( newValue) => {
-  console.log("Total Tickets:",  newValue);
-});
+watch(selectedTicket, resetSearchState);
+
 </script>
-
-
 
 <style scoped>
 @import url(@/assets/css/eticket.css);

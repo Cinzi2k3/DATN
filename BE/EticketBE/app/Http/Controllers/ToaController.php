@@ -112,6 +112,7 @@ public function chotoa(Request $request): JsonResponse
                         'trangthai' => $trangthai,  // Trạng thái ghế
                         'tang' => $seat->tang,
                         'khoang' => $seat->khoang,
+                        'gia' => $seat->gia,
                     ];
                 }),
             ];

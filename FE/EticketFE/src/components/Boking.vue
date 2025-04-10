@@ -63,17 +63,18 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick, watch } from 'vue';
-import axios from 'axios';
-import Seat from '@/components/Seat.vue';
-import Bed from '@/components/Bed.vue';
-import { useRouter } from 'vue-router';
+import { ref, computed, onMounted, nextTick, watch } from "vue";
+import axios from "axios";
+import Seat from "@/components/Seat.vue";
+import Bed from "@/components/Bed.vue";
+import { useRouter } from "vue-router";
+import { ElNotification } from "element-plus";
 
 // Refs
 const carOptions = ref([]);
 const selectedCar = ref(0);
 const carSelectionRef = ref(null);
-const currentCarType = ref('');
+const currentCarType = ref("");
 const seatData = ref(null);
 const selectedSeatsByCar = ref({});
 const router = useRouter();
@@ -88,12 +89,13 @@ const props = defineProps({
   selectedDay: String,
   totalTickets: { type: Number, default: 1 },
   ticketDetails: Array,
-  departureTime:String,
-  arrivalTime:String,
-  malichtrinh:String,
-  
+  departureTime: String,
+  arrivalTime: String,
+  malichtrinh: String,
+  isReturnTrip: Boolean, // Thêm prop để biết đây là vé khứ hồi
 });
-const emits = defineEmits(['update:visible']);
+
+const emits = defineEmits(["update:visible", "submit", "proceed-to-return"]);
 
 // Computed
 const totalSelectedSeats = computed(() =>
@@ -103,19 +105,18 @@ const totalSelectedSeats = computed(() =>
 // Methods
 const closeDialog = () => {
   selectedSeatsByCar.value = {};
-  emits('update:visible', false);
-}
-const updateVisible = (value) => emits('update:visible', value);
+  emits("update:visible", false);
+};
+
+const updateVisible = (value) => emits("update:visible", value);
 
 const fetchTrainCars = async () => {
-  console.log('Fetching with trainCode:', props.trainCode, 'malichtrinh:', props.malichtrinh);
   try {
     if (!props.malichtrinh) {
-      console.error('malichtrinh is not provided!');
+      console.error("malichtrinh is not provided!");
       return;
     }
     const { data } = await axios.get(`/chotoa?trainCode=${props.trainCode}&malichtrinh=${props.malichtrinh}`);
-    console.log('Fetching URL:', `/chotoa?trainCode=${props.trainCode}&malichtrinh=${props.malichtrinh}`);
     if (data.success && Array.isArray(data.data)) {
       carOptions.value = data.data
         .map((car) => ({
@@ -128,16 +129,16 @@ const fetchTrainCars = async () => {
         }))
         .sort((a, b) => b.id - a.id);
 
-      const toa1Index = carOptions.value.findIndex((car) => car.type.includes('Toa 1:'));
+      const toa1Index = carOptions.value.findIndex((car) => car.type.includes("Toa 1:"));
       selectedCar.value = toa1Index !== -1 ? toa1Index : 0;
       selectCar(selectedCar.value);
       await nextTick();
       setInitialScrollPosition();
     } else {
-      console.error('Invalid API data:', data);
+      console.error("Invalid API data:", data);
     }
   } catch (error) {
-    console.error('API fetch error:', error);
+    console.error("API fetch error:", error);
   }
 };
 
@@ -154,7 +155,7 @@ const selectCar = (index) => {
 const setInitialScrollPosition = () => {
   const container = carSelectionRef.value;
   if (container) {
-    const imageHead = container.querySelector('.image-head');
+    const imageHead = container.querySelector(".image-head");
     if (imageHead) {
       container.scrollLeft = imageHead.offsetLeft - container.offsetWidth + imageHead.offsetWidth;
     } else {
@@ -168,7 +169,6 @@ const updateSelectedSeats = (carType, newSelected) => {
 };
 
 const handleBook = (selectedSeats) => {
-  // Thu thập dữ liệu để chuyển sang trang Pay
   const bookingData = {
     trainCode: props.trainCode,
     traintau: props.traintau,
@@ -178,33 +178,36 @@ const handleBook = (selectedSeats) => {
     ticketDetails: props.ticketDetails,
     selectedSeatsByCar: selectedSeatsByCar.value,
     totalTickets: props.totalTickets,
-    departureTime: props.departureTime, // Thêm giờ đi
-    arrivalTime: props.arrivalTime,     // Thêm giờ đến
+    departureTime: props.departureTime,
+    arrivalTime: props.arrivalTime,
+    malichtrinh: props.malichtrinh,
   };
 
-  console.log('Booking data:', bookingData);
+  emits("submit", bookingData); // Phát sự kiện submit để parent xử lý
 
-  // Chuyển hướng sang trang Payment với dữ liệu
-  router.push({
-    name: 'Payment', // Tên route của trang Payment
-    query: { data: JSON.stringify(bookingData) }, // Truyền dữ liệu qua query string
-  });
-
-  // Đóng dialog sau khi chuyển hướng
-  closeDialog();
+  if (props.isReturnTrip) {
+    // Nếu là vé khứ hồi, chuyển sang bước chọn vé ngày về
+    emits("proceed-to-return");
+  } else {
+    // Nếu là vé một chiều, chuyển hướng sang trang Pay
+    router.push({
+      name: "Payment",
+      query: { data: JSON.stringify(bookingData) },
+    });
+    ElNotification.success("Đặt vé thành công ! Vui lòng thanh toán để hoàn tất !")
+    closeDialog();
+  }
 };
 
 // Lifecycle
 onMounted(() => {
-    fetchTrainCars();
-  });
-  
+  fetchTrainCars();
+});
 
 watch(
   () => props.malichtrinh,
   (newMalichtrinh, oldMalichtrinh) => {
     if (newMalichtrinh !== oldMalichtrinh) {
-      console.log('malichtrinh changed:', newMalichtrinh);
       fetchTrainCars();
     }
   }
@@ -212,6 +215,5 @@ watch(
 </script>
 
 <style scoped>
-@import url('@/assets/css/boking.css');
-
+@import url("@/assets/css/boking.css");
 </style>

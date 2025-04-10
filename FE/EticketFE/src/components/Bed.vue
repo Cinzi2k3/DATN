@@ -34,7 +34,7 @@
                 }"
               >
                 <div class="bed-number">{{ bed.sohieu }}</div>
-                <div v-if="bed.trangthai !== 'Đã đặt'" class="bed-price">{{ bed.gia || (bed.tang === '1' ? '712k' : '670k') }}</div>
+                <div v-if="bed.trangthai !== 'Đã đặt'" class="bed-price">{{ formatPrice( bed.gia )}}</div>
               </div>
             </div>
             <div v-if="compartment < numCompartments" class="divider"></div>
@@ -47,7 +47,7 @@
       <p>Số giường đã chọn: {{ totalSelected }} / {{ totalTickets }}</p>
       <button
         class="btn btn-primary" 
-        :disabled="totalSelected === 0 || totalSelected > totalTickets"
+        :disabled="totalSelected !== totalTickets"
         @click="bookTickets"
       >
         Đặt vé
@@ -74,6 +74,9 @@
 <script setup>
 import { ElNotification } from 'element-plus';
 import { defineProps, computed, defineEmits } from 'vue';
+import { useFormatPrice } from '@/composables/useFormatprice';
+
+const { formatPrice} = useFormatPrice();
 
 const props = defineProps({
   car: Object,
@@ -127,7 +130,6 @@ const toggleBedSelection = (bedNumber) => {
 const bookTickets = () => {
   if (props.selectedBeds.length > 0) {
     emit('book', { carType: props.car.type, beds: props.selectedBeds }); // Truyền tên toa và danh sách giường
-    ElNotification.success('Đặt vé thành công!');
   }
 };
 </script>

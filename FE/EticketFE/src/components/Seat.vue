@@ -26,7 +26,7 @@
             <div class="seat-top-armrest"></div>
             <div class="seat-square">
               <div class="seat-number">{{ seat.sohieu }}</div>
-              <div v-if="seat.trangthai === 'controng'" class="seat-price">{{ seat.gia || '372k' }}</div>
+              <div v-if="seat.trangthai === 'controng'" class="seat-price">{{ formatPrice(seat.gia) }}</div>
             </div>
             <div class="seat-bottom-armrest"></div>
           </div>
@@ -38,7 +38,7 @@
       <p>Số ghế đã chọn: {{ totalSelected }} / {{ totalTickets }}</p>
       <button
         class="btn btn-primary" 
-        :disabled="totalSelected === 0 || totalSelected > totalTickets"
+        :disabled="totalSelected !== totalTickets"
         @click="bookTickets"
       >
         Đặt vé
@@ -80,6 +80,9 @@
 <script setup>
 import { ElNotification } from 'element-plus';
 import { defineProps, computed, defineEmits } from 'vue';
+import { useFormatPrice } from '@/composables/useFormatprice';
+
+const { formatPrice } = useFormatPrice();
 
 const props = defineProps({
   car: Object,
@@ -130,7 +133,7 @@ const toggleSeatSelection = (seatNumber) => {
 const bookTickets = () => {
   if (props.selectedSeats.length > 0) {
     emit('book', { carType: props.car.type, seats: props.selectedSeats }); // Truyền tên toa và danh sách ghế
-    ElNotification.success('Đặt vé thành công!');
+
   }
 };
 </script>
