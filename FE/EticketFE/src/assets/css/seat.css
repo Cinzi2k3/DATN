@@ -234,7 +234,8 @@
 }
 
 .btn-primary {
-  padding: 10px 20px;
+  margin-left: 15px;
+  padding: 10px 80px;
   font-size: 16px;
   background-color: #007bff;
   border: none;
@@ -247,4 +248,17 @@
   background-color: #6c757d;
   cursor: not-allowed;
 }
-  
+.ticket-btn {
+  margin: 0.5rem;
+  padding: 0.5rem 1rem;
+  white-space: nowrap;
+}
+.discount-badge {
+  font-size: 0.75rem;
+  color: #fff;
+  background-color: #e91e63; /* Màu nền nổi bật, có thể tùy chỉnh */
+  padding: 1px 6px;
+  border-radius: 8px;
+  margin-left: 6px;
+  vertical-align: middle;
+}

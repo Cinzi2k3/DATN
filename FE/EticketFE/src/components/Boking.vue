@@ -44,6 +44,7 @@
         :ticket-details="ticketDetails"
         :selected-seats="selectedSeatsByCar[carOptions[selectedCar]?.type] || []"
         :total-selected="totalSelectedSeats"
+        :selected-seats-by-car="selectedSeatsByCar"
         @update:selected-seats="updateSelectedSeats(carOptions[selectedCar]?.type, $event)"
         @book="handleBook"
       />
@@ -55,6 +56,7 @@
         :ticket-details="ticketDetails"
         :selected-beds="selectedSeatsByCar[carOptions[selectedCar]?.type] || []"
         :total-selected="totalSelectedSeats"
+        :selected-seats-by-car="selectedSeatsByCar"
         @update:selected-beds="updateSelectedSeats(carOptions[selectedCar]?.type, $event)"
         @book="handleBook"
       />
@@ -101,6 +103,18 @@ const emits = defineEmits(["update:visible", "submit", "proceed-to-return"]);
 const totalSelectedSeats = computed(() =>
   Object.values(selectedSeatsByCar.value).reduce((total, seats) => total + (seats?.length || 0), 0)
 );
+
+const totalPrice = computed(() => {
+  let total = 0;
+  Object.values(selectedSeatsByCar.value).forEach((seats) => {
+    seats.forEach((seat) => {
+      if (seat.gia) {
+        total += Number(seat.gia);
+      }
+    });
+  });
+  return total;
+});
 
 // Methods
 const closeDialog = () => {
@@ -165,10 +179,55 @@ const setInitialScrollPosition = () => {
 };
 
 const updateSelectedSeats = (carType, newSelected) => {
-  if (carType) selectedSeatsByCar.value[carType] = newSelected;
+  if (!carType) return;
+
+  const updatedSeatsByCar = { ...selectedSeatsByCar.value };
+
+  // Kiểm tra trùng lặp ghế với Set
+  const seatNumberSet = new Set(newSelected.map((seat) => seat.sohieu));
+  if (seatNumberSet.size !== newSelected.length) {
+    ElNotification.error("Không thể chọn cùng một ghế cho nhiều vé trong cùng toa!");
+    return;
+  }
+
+  // Kiểm tra ràng buộc vé trẻ em
+  const hasChild = newSelected.some((seat) => seat.ticketType === "Trẻ em");
+  const hasAdult = newSelected.some((seat) => seat.ticketType === "Người lớn");
+  if (hasChild && !hasAdult) {
+    ElNotification.error("Vé trẻ em phải được chọn trong toa có vé người lớn!");
+    return;
+  }
+
+  updatedSeatsByCar[carType] = newSelected;
+
+  Object.keys(updatedSeatsByCar).forEach((otherCarType) => {
+    if (otherCarType !== carType) {
+      updatedSeatsByCar[otherCarType] = updatedSeatsByCar[otherCarType].filter(
+        (seat) =>
+          !newSelected.some(
+            (newSeat) =>
+              newSeat.ticketType === seat.ticketType &&
+              newSeat.ticketNumber === seat.ticketNumber
+          )
+      );
+    }
+  });
+
+  selectedSeatsByCar.value = updatedSeatsByCar;
 };
 
-const handleBook = (selectedSeats) => {
+// Booking.vue
+const handleBook = () => {
+  // Kiểm tra ràng buộc vé trẻ em trực tiếp
+  for (const [carType, selections] of Object.entries(selectedSeatsByCar.value)) {
+    const hasChild = selections.some((seat) => seat.ticketType === "Trẻ em");
+    const hasAdult = selections.some((seat) => seat.ticketType === "Người lớn");
+    if (hasChild && !hasAdult) {
+      ElNotification.error("Vé trẻ em phải được chọn trong toa có vé người lớn!");
+      return;
+    }
+  }
+
   const bookingData = {
     trainCode: props.trainCode,
     traintau: props.traintau,
@@ -181,20 +240,19 @@ const handleBook = (selectedSeats) => {
     departureTime: props.departureTime,
     arrivalTime: props.arrivalTime,
     malichtrinh: props.malichtrinh,
+    totalPrice: totalPrice.value,
   };
 
-  emits("submit", bookingData); // Phát sự kiện submit để parent xử lý
+  emits("submit", bookingData);
 
   if (props.isReturnTrip) {
-    // Nếu là vé khứ hồi, chuyển sang bước chọn vé ngày về
     emits("proceed-to-return");
   } else {
-    // Nếu là vé một chiều, chuyển hướng sang trang Pay
     router.push({
       name: "Payment",
       query: { data: JSON.stringify(bookingData) },
     });
-    ElNotification.success("Đặt vé thành công ! Vui lòng thanh toán để hoàn tất !")
+    ElNotification.success("Đặt vé thành công! Vui lòng thanh toán để hoàn tất!");
     closeDialog();
   }
 };

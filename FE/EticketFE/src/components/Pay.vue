@@ -13,12 +13,24 @@
     <p><strong>Ngày đi:</strong> {{ departureData.selectedDay }}</p>
     <p><strong>Tổng số vé:</strong> {{ departureData.totalTickets }}</p>
     <p><strong>Thông tin vé:</strong> {{ departureData.ticketDetails }}</p>
-    <p><strong>Ghế và giường đã chọn theo toa:</strong></p>
-    <ul>
-      <li v-for="(seatsOrBeds, carType) in departureData.selectedSeatsByCar" :key="carType">
-        <strong>{{ carType }}:</strong> {{ seatsOrBeds.join(", ") }}
-      </li>
-    </ul>
+    <p><strong>Gía : {{ departureData.totalPrice }}</strong></p>
+    <div>
+      <p><strong>Ghế và giường đã chọn theo toa:</strong></p>
+  <ul>
+    <li v-for="(seatsOrBeds, carType) in departureData.selectedSeatsByCar" :key="carType">
+      <strong>{{ carType }}:</strong>
+      <span v-if="seatsOrBeds.length > 0">
+        <ul>
+          <li v-for="seatOrBed in seatsOrBeds" :key="seatOrBed.sohieu">
+            {{ seatOrBed.sohieu }} - {{ seatOrBed.ticketType }} {{ seatOrBed.ticketNumber }}: 
+            <strong>{{ seatOrBed.gia }}</strong>
+          </li>
+        </ul>
+      </span>
+      <span v-else>Chưa chọn ghế/giường</span>
+    </li>
+  </ul>
+  </div>
 
     <!-- Hiển thị thông tin chuyến về nếu có -->
     <div v-if="returnData">
@@ -33,11 +45,17 @@
       <p><strong>Tổng số vé:</strong> {{ returnData.totalTickets }}</p>
       <p><strong>Thông tin vé:</strong> {{ returnData.ticketDetails }}</p>
       <p><strong>Ghế và giường đã chọn theo toa:</strong></p>
-      <ul>
-        <li v-for="(seatsOrBeds, carType) in returnData.selectedSeatsByCar" :key="carType">
-          <strong>{{ carType }}:</strong> {{ seatsOrBeds.join(", ") }}
-        </li>
-      </ul>
+      <div>
+    <p><strong>Ghế và giường đã chọn theo toa:</strong></p>
+    <ul>
+      <li v-for="(seatsOrBeds, carType) in returnData.selectedSeatsByCar" :key="carType">
+        <strong>{{ carType }}:</strong>
+        <span v-if="seatsOrBeds.length > 0">
+          {{ formatSeatsOrBeds(seatsOrBeds) }}
+        </span>
+      </li>
+    </ul>
+  </div>
     </div>
 
     <!-- Thêm logic thanh toán tại đây -->
@@ -47,7 +65,11 @@
 
 <script setup>
 import { useRoute } from "vue-router";
-
+const formatSeatsOrBeds = (seatsOrBeds) => {
+  return seatsOrBeds
+    .map((item) => `${item.sohieu} (${item.ticketType} ${item.ticketNumber})`)
+    .join(", ");
+};
 const route = useRoute();
 
 // Lấy dữ liệu từ query
