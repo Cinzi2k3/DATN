@@ -29,16 +29,16 @@
 </template>
 
 <script setup>
-import Navbar from "@/components/Navbar.vue";
-import Slide from "@/components/Slide.vue";
-import Muc from "@/components/Muc.vue";
-import Map from "@/components/Map.vue";
-import Tintuc from "@/components/Tintuc.vue";
-import Camnang from "@/components/Camnang.vue";
-import Review from "@/components/Review.vue";
-import Tauchay from "@/components/Tauchay.vue";
-import Eticket from "@/components/Eticket.vue";
-import Etickethome from "@/components/Etickethome.vue";
+import Navbar from "@/components/home/Navbar.vue";
+import Slide from "@/components/home/Slide.vue";
+import Muc from "@/components/home/Muc.vue";
+import Map from "@/components/home/Map.vue";
+import Tintuc from "@/components/home/Tintuc.vue";
+import Camnang from "@/components/home/Camnang.vue";
+import Review from "@/components/home/Review.vue";
+import Tauchay from "@/components/home/Tauchay.vue";
+import Eticket from "@/components/booketicket/Eticket.vue";
+import Etickethome from "@/components/home/Etickethome.vue";
 
 </script>
 

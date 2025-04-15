@@ -23,7 +23,7 @@ export function useTicketManagement() {
     {
       id: "adult",
       label: "Người lớn",
-      description: "Từ 11 - 59 tuổi",
+      description: "Từ 11 tuổi trở lên",
       count: 1,
       discount: null,
     },

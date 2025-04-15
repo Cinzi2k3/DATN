@@ -182,8 +182,8 @@
 
 <script setup>
 import { onMounted, watch, ref } from "vue";
-import SearchTicketResult from "@/components/SearchTicketResult.vue";
-import TrainInfoCard from "@/components/TrainInfoCard.vue";
+import SearchTicketResult from "./SearchTicketResult.vue";
+import TrainInfoCard from "./TrainInfoCard.vue";
 import {Refresh, Calendar, ArrowLeft, ArrowRight,} from "@element-plus/icons-vue";
 import { useTicketManagement } from '@/composables/useTicketManagement';
 import { useDateManagement } from '@/composables/useDateManagement';

@@ -89,8 +89,9 @@
       <div v-if="seats && seats.length > 0" class="mt-4 text-center d-flex">
         <div class="d-flex flex-column align-items-end"> 
           <span>Đã chọn : <strong class="fs-6">{{ totalSelected }} / {{ totalTickets }} chỗ</strong></span>
-          <span class="fw-bold fs-6">Tổng tiền : <span class="fs-3 text-primary">{{ formatTotalPrice(totalPrice) }}</span></span>
-        </div>
+          <div v-if="totalPrice === 0" class="textseat">Quý khách vui lòng chọn chỗ trống ở trên tương ứng loại vé</div>
+          <span v-else-if="totalPrice > 0 " class="fw-bold fs-6">Tổng tiền : <span class="fs-4 text-primary">{{ formatTotalPrice(totalPrice) }}</span></span>
+        </div> 
         <button
           class="btn btn-primary ms-3"
           :disabled="totalSelected !== totalTickets"

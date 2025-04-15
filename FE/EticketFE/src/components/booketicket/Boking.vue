@@ -67,8 +67,8 @@
 <script setup>
 import { ref, computed, onMounted, nextTick, watch } from "vue";
 import axios from "axios";
-import Seat from "@/components/Seat.vue";
-import Bed from "@/components/Bed.vue";
+import Seat from "./Seat.vue";
+import Bed from "./Bed.vue";
 import { useRouter } from "vue-router";
 import { ElNotification } from "element-plus";
 

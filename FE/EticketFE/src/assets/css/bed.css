@@ -216,4 +216,17 @@
     padding: 0.5rem 1rem;
     white-space: nowrap;
   }
+  .textbed{
+    margin-top: 15px;
+    color: red;
+  }
+  .discount-badge {
+    font-size: 0.75rem;
+    color: #fff;
+    background-color: #e91e63; /* Màu nền nổi bật, có thể tùy chỉnh */
+    padding: 1px 6px;
+    border-radius: 8px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
     

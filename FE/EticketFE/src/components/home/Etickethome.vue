@@ -143,7 +143,7 @@ import axios from "axios";
 import { useSwapStations } from "@/composables/useSwapStations";
 import { useDown } from "@/composables/useDown";
 import { useFetchStations } from "@/composables/useFetchStations";
-import { useTicketManagement } from "../composables/useTicketManagement";
+import { useTicketManagement } from "@/composables/useTicketManagement";
 
 const loading = ref(false);
 const router = useRouter();

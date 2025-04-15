@@ -73,7 +73,7 @@
 
 <script setup>
 import { ref } from "vue";
-import Boking from "@/components/Boking.vue";
+import Boking from "./Boking.vue";
 
 const dialogVisible = ref(false);
 
