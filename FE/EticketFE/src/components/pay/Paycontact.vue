@@ -13,6 +13,7 @@
             <el-input 
               v-model="form.phone" 
               placeholder="0123456789"
+              @change="emitContactInfo"
             />
           </el-form-item>
         </el-col>
@@ -21,24 +22,36 @@
             <el-input 
               v-model="form.email" 
               placeholder="example@gmail.com"
+              @change="emitContactInfo"
             />
           </el-form-item>
         </el-col>
       </el-row>
       
-      <el-checkbox v-model="form.eticketChecked">Xuất hóa đơn điện tử</el-checkbox>
+      <el-checkbox v-model="form.eticketChecked" @change="emitContactInfo">
+        Xuất hóa đơn điện tử
+      </el-checkbox>
     </el-form>
   </el-card>
 </template>
 
 <script setup>
-import { reactive } from 'vue';
+import { reactive, watch } from 'vue';
+
+const emits = defineEmits(['update:contactInfo']);
 
 const form = reactive({
   phone: '',
   email: '',
   eticketChecked: false
 });
+
+const emitContactInfo = () => {
+  emits('update:contactInfo', { ...form });
+};
+
+// Emit initial empty form
+emitContactInfo();
 </script>
 
 <style scoped>

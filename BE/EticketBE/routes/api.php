@@ -21,6 +21,7 @@ use App\Http\Controllers\GiaController;
 use App\Http\Controllers\DonHangController;
 use App\Http\Controllers\ThanhToanController;
 use App\Http\Controllers\DatVeController;
+use App\Http\Controllers\VNPayController;
 
 //Đăng nhập, đăng kí
 Route::post('/login', [AuthController::class, 'login']);
@@ -83,3 +84,7 @@ Route::apiResource('thanhtoan', ThanhToanController::class);
 
 //Đặt vé
 Route::get('/datve', [DatVeController::class, 'DatVe']);
+
+//Vnpay
+Route::post('/api/vnpay/create', [VNPayController::class, 'createPayment']);
+Route::get('/api/vnpay/return', [VNPayController::class, 'returnPayment']);

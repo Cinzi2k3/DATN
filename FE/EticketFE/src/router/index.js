@@ -28,6 +28,11 @@ const routes = [
     name: 'Payment',
     component: Payment
   },
+  {
+    path: '/payment/result',
+    name: 'PaymentResult',
+    component: () => import('@/views/PaymentResult.vue'),
+  },
 ];
 
 // Tạo instance router
