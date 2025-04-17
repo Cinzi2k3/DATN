@@ -9,7 +9,7 @@
     <div class="train-booking-header">
       <div class="route-container">
         <div class="route-info">
-          <span>{{ searchgadi }} → {{ searchgaden }} | {{ selectedDay }}</span>
+          <span>{{ searchgadi }} → {{ searchgaden }} | {{ selectedDay }} tới {{ arrivalDate }}</span>
         </div>
         <h2 class="train-title">{{ traintau }} {{ trainCode }}</h2>
       </div>
@@ -89,6 +89,7 @@ const props = defineProps({
   searchgadi: String,
   searchgaden: String,
   selectedDay: String,
+  arrivalDate: String,
   totalTickets: { type: Number, default: 1 },
   ticketDetails: Array,
   departureTime: String,
@@ -234,6 +235,7 @@ const handleBook = () => {
     searchgadi: props.searchgadi,
     searchgaden: props.searchgaden,
     selectedDay: props.selectedDay,
+    arrivalDate: props.arrivalDate,
     ticketDetails: props.ticketDetails,
     selectedSeatsByCar: selectedSeatsByCar.value,
     totalTickets: props.totalTickets,

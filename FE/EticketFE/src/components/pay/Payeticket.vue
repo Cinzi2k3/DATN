@@ -48,10 +48,10 @@
           </el-row>
 
           <!-- Thông tin hành khách -->
-          <el-form :model="form[index]" label-position="top">
+          <el-form :model="form[index]" label-position="top" :rules="rules">
             <el-row :gutter="20">
               <el-col :span="8">
-                <el-form-item label="Họ và tên" required>
+                <el-form-item label="Họ và tên" prop="name" required>
                   <el-input 
                     v-model="form[index].name" 
                     placeholder="Vd: Nguyễn Văn Nam"
@@ -64,32 +64,26 @@
                 <el-form-item label="Ngày sinh" required>
                   <el-row :gutter="8">
                     <el-col :span="8">
-                      <el-input 
-                        v-model="form[index].day" 
-                        placeholder="DD"
-                        @change="emitPassengerInfo"
-                      />
+                      <el-form-item prop="day">
+                        <el-input v-model="form[index].day" placeholder="DD" />
+                      </el-form-item>
                     </el-col>
                     <el-col :span="8">
-                      <el-input 
-                        v-model="form[index].month" 
-                        placeholder="MM"
-                        @change="emitPassengerInfo"
-                      />
+                      <el-form-item prop="month">
+                        <el-input v-model="form[index].month" placeholder="MM" />
+                      </el-form-item>
                     </el-col>
                     <el-col :span="8">
-                      <el-input 
-                        v-model="form[index].year" 
-                        placeholder="YYYY"
-                        @change="emitPassengerInfo"
-                      />
+                      <el-form-item prop="year">
+                        <el-input v-model="form[index].year" placeholder="YYYY" />
+                      </el-form-item>
                     </el-col>
                   </el-row>
                 </el-form-item>
               </el-col>
 
               <el-col :span="8">
-                <el-form-item>
+                <el-form-item prop="idNumber">
                   <template #label>
                     <div class="label-with-icon">
                       CCCD / Passport
@@ -132,6 +126,29 @@ const props = defineProps({
     default: null,
   },
 });
+
+const rules = {
+  name: [
+  { required: true, message: 'Vui lòng nhập họ và tên', trigger: 'blur' },
+  { pattern: /^[a-zA-ZÀ-ỹ]+(\s[a-zA-ZÀ-ỹ]+)+$/, message: 'Nhập đầy đủ họ và tên', trigger: 'blur'}
+ ],
+  day: [
+    { required: true, message: 'Nhập ngày', trigger: 'blur' },
+    { pattern: /^(0?[1-9]|[12][0-9]|3[01])$/, message: 'Ngày không hợp lệ', trigger: 'blur' }
+  ],
+  month: [
+    { required: true, message: 'Nhập tháng', trigger: 'blur' },
+    { pattern: /^(0?[1-9]|1[0-2])$/, message: 'Tháng không hợp lệ', trigger: 'blur' }
+  ],
+  year: [
+    { required: true, message: 'Nhập năm', trigger: 'blur' },
+    { pattern: /^(19|20)\d{2}$/, message: 'Năm không hợp lệ', trigger: 'blur' }
+  ],
+  idNumber: [
+    { required: true, message: 'Vui lòng nhập CCCD/Passport', trigger: 'blur' },
+    { min: 9, message: 'CCCD/Passport phải có ít nhất 9 ký tự', trigger: 'blur' }
+  ]
+};
 
 // Tạo danh sách vé kết hợp từ departureData và returnData
 const tickets = computed(() => {

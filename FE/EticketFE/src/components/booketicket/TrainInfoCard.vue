@@ -60,6 +60,7 @@
       :searchgadi="searchgadi"
       :searchgaden="searchgaden"
       :selectedDay="selectedDay"
+      :arrivalDate="arrivalDate"
       :totalTickets="totalTickets"
       :ticketDetails="ticketDetails"
       :departureTime="departureTime"
