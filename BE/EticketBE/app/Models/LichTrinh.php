@@ -33,22 +33,5 @@ public function DatVe()
 {
     return $this->hasOne(DatVe::class, 'malichtrinh');
 }
-protected $casts = [
-    'thoigiandi' => 'datetime',
-    'thoigianden' => 'datetime',
-];
-
-public function getThoiGianDiAttribute($value)
-{
-    return \Carbon\Carbon::parse($value)->format('H:i d/m/Y');
-}
-
-public function getThoiGianDenAttribute($value)
-{
-    return \Carbon\Carbon::parse($value)->format('H:i d/m/Y');
-}
-public function Ve(){
-    return $this -> belongsToMany(Ve::class,'malichtrinh');
-}
 
 }

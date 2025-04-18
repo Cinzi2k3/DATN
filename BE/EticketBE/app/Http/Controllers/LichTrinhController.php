@@ -52,8 +52,8 @@ class LichTrinhController extends Controller
         $tongSoGheCon = $tongSoGhe - $soGheDaDat;
         
         // Tính thời gian di chuyển
-        $thoiGianDi = Carbon::parse($lichTrinh->thoigiandi);
-        $thoiGianDen = Carbon::parse($lichTrinh->thoigianden);
+        $thoiGianDi = Carbon::createFromFormat('Y-m-d H:i:s', $lichTrinh->thoigiandi);
+        $thoiGianDen = Carbon::createFromFormat('Y-m-d H:i:s', $lichTrinh->thoigianden);
         $soGioDiChuyen = $thoiGianDi->diffInHours($thoiGianDen);
         $soPhutDiChuyen = $thoiGianDi->diffInMinutes($thoiGianDen) % 60;
         $thoiGianDiChuyen = $soGioDiChuyen . 'h' . $soPhutDiChuyen . 'p';
@@ -64,8 +64,8 @@ class LichTrinhController extends Controller
             'tenloaitau' => $lichTrinh->Tau->LoaiTau->tenloaitau ?? 'Không xác định',
             'gadi' => $lichTrinh->TuyenDuong->GaDi->tenga ?? 'Không xác định',
             'gaden' => $lichTrinh->TuyenDuong->GaDen->tenga ?? 'Không xác định',
-            'ngaydi' => Carbon::parse($lichTrinh->thoigiandi)->format('Y-m-d'),
-            'ngayden' => Carbon::parse($lichTrinh->thoigianden)->format('Y-m-d'),
+'ngaydi' => $thoiGianDi->format('Y-m-d'),
+            'ngayden' => $thoiGianDen->format('Y-m-d'),
             'giodi' => Carbon::parse($lichTrinh->thoigiandi)->format('H:i'),
             'gioden' => Carbon::parse($lichTrinh->thoigianden)->format('H:i'),
             'thoigiandichuyen' => $thoiGianDiChuyen,

@@ -163,4 +163,61 @@ const logout = async () => {
 
 <style scoped>
 @import url(@/assets/css/header.css);
+@media (max-width: 768px) {
+  .container {
+    margin-left: 1px;
+    margin-right: 1px;
+  }
+
+  .banner-marquee {
+    right: 0;
+    margin-top: 10px;
+    border-radius: 20px;
+  }
+
+  .dropdown {
+    width: 150px;
+    font-size: 14px;
+    right: 10px;
+    padding-top: 5px;
+  }
+
+  .phone {
+    font-size: 16px;
+    margin: 20px -10px 10px -30px;
+  }
+.vien{
+  margin-top: -5px;
+}
+
+  .loading-overlay {
+    width: 100vw;
+    height: 100vh;
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(255, 255, 255, 0.5);
+    border-top: 4px solid #fff;
+  }
+
+  /* Điều chỉnh cột */
+  .el-col {
+    flex: 1 1 100%; /* Chia cột thành hàng dọc trên thiết bị nhỏ */
+    margin-bottom: 10px;
+  }
+
+  /* Hình ảnh logo nhỏ hơn */
+
+  .headerSearch {
+    text-align: center;
+    margin-top: 10px;
+  }
+
+  .scrolling-text {
+    font-size: 12px;
+  }
+}
+
 </style>

@@ -1,86 +1,261 @@
 <template>
   <div class="payment-result">
-      <div class="result-container">
-          <el-card class="result-card">
-              <div v-if="paymentStatus === 'success'" class="success-result">
-                  <div class="icon-wrapper success">
-                      <i class="el-icon-check-circle"></i>
+    <div class="result-container">
+      <el-card class="result-card" :body-style="{ padding: '0px' }">
+        <!-- Thanh toán thành công -->
+        <div v-if="paymentStatus === 'success'" class="success-result">
+          <div class="header-section bg-success">
+            <div class="icon-wrapper success">
+              <el-icon class="icon-large"><Check /></el-icon>
+            </div>
+            <h1 class="mb-0">Thanh toán thành công!</h1>
+          </div>
+          
+          <div class="result-content py-4 px-4">
+            <div class="order-summary">
+              <div class="alert alert-light border mb-4">
+                <div class="row">
+                  <div class="col-md-6">
+                    <p class="mb-1"><strong>Tên người đặt:</strong> {{ bookingData.contact_name }}</p>
+                    <p class="mb-1"><strong>Số điện thoại:</strong> {{ bookingData.contact_phone }}</p>
+                    <p class="mb-1"><strong>Email:</strong> {{ bookingData.contact_email }}</p>
                   </div>
-                  <h1>Thanh toán thành công!</h1>
-                  <p>Cảm ơn bạn đã đặt vé. Mã đơn hàng của bạn là: {{ transactionId }}</p>
-                  <p>Loại vé: {{ bookingData.ticket_type === 'one-way' ? 'Một chiều' : 'Khứ hồi' }}</p>
-                  <p>Vé điện tử sẽ được gửi đến email của bạn trong vòng 15 phút.</p>
+                  <div class="col-md-6">
+                    <p class="mb-1"><strong>Ngày đặt:</strong> {{ getCurrentDate() }}</p>
+                    <p class="mb-1"><strong>Loại vé:</strong> {{ bookingData.ticket_type === 'one-way' ? 'Một chiều' : 'Khứ hồi' }}</p>
+                    <p class="mb-1"><strong>Phương thức thanh toán:</strong> VNPay</p>
+                  </div>
+                </div>
+              </div>
+              
+              <el-alert
+                type="info"
+                :closable="false"
+                show-icon>
+                <template #title>
+                  <span class="fw-bold">Thông báo</span>
+                </template>
+                <p class="mb-0">Vé điện tử sẽ được gửi đến email của bạn trong vòng 15 phút.</p>
+              </el-alert>
+            </div>
 
-                  <div class="ticket-info" v-if="bookingData">
-                      <h3>Thông tin vé</h3>
+            <div class="ticket-info mt-4" v-if="bookingData">
+              <div class="section-header">
+                <el-divider content-position="left">
+                  <el-icon class="me-2"><Ticket /></el-icon>Thông tin vé
+                </el-divider>
+              </div>
 
-                      <!-- Vé một chiều -->
-                      <div class="ticket-details" v-if="departureData?.length">
-                          <h4>Vé đi (Một chiều)</h4>
-                          <div v-for="(detail, index) in departureData" :key="`departure-${index}`">
-                              <p><strong>Tuyến đường:</strong> {{ detail.schedule_route }}</p>
-                              <p><strong>Thời gian:</strong> {{ detail.departureTime }} đến {{ detail.arrivalTime }}</p>
-                              <p><strong>Mã tàu:</strong> {{ detail.train_code }}</p>
-                              <p><strong>Loại tàu:</strong> {{ detail.train_type }}</p>
-                              <p><strong>Toa:</strong> {{ detail.car_name }}</p>
-                              <p><strong>Số ghế:</strong> {{ detail.seat_number }}</p>
-                              <p><strong>Giá vé:</strong> {{ formatTotalPrice(detail.price) }}</p>
-                              <p><strong>Hành khách:</strong> {{ detail.passenger?.name || 'Không có thông tin' }} ({{ detail.passenger?.cccd || 'N/A' }})</p>
+              <!-- Vé một chiều -->
+              <el-collapse v-model="activeCollapse" class="custom-collapse mb-3" v-if="departureData?.length">
+                <el-collapse-item name="departure">
+                  <template #title>
+                    <div class="d-flex align-items-center">
+                      <el-icon class="me-2 text-primary fs-5"><Right /></el-icon>
+                      <span class="fw-bold fs-5">Vé đi</span>
+                    </div>
+                  </template>
+                  <div class="card border-0 shadow-sm mb-3" v-for="(detail, index) in departureData" :key="`departure-${index}`">
+                    <div class="card-body">
+                      <div class="ticket-header mb-3 pb-3 border-bottom">
+                        <div class="d-flex justify-content-between">
+                          <div class="route-info">
+                            <h5 class="mb-1">{{ getFromToStations(detail.schedule_route) }}</h5>
+                            <p class="text-muted mb-0 mt-2">{{ formatDate(detail.departureTime) }} → {{ formatDate(detail.arrivalTime) }}</p>
                           </div>
-                      </div>
-
-                      <!-- Vé khứ hồi -->
-                      <div class="ticket-details" v-if="returnData?.length">
-                          <h4>Vé về (Khứ hồi)</h4>
-                          <div v-for="(detail, index) in returnData" :key="`return-${index}`">
-                              <p><strong>Tuyến đường:</strong> {{ detail.schedule_route }}</p>
-                              <p><strong>Thời gian:</strong> {{ detail.departureTime }} đến {{ detail.arrivalTime }}</p>
-                              <p><strong>Mã tàu:</strong> {{ detail.train_code }}</p>
-                              <p><strong>Loại tàu:</strong> {{ detail.train_type }}</p>
-                              <p><strong>Toa:</strong> {{ detail.car_name }}</p>
-                              <p><strong>Số ghế:</strong> {{ detail.seat_number }}</p>
-                              <p><strong>Giá vé:</strong> {{ formatTotalPrice(detail.price) }}</p>
-                              <p><strong>Hành khách:</strong> {{ detail.passenger?.name || 'Không có thông tin' }} ({{ detail.passenger?.cccd || 'N/A' }})</p>
+                          <div class="time-info text-end">
+                            <div class="d-flex align-items-center justify-content-end">
+                              <span class="fw-bold me-2">{{ getTime(detail.departureTime) }}</span>
+                              <div class="route-line mx-2">
+                                <el-icon class="mx-1"><Right /></el-icon>
+                              </div>
+                              <span class="fw-bold ms-2">{{ getTime(detail.arrivalTime) }}</span>
+                            </div>
+                            <div class="mt-1">
+                              <i class="far fa-clock me-1"></i>
+                              <span class="small">{{ calculateDuration(detail.departureTime, detail.arrivalTime) }}</span>
+                            </div>
                           </div>
+                        </div>
                       </div>
-
-                      <!-- Tổng tiền -->
-                      <div class="ticket-details">
-                          <p><strong>Tổng tiền:</strong> {{ formatTotalPrice(bookingData.total_amount) }}</p>
+                      
+                      <div class="row ticket-grid">
+                        <div class="col-md-6">
+                          <p><el-icon class="me-2 text-muted"><Van /></el-icon><strong>Mã tàu:</strong> {{ detail.train_code }}</p>
+                          <p><el-icon class="me-2 text-muted"><InfoFilled /></el-icon><strong>Loại tàu:</strong> {{ detail.train_type }}</p>
+                          <p><el-icon class="me-2 text-muted"><SuitcaseLine /></el-icon><strong>Toa:</strong> {{ detail.car_name }}</p>
+                          <p><el-icon class="me-2 text-muted"><OfficeBuilding /></el-icon><strong>Số ghế:</strong> {{ detail.seat_number }}</p>
+                        </div>
+                        <div class="col-md-6">
+                          <p><el-icon class="me-2 text-muted"><Money /></el-icon><strong>Giá vé:</strong> {{ formatTotalPrice(detail.price) }}</p>
+                          <p><el-icon class="me-2 text-muted"><User /></el-icon><strong>Hành khách:</strong> {{ detail.passenger?.name || 'Không có thông tin' }}</p>
+                          <p><el-icon class="me-2 text-muted"><Document /></el-icon><strong>CCCD/Passport:</strong> {{ detail.passenger?.cccd || 'N/A' }}</p>
+                          <p><el-icon class="me-2 text-muted"><Discount /></el-icon><strong>Loại vé:</strong> {{ getTicketType(detail.ticket_type) }}</p>
+                        </div>
                       </div>
+                    </div>
                   </div>
-                  <div v-else>
-                      <p>Không có thông tin vé.</p>
-                  </div>
+                </el-collapse-item>
+              </el-collapse>
 
-                  <div class="actions">
-                      <el-button type="primary" @click="goToHome">Về trang chủ</el-button>
-                      <el-button @click="printTicket">In vé</el-button>
+              <!-- Vé khứ hồi -->
+              <el-collapse v-model="activeCollapse" class="custom-collapse mb-3" v-if="returnData?.length">
+                <el-collapse-item name="return">
+                  <template #title>
+                    <div class="d-flex align-items-center">
+                      <el-icon class="me-2 text-success fs-5"><Back /></el-icon>
+                      <span class="fw-bold fs-5">Vé về</span>
+                    </div>
+                  </template>
+                  <div class="card border-0 shadow-sm mb-3" v-for="(detail, index) in returnData" :key="`return-${index}`">
+                    <div class="card-body">
+                      <div class="ticket-header mb-3 pb-3 border-bottom">
+                        <div class="d-flex justify-content-between">
+                          <div class="route-info">
+                            <h5 class="mb-1">{{ getFromToStations(detail.schedule_route) }}</h5>
+                            <p class="text-muted mb-0 mt-2">{{ formatDate(detail.departureTime) }} → {{ formatDate(detail.arrivalTime) }}</p>
+                          </div>
+                          <div class="time-info text-end">
+                            <div class="d-flex align-items-center justify-content-end">
+                              <span class="fw-bold me-2">{{ getTime(detail.departureTime) }}</span>
+                              <div class="route-line mx-2">
+                                <el-icon class="mx-1"><Right /></el-icon>
+                              </div>
+                              <span class="fw-bold ms-2">{{ getTime(detail.arrivalTime) }}</span>
+                            </div>
+                            <div class="mt-1">
+                              <i class="far fa-clock me-1"></i>
+                              <span class="small">{{ calculateDuration(detail.departureTime, detail.arrivalTime) }}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="row ticket-grid">
+                        <div class="col-md-6">
+                          <p><el-icon class="me-2 text-muted"><Van /></el-icon><strong>Mã tàu:</strong> {{ detail.train_code }}</p>
+                          <p><el-icon class="me-2 text-muted"><InfoFilled /></el-icon><strong>Loại tàu:</strong> {{ detail.train_type }}</p>
+                          <p><el-icon class="me-2 text-muted"><SuitcaseLine /></el-icon><strong>Toa:</strong> {{ detail.car_name }}</p>
+                          <p><el-icon class="me-2 text-muted"><OfficeBuilding /></el-icon><strong>Số ghế:</strong> {{ detail.seat_number }}</p>
+                        </div>
+                        <div class="col-md-6">
+                          <p><el-icon class="me-2 text-muted"><Money /></el-icon><strong>Giá vé:</strong> {{ formatTotalPrice(detail.price) }}</p>
+                          <p><el-icon class="me-2 text-muted"><User /></el-icon><strong>Hành khách:</strong> {{ detail.passenger?.name || 'Không có thông tin' }}</p>
+                          <p><el-icon class="me-2 text-muted"><Document /></el-icon><strong>CCCD/Passport:</strong> {{ detail.passenger?.cccd || 'N/A' }}</p>
+                          <p><el-icon class="me-2 text-muted"><Discount /></el-icon><strong>Loại vé:</strong> {{ getTicketType(detail.ticket_type) }}</p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
+                </el-collapse-item>
+              </el-collapse>
+
+              <!-- Tổng tiền -->
+              <div class="total-section mt-4">
+                <div class="card border-0 shadow-sm">
+                  <div class="card-body">
+                    <h5 class="mb-3 border-bottom pb-2">Chi tiết thanh toán</h5>
+                    <div class="d-flex justify-content-between mb-2">
+                      <span>Tổng tiền vé:</span>
+                      <span>{{ formatTotalPrice(bookingData.total_amount) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                      <span>Phí dịch vụ:</span>
+                      <span>Chưa có</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                      <span>Giảm giá:</span>
+                      <span class="text-success">Chưa có</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center">
+                      <span class="fw-bold fs-5">Tổng thanh toán:</span>
+                      <span class="fs-4 fw-bold">{{ formatTotalPrice(bookingData.total_amount) }}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div v-else-if="paymentStatus === 'failed'" class="failed-result">
-                  <div class="icon-wrapper failed">
-                      <i class="el-icon-close-circle"></i>
-                  </div>
-                  <h1>Thanh toán thất bại</h1>
-                  <p>Rất tiếc, thanh toán của bạn không thành công.</p>
-                  <p>Mã lỗi: {{ errorCode }}</p>
-                  <div class="actions">
-                      <el-button @click="tryAgain">Thử lại</el-button>
-                      <el-button @click="goToHome">Về trang chủ</el-button>
-                  </div>
+              <!-- Mã QR -->
+              <div class="qr-code-section mt-4 text-center">
+                <h5>Mã QR vé của bạn</h5>
+                <qrcode-vue
+                  v-if="qrCodeData"
+                  :value="qrCodeData"
+                  :size="200"
+                  level="H"
+                  class="qr-code"
+                />
+                <p class="text-muted mt-2">Quét mã QR tại quầy check-in để xác nhận vé.</p>
               </div>
+            </div>
+            <div v-else class="alert alert-warning mt-4">
+              <el-icon class="me-2"><WarningFilled /></el-icon>
+              Không có thông tin vé.
+            </div>
 
-              <div v-else class="processing-result">
-                  <div class="icon-wrapper processing">
-                      <i class="el-icon-loading"></i>
-                  </div>
-                  <h1>Đang xử lý thanh toán</h1>
-                  <p>Vui lòng đợi trong khi chúng tôi xác nhận thanh toán của bạn.</p>
-              </div>
-          </el-card>
-      </div>
+            <div class="actions mt-4 text-center">
+              <el-button type="primary" round size="large" @click="goToHome">
+                <el-icon class="me-2"><HomeFilled /></el-icon>Về trang chủ
+              </el-button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Thanh toán thất bại -->
+        <div v-else-if="paymentStatus === 'failed'" class="failed-result">
+          <div class="header-section bg-danger">
+            <div class="icon-wrapper failed">
+              <el-icon class="icon-large"><Close /></el-icon>
+            </div>
+            <h1 class="mb-0">Thanh toán thất bại</h1>
+          </div>
+          
+          <div class="result-content py-4 px-4 text-center">
+            <el-alert
+              type="error"
+              :closable="false"
+              show-icon
+              class="mb-4">
+              <template #title>
+                <span class="fw-bold">Rất tiếc, thanh toán của bạn không thành công.</span>
+              </template>
+              <p class="mb-0">Mã lỗi: {{ errorCode }}</p>
+            </el-alert>
+            
+            <div class="actions mt-4">
+              <el-button type="danger" round size="large" @click="tryAgain">
+                <el-icon class="me-2"><RefreshRight /></el-icon>Thử lại
+              </el-button>
+              <el-button round size="large" @click="goToHome">
+                <el-icon class="me-2"><HomeFilled /></el-icon>Về trang chủ
+              </el-button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Đang xử lý -->
+        <div v-else class="processing-result">
+          <div class="header-section bg-primary">
+            <div class="icon-wrapper processing">
+              <el-progress type="circle" :percentage="100" status="processing"></el-progress>
+            </div>
+            <h1 class="mb-0">Đang xử lý thanh toán</h1>
+          </div>
+          
+          <div class="result-content py-4 px-4 text-center">
+            <el-alert
+              type="info"
+              :closable="false"
+              show-icon>
+              <template #title>
+                <span class="fw-bold">Vui lòng đợi trong khi chúng tôi xác nhận thanh toán của bạn.</span>
+              </template>
+            </el-alert>
+          </div>
+        </div>
+      </el-card>
+    </div>
   </div>
 </template>
 
@@ -88,7 +263,13 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useFormatPrice } from '@/composables/useFormatprice';
+import QrcodeVue from 'qrcode.vue';
 import axios from 'axios';
+import {
+  Check, Close, Clock, HomeFilled, Ticket, User, Money,
+  InfoFilled, LocationInformation, Right, Back, RefreshRight, WarningFilled,
+  Van, SuitcaseLine, OfficeBuilding, View, Document, Discount
+} from '@element-plus/icons-vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -98,47 +279,56 @@ const paymentStatus = ref('processing');
 const transactionId = ref('');
 const errorCode = ref('');
 const bookingData = ref(null);
+const activeCollapse = ref(['departure', 'return']);
+const qrCodeData = ref('');
 
 const departureData = computed(() => {
   if (bookingData.value?.details) {
-      return bookingData.value.details.departure || [];
-  }
-  return [];
-});
-const returnData = computed(() => {
-  if (bookingData.value?.details) {
-      return bookingData.value.details.return || [];
+    return bookingData.value.details.departure || [];
   }
   return [];
 });
 
+const returnData = computed(() => {
+  if (bookingData.value?.details) {
+    return bookingData.value.details.return || [];
+  }
+  return [];
+});
+
+// Trong PaymentResult.vue, sửa qrCodeData
 onMounted(async () => {
   const vnpTxnRef = route.query.vnp_TxnRef;
   const vnpResponseCode = route.query.vnp_ResponseCode;
 
   if (!vnpTxnRef) {
-      paymentStatus.value = 'failed';
-      errorCode.value = 'Không tìm thấy mã giao dịch';
-      return;
+    paymentStatus.value = 'failed';
+    errorCode.value = 'Không tìm thấy mã giao dịch';
+    return;
   }
 
   transactionId.value = vnpTxnRef;
 
   if (vnpResponseCode === '00') {
-      paymentStatus.value = 'success';
+    paymentStatus.value = 'success';
 
-      try {
-          const response = await axios.get(`/orders/${vnpTxnRef}`);
-          console.log('API response:', response.data);
-          bookingData.value = response.data.bookingData;
-      } catch (error) {
-          console.error('Lỗi khi lấy dữ liệu đơn hàng:', error.response?.data || error.message);
-          paymentStatus.value = 'failed';
-          errorCode.value = error.response?.data?.error || 'Lỗi tải dữ liệu đơn hàng';
+    try {
+      const response = await axios.get(`/orders/${vnpTxnRef}`);
+      console.log('API response:', response.data);
+      bookingData.value = response.data.bookingData;
+
+      // Tạo mã QR chứa URL
+      if (bookingData.value) {
+        qrCodeData.value = `http://192.168.0.105:5173/check-in?vnp_txn_ref=${vnpTxnRef}`;
       }
-  } else {
+    } catch (error) {
+      console.error('Lỗi khi lấy dữ liệu đơn hàng:', error.response?.data || error.message);
       paymentStatus.value = 'failed';
-      errorCode.value = vnpResponseCode || 'Lỗi không xác định';
+      errorCode.value = error.response?.data?.error || 'Lỗi tải dữ liệu đơn hàng';
+    }
+  } else {
+    paymentStatus.value = 'failed';
+    errorCode.value = vnpResponseCode || 'Lỗi không xác định';
   }
 });
 
@@ -150,117 +340,59 @@ const tryAgain = () => {
   router.go(-1);
 };
 
-const printTicket = () => {
-  window.print();
+// Hàm xử lý dữ liệu
+const getFromToStations = (route) => {
+  if (!route) return 'N/A';
+  const stations = route.split(' - ');
+  return stations.length === 2 ? stations.join(' → ') : route;
+};
+
+const formatDate = (dateTime) => {
+  if (!dateTime) return 'N/A';
+  const date = new Date(dateTime);
+  return date.toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+};
+
+const getTime = (dateTime) => {
+  if (!dateTime) return 'N/A';
+  const date = new Date(dateTime);
+  return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+};
+
+const calculateDuration = (start, end) => {
+  if (!start || !end) return 'N/A';
+  
+  const startTime = new Date(start);
+  const endTime = new Date(end);
+  const diff = endTime - startTime;
+  
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  
+  return `${hours} giờ ${minutes} phút`;
+};
+
+const getTicketType = (ticket_type) => {
+  const types = {
+    'adult': 'Người lớn',
+    'child': 'Trẻ em',
+  };
+  return types[ticket_type] || 'N/A';
+};
+
+const getCurrentDate = () => {
+  return new Date().toLocaleDateString('vi-VN', { year: 'numeric', month: 'long', day: 'numeric' });
 };
 </script>
 
-<style scoped>
-.payment-result {
-  background-color: #f2f7fa;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 0;
+<style>
+@import url(@/assets/css/paymentresult.css);
+
+.qr-code-section {
+  margin-top: 20px;
 }
 
-.result-container {
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.result-card {
-  padding: 20px;
-}
-
-.icon-wrapper {
-  font-size: 64px;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.success-result,
-.failed-result,
-.processing-result {
-  text-align: center;
-  padding: 20px 0;
-}
-
-.success .el-icon-check-circle {
-  color: #67c23a;
-}
-
-.failed .el-icon-close-circle {
-  color: #f56c6c;
-}
-
-.processing .el-icon-loading {
-  color: #409eff;
-}
-
-h1 {
-  font-size: 28px;
-  margin-bottom: 20px;
-  color: #303133;
-}
-
-p {
-  color: #606266;
-  margin-bottom: 10px;
-}
-
-.ticket-info {
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  padding: 20px;
-  margin: 30px 0;
-  text-align: left;
-}
-
-.ticket-info h3 {
-  margin-top: 0;
-  color: #104c8a;
-  font-size: 18px;
-  margin-bottom: 15px;
-}
-
-.ticket-info h4 {
-  color: #104c8a;
-  font-size: 16px;
-  margin: 20px 0 10px;
-}
-
-.ticket-details {
-  margin-bottom: 20px;
-  padding: 10px;
-  border-bottom: 1px solid #e8ecef;
-}
-
-.ticket-details:last-child {
-  border-bottom: none;
-}
-
-.ticket-details p {
-  margin-bottom: 8px;
-}
-
-.actions {
-  margin-top: 30px;
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-}
-
-@media print {
-  .actions {
-      display: none;
-  }
-
-  .ticket-info {
-      background-color: transparent;
-      border: none;
-  }
+.qr-code {
+  display: inline-block;
 }
 </style>

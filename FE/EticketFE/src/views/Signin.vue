@@ -85,7 +85,7 @@ const loading = ref(false);
 const signup = async () => {
   loading.value = true;
   try {
-    const response = await axios.post("http://127.0.0.1:8000/api/register", {
+    const response = await axios.post("/register", {
       name: name.value,
       email: email.value,
       password: password.value,
@@ -105,13 +105,13 @@ const signin = async () => {
   loading.value = true;
   try {
     // Gửi yêu cầu đăng nhập
-    const loginResponse = await axios.post("http://127.0.0.1:8000/api/login", {
+    const loginResponse = await axios.post("/login", {
       email: email.value,
       password: password.value,
     });
     ElNotification.success("Đăng nhập thành công");
     // Gửi yêu cầu lấy thông tin người dùng
-    const userResponse = await axios.get(`http://127.0.0.1:8000/api/user?email=${email.value}`);
+    const userResponse = await axios.get(`/user?email=${email.value}`);
     if (userResponse.data.success) {
       const userName = userResponse.data.user.name;
       // Lưu tên vào authStore

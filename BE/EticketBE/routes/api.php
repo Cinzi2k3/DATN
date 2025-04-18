@@ -23,6 +23,7 @@ use App\Http\Controllers\ThanhToanController;
 use App\Http\Controllers\DatVeController;
 use App\Http\Controllers\VNPayController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\CheckInController;
 
 //Đăng nhập, đăng kí
 Route::post('/login', [AuthController::class, 'login']);
@@ -93,3 +94,6 @@ Route::get('/vnpay/return', [VNPayController::class, 'returnPayment']);
 //order
 Route::get('/orders', [OrderController::class, 'index']);
 Route::get('/orders/{txnRef}', [OrderController::class, 'show']);
+
+//checkin
+Route::post('/check-in', [CheckInController::class, 'checkIn']);

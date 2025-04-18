@@ -36,10 +36,11 @@
         </el-col>
         <el-col :span="8" class="text-center text-muted fs-4">
           <i class="fa-solid fa-train"></i>
+          <div class="text-muted">{{ departureData.duration }}</div>
         </el-col>
         <el-col :span="8" class="text-end">
           <div class="fw-bold fs-5">{{ departureData.arrivalTime }}</div>
-          <div class="text-muted">{{ departureData.selectedDay }}</div>
+          <div class="text-muted">{{ departureData.arrivalDate }}</div>
         </el-col>
       </el-row>
     </div>
@@ -82,10 +83,11 @@
         </el-col>
         <el-col :span="8" class="text-center text-muted fs-4">
           <i class="fa-solid fa-train"></i>
+          <div class="text-muted">{{ returnData.duration }}</div>
         </el-col>
         <el-col :span="8" class="text-end">
           <div class="fw-bold fs-5">{{ returnData.arrivalTime }}</div>
-          <div class="text-muted">{{ returnData.selectedDay }}</div>
+          <div class="text-muted">{{ returnData.arrivalDate }}</div>
         </el-col>
       </el-row>
     </div>

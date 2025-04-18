@@ -84,14 +84,12 @@
 
               <el-col :span="8">
                 <el-form-item prop="idNumber">
-                  <template #label>
                     <div class="label-with-icon">
                       CCCD / Passport
                       <el-tooltip content="Thông tin được yêu cầu bởi đường sắt Việt Nam" placement="top">
                         <el-icon><InfoFilled /></el-icon>
                       </el-tooltip>
                     </div>
-                  </template>
                   <el-input 
                     v-model="form[index].idNumber" 
                     placeholder="Nhập CCCD hoặc Passport"

@@ -34,6 +34,7 @@ class OrderController extends Controller
                     'contact_phone' => $order->contact_phone,
                     'total_amount' => $order->total_amount,
                     'status' => $order->status,
+                    'checkin' => $order->checkin,
                     'ticket_type' => $order->ticket_type,
                     'details' => $order->details->map(function ($detail) {
                         return [

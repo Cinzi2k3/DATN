@@ -14,6 +14,7 @@ class Order extends Model
         'contact_phone',
         'total_amount',
         'status',
+        'checkin',
     ];
 
     public function passengers()
