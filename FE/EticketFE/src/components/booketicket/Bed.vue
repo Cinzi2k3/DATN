@@ -40,11 +40,11 @@
                 class="bed"
                 :class="{
                   selected: isBedSelected(bed.sohieu),
-                  unavailable: bed.trangthai === 'Đã đặt',
+                  unavailable: bed.trangthai === 'dadat',
                 }"
               >
                 <div class="bed-number">{{ bed.sohieu }}</div>
-                <div v-if="bed.trangthai !== 'Đã đặt'" class="bed-price">
+                <div v-if="bed.trangthai === 'controng'" class="bed-price">
                   {{ formatPrice(bed.gia) }}
                 </div>
               </div>

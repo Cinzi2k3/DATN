@@ -218,7 +218,7 @@ const updateSelectedSeats = (carType, newSelected) => {
 };
 
 // Booking.vue
-const handleBook = () => {
+const handleBook = async () => {
   // Kiểm tra ràng buộc vé trẻ em trực tiếp
   for (const [carType, selections] of Object.entries(selectedSeatsByCar.value)) {
     const hasChild = selections.some((seat) => seat.ticketType === "Trẻ em");
@@ -245,17 +245,41 @@ const handleBook = () => {
     totalPrice: totalPrice.value,
   };
 
-  emits("submit", bookingData);
+  try {
+    // Gửi yêu cầu đặt vé đến API
 
-  if (props.isReturnTrip) {
-    emits("proceed-to-return");
-  } else {
-    router.push({
-      name: "Payment",
-      query: { data: JSON.stringify(bookingData) },
-    });
-    ElNotification.success("Đặt vé thành công! Vui lòng thanh toán để hoàn tất!");
-    closeDialog();
+    const response = await axios.post("/datve", {
+      sohieu: selectedSeatsByCar.value[carOptions.value[selectedCar.value].type].map(
+        (seat) => seat.sohieu
+      ),
+      malichtrinh: props.malichtrinh,
+      matoa: carOptions.value[selectedCar.value].id,
+
+      });
+
+    if (response.data.success) {
+      ElNotification.success("Đặt vé thành công !");
+
+      // Tải lại dữ liệu ghế để cập nhật giao diện
+      await fetchTrainCars();
+
+      // Emit dữ liệu đặt vé
+      emits("submit", bookingData);
+
+      if (props.isReturnTrip) {
+        emits("proceed-to-return");
+      } else {
+        router.push({
+          name: "Payment",
+          query: { data: JSON.stringify(bookingData) },
+        });
+        closeDialog();
+      }
+    } else {
+      ElNotification.error(response.data.error || "Đặt vé thất bại!");
+    }
+  } catch (error) {
+    ElNotification.error("Lỗi khi đặt vé: " + error.message);
   }
 };
 
