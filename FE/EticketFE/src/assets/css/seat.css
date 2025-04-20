@@ -1,4 +1,4 @@
-.car-container {
+gap.car-container {
   max-width: 800px;
   margin: 0 auto;
 }
@@ -99,10 +99,10 @@
   z-index: 1; /* Added to ensure square is behind armrests and backrest */
 }
 
-.seat:hover:not(.unavailable) .seat-square,
-.seat:hover:not(.unavailable) .seat-backrest,
-.seat:hover:not(.unavailable) .seat-top-armrest,
-.seat:hover:not(.unavailable) .seat-bottom-armrest {
+.seat:hover:not(.unavailable):not(.danggiu) .seat-square,
+.seat:hover:not(.unavailable):not(.danggiu) .seat-backrest,
+.seat:hover:not(.unavailable):not(.danggiu) .seat-top-armrest,
+.seat:hover:not(.unavailable):not(.danggiu) .seat-bottom-armrest {
   background-color: #e6f2ff;
 }
 
@@ -122,6 +122,15 @@
 .seat.unavailable .seat-bottom-armrest {
   background-color: #e9ecef;
   border-color: #ced4da;
+  cursor: not-allowed;
+}
+
+.seat.danggiu .seat-square,
+.seat.danggiu .seat-backrest,
+.seat.danggiu .seat-top-armrest,
+.seat.danggiu .seat-bottom-armrest {
+  background-color: #84b97d;
+  border-color: #7a9e75;
   cursor: not-allowed;
 }
 
@@ -152,7 +161,6 @@
   display: flex;
   justify-content: center;
   margin-top: 2rem;
-  gap: 20px;
 }
 
 .legend-item {
@@ -231,6 +239,14 @@
 .legend-item.unavailable .legend-bottom {
   background-color: #e9ecef;
   border-color: #ced4da;
+}
+
+.legend-item.dang-giu .legend-backrest,
+.legend-item.dang-giu .legend-top,
+.legend-item.dang-giu .legend-square,
+.legend-item.dang-giu .legend-bottom {
+  background-color: #84b97d;
+  border-color: #84b97d;
 }
 
 .btn-primary {

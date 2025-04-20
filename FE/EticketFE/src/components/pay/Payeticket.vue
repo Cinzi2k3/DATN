@@ -231,7 +231,6 @@ const emitPassengerInfo = () => {
     ...passenger,
     ticketInfo: tickets.value[index]
   }));
-  
   emits('update:passengerInfo', passengerInfo);
 };
 

@@ -91,7 +91,7 @@
     z-index: 2;
   }
   
-  .bed:hover:not(.unavailable) {
+  .bed:hover:not(.unavailable):not(.danggiu) {
     background-color: #e6f2ff;
     transform: translateY(-2px);
   }
@@ -105,6 +105,15 @@
   .bed.selected:before {
     background-color: #4dabf7;
     border-color: #339af0;
+  }
+  .bed.danggiu {
+    background-color: #84b97d;
+    border-color: #84b97d;
+    cursor: not-allowed;
+  }
+  .bed.danggiu:before {
+    background-color: #78b970;
+    border-color: #5bb14f;
   }
   
   .bed.unavailable {
@@ -181,6 +190,15 @@
   .beds.selected:before {
     background-color: #4dabf7;
     border-color: #339af0;
+  }
+  .beds.dang-giu {
+    background-color: #84b97d;
+    border-color: #84b97d;
+    width: 55%;
+  }
+  .beds.dang-giu:before {
+    background-color: #78b970;
+    border-color: #5bb14f;
   }
   
   .beds.unavailable {

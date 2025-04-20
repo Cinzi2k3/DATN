@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Passenger;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class VNPayController extends Controller
@@ -18,14 +19,14 @@ class VNPayController extends Controller
             Log::info('VNPay createPayment request:', $request->all());
 
             $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-            $vnp_Returnurl = "http://127.0.0.1:8000/api/vnpay/return";
-            $vnp_TmnCode = "KHT30JML";
-            $vnp_HashSecret = "YDKXVCGC7KL9KGJ8Y83JTORK8MWXCFSV";
+                $vnp_Returnurl = "http://127.0.0.1:8000/api/vnpay/return";
+                $vnp_TmnCode = "KHT30JML";
+                $vnp_HashSecret = "YDKXVCGC7KL9KGJ8Y83JTORK8MWXCFSV";
 
             // Tạo mã đơn hàng
             $vnp_TxnRef = time() . "-" . Str::random(8);
 
-            // Lưu thông tin đơn hàng vào bảng orders
+            // Lưu thông tin đơn hàng
             $order = new Order();
             $order->transaction_id = $vnp_TxnRef;
             $order->contact_name = $request->contact['name'] ?? 'Unknown';
@@ -37,7 +38,7 @@ class VNPayController extends Controller
             $order->save();
             Log::info('Order saved:', ['order_id' => $order->id, 'transaction_id' => $order->transaction_id]);
 
-            // Lưu thông tin hành khách và ánh xạ ID hành khách
+            // Lưu thông tin hành khách
             $passengerIds = [];
             foreach ($request->passengers as $passenger) {
                 $passengerRecord = new Passenger();
@@ -49,62 +50,52 @@ class VNPayController extends Controller
                 $passengerIds[] = $passengerRecord->id;
             }
 
-            // Lưu chi tiết vé đi (one-way)
-            $passengerIndex = 0;
-            foreach ($request->departure['selectedSeatsByCar'] as $carName => $seatAssignments) {
-                foreach ($seatAssignments as $seat) {
-                    if ($passengerIndex >= count($request->passengers)) break;
-
-                    $passenger = $request->passengers[$passengerIndex];
-
-                    $orderDetail = new OrderDetail();
-                    $orderDetail->order_id = $order->id;
-                    $orderDetail->passenger_id = $passengerIds[$passengerIndex];
-                    $orderDetail->trip_type = 'departure';
-                    $orderDetail->ticket_type = $passenger['ticket_type'] ?? ($seat['ticketType'] === 'Người lớn' ? 'adult' : 'child');
-                    $orderDetail->schedule_route = ($request->departure['searchgadi'] ?? 'Unknown') . ' - ' . ($request->departure['searchgaden'] ?? 'Unknown');
-                    $orderDetail->car_name = $carName; // Lưu tên toa động
-                    $orderDetail->departure_time = Carbon::createFromFormat('Y-m-d H:i', $request->departure['selectedDay'] . ' ' . $request->departure['departureTime'])->toDateTimeString();
-                    $orderDetail->arrival_time = Carbon::createFromFormat('Y-m-d H:i', $request->departure['arrivalDate'] . ' ' . $request->departure['arrivalTime'])->toDateTimeString();
-                    $orderDetail->train_code = $request->departure['trainCode'] ?? 'Unknown';
-                    $orderDetail->train_type = $request->departure['traintau'] ?? 'Unknown';
-                    $orderDetail->seat_number = $seat['sohieu'] ?? 'Unknown';
-                    $orderDetail->price = $seat['gia'] ?? ($request->amount / count($request->passengers));
-                    $orderDetail->save();
-                    Log::info('OrderDetail (one-way) saved:', ['detail_id' => $orderDetail->id, 'car_name' => $carName]);
-
-                    $passengerIndex++;
-                }
-            }
-
-            // Lưu chi tiết vé về (nếu có)
-            if ($request->return && !empty($request->return['searchgadi']) && !empty($request->return['searchgaden'])) {
+            // Hàm lưu chi tiết vé 
+            $saveOrderDetails = function ($tripType, $tripData, $orderId, $passengerIds, $passengers) {
                 $passengerIndex = 0;
-                foreach ($request->return['selectedSeatsByCar'] as $carName => $seatAssignments) {
+                foreach ($tripData['selectedSeatsByCar'] as $carName => $seatAssignments) {
                     foreach ($seatAssignments as $seat) {
-                        if ($passengerIndex >= count($request->passengers)) break;
+                        if ($passengerIndex >= count($passengers)) break;
 
-                        $passenger = $request->passengers[$passengerIndex];
+                        $passenger = $passengers[$passengerIndex];
+
+                        // Lấy macho từ bảng cho
+                        $seatInfo = DB::table('cho')
+                            ->where('sohieu', $seat['sohieu'])
+                            ->where('matoa', $tripData['matoa'])
+                            ->first();
+
+                        if (!$seatInfo) {
+                            throw new \Exception("Ghế {$seat['sohieu']} không tồn tại trong toa {$tripData['matoa']}.");
+                        }
 
                         $orderDetail = new OrderDetail();
-                        $orderDetail->order_id = $order->id;
+                        $orderDetail->order_id = $orderId;
                         $orderDetail->passenger_id = $passengerIds[$passengerIndex];
-                        $orderDetail->trip_type = 'return';
+                        $orderDetail->trip_type = $tripType;
                         $orderDetail->ticket_type = $passenger['ticket_type'] ?? ($seat['ticketType'] === 'Người lớn' ? 'adult' : 'child');
-                        $orderDetail->schedule_route = ($request->return['searchgadi'] ?? 'Unknown') . ' - ' . ($request->return['searchgaden'] ?? 'Unknown');
-                        $orderDetail->car_name = $carName; // Lưu tên toa động
-                        $orderDetail->departure_time = Carbon::createFromFormat('Y-m-d H:i', $request->return['selectedDay'] . ' ' . $request->return['departureTime'])->toDateTimeString();
-                        $orderDetail->arrival_time = Carbon::createFromFormat('Y-m-d H:i', $request->return['arrivalDate'] . ' ' . $request->return['arrivalTime'])->toDateTimeString();
-                        $orderDetail->train_code = $request->return['trainCode'] ?? 'Unknown';
-                        $orderDetail->train_type = $request->return['traintau'] ?? 'Unknown';
+                        $orderDetail->schedule_route = ($tripData['searchgadi'] ?? 'Unknown') . ' - ' . ($tripData['searchgaden'] ?? 'Unknown');
+                        $orderDetail->car_name = $carName;
+                        $orderDetail->departure_time = Carbon::createFromFormat('Y-m-d H:i', $tripData['selectedDay'] . ' ' . $tripData['departureTime'])->toDateTimeString();
+                        $orderDetail->arrival_time = Carbon::createFromFormat('Y-m-d H:i', $tripData['arrivalDate'] . ' ' . $tripData['arrivalTime'])->toDateTimeString();
+                        $orderDetail->train_code = $tripData['trainCode'] ?? 'Unknown';
+                        $orderDetail->train_type = $tripData['traintau'] ?? 'Unknown';
                         $orderDetail->seat_number = $seat['sohieu'] ?? 'Unknown';
-                        $orderDetail->price = $seat['gia'] ?? ($request->amount / count($request->passengers));
+                        $orderDetail->price = $seat['gia'] ?? ($request->amount / count($passengers));
                         $orderDetail->save();
-                        Log::info('OrderDetail (round-trip) saved:', ['detail_id' => $orderDetail->id, 'car_name' => $carName]);
+                        Log::info("OrderDetail ($tripType) saved:", ['detail_id' => $orderDetail->id, 'car_name' => $carName]);
 
                         $passengerIndex++;
                     }
                 }
+            };
+
+            // Lưu chi tiết vé đi
+            $saveOrderDetails('departure', $request->departure, $order->id, $passengerIds, $request->passengers, $vnp_TxnRef);
+
+            // Lưu chi tiết vé về (nếu có)
+            if ($request->return && !empty($request->return['searchgadi']) && !empty($request->return['searchgaden'])) {
+                $saveOrderDetails('return', $request->return, $order->id, $passengerIds, $request->passengers, $vnp_TxnRef);
             }
 
             // Tạo dữ liệu gửi đến VNPay
@@ -197,10 +188,44 @@ class VNPayController extends Controller
 
             if ($order) {
                 if ($inputData['vnp_ResponseCode'] == '00') {
+                    // Thanh toán thành công, cập nhật trạng thái ghế thành dadat
+                    $orderDetails = OrderDetail::where('order_id', $order->id)->get();
+                    foreach ($orderDetails as $detail) {
+                        $seatInfo = DB::table('cho')
+                            ->where('sohieu', $detail->seat_number)
+                            ->first();
+
+                        if ($seatInfo) {
+                            DB::table('datve')
+                                ->where('macho', $seatInfo->macho)
+                                ->update([
+                                    'trangthai' => 'dadat',
+                                    'thoihan_giu' => null,
+                                ]);
+                        }
+                    }
+
                     $order->status = 'completed';
                     $order->save();
                     $redirectUrl = env('FRONTEND_URL') . '/payment/result?vnp_TxnRef=' . $inputData['vnp_TxnRef'] . '&vnp_ResponseCode=' . $inputData['vnp_ResponseCode'];
                 } else {
+                    // Thanh toán thất bại, cập nhật trạng thái ghế về controng
+                    $orderDetails = OrderDetail::where('order_id', $order->id)->get();
+                    foreach ($orderDetails as $detail) {
+                        $seatInfo = DB::table('cho')
+                            ->where('sohieu', $detail->seat_number)
+                            ->first();
+
+                        if ($seatInfo) {
+                            DB::table('datve')
+                                ->where('macho', $seatInfo->macho)
+                                ->update([
+                                    'trangthai' => 'controng',
+                                    'thoihan_giu' => null,
+                                ]);
+                        }
+                    }
+
                     $order->status = 'failed';
                     $order->save();
                     $redirectUrl = env('FRONTEND_URL', 'http://localhost:5173') . '/payment/result?vnp_ResponseCode=' . ($inputData['vnp_ResponseCode'] ?? '99') . '&status=failed';

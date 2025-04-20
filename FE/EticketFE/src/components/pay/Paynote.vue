@@ -8,7 +8,7 @@
             Vé điện tử sẽ gửi qua email và điện thoại sau khi thanh toán.
           </li>
           <li class="mb-2">
-            Thanh toán qua mã QR, chuyển khoản, thẻ nội địa/quốc tế hoặc MoMo.
+            Thanh toán qua mã QR, chuyển khoản, thẻ nội địa/quốc tế hoặc VNPAY.
           </li>
           <li>Hỗ trợ: Gọi <strong>1900 2087</strong>.</li>
         </ul>

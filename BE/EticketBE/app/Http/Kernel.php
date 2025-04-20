@@ -1,11 +1,22 @@
 <?php
 
 namespace App\Http;
-
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
 {
+    protected function schedule(Schedule $schedule)
+    {
+        $schedule->job(new \App\Jobs\CheckSeatHoldExpiration)->everyMinute();
+    }
+
+    protected function commands()
+    {
+        $this->load(__DIR__.'/Commands');
+
+        require base_path('routes/console.php');
+    }
     /**
      * The application's global HTTP middleware stack.
      *

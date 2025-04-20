@@ -9,7 +9,7 @@
     <div class="train-booking-header">
       <div class="route-container">
         <div class="route-info">
-          <span>{{ searchgadi }} → {{ searchgaden }} | {{ selectedDay }} tới {{ arrivalDate }}</span>
+          <span>{{ searchgadi }} → {{ searchgaden }} | {{ selectedDay }}</span>
         </div>
         <h2 class="train-title">{{ traintau }} {{ trainCode }}</h2>
       </div>
@@ -40,6 +40,7 @@
         v-if="currentCarType === 'Toa ghế ngồi'"
         :car="carOptions[selectedCar]"
         :seats="seatData?.cho || []"
+        :seat-status="seatStatus"
         :total-tickets="totalTickets"
         :ticket-details="ticketDetails"
         :selected-seats="selectedSeatsByCar[carOptions[selectedCar]?.type] || []"
@@ -52,6 +53,7 @@
         v-else-if="currentCarType === 'Toa giường nằm'"
         :car="carOptions[selectedCar]"
         :beds="seatData?.cho || []"
+        :seat-status="seatStatus"
         :total-tickets="totalTickets"
         :ticket-details="ticketDetails"
         :selected-beds="selectedSeatsByCar[carOptions[selectedCar]?.type] || []"
@@ -78,6 +80,7 @@ const selectedCar = ref(0);
 const carSelectionRef = ref(null);
 const currentCarType = ref("");
 const seatData = ref(null);
+const seatStatus = ref([]); // Lưu trạng thái ghế
 const selectedSeatsByCar = ref({});
 const router = useRouter();
 
@@ -95,7 +98,7 @@ const props = defineProps({
   departureTime: String,
   arrivalTime: String,
   malichtrinh: String,
-  isReturnTrip: Boolean, // Thêm prop để biết đây là vé khứ hồi
+  isReturnTrip: Boolean,
 });
 
 const emits = defineEmits(["update:visible", "submit", "proceed-to-return"]);
@@ -157,13 +160,26 @@ const fetchTrainCars = async () => {
   }
 };
 
-const selectCar = (index) => {
+const fetchSeatStatus = async (matoa) => {
+  try {
+    const { data } = await axios.get(`/seat-status?malichtrinh=${props.malichtrinh}&matoa=${matoa}`);
+    if (data.success) {
+      seatStatus.value = data.data;
+    }
+  } catch (error) {
+    console.error("Lỗi khi lấy trạng thái ghế:", error);
+  }
+};
+
+const selectCar = async (index) => {
   selectedCar.value = index;
   const car = carOptions.value[index];
   if (car) {
     currentCarType.value = car.tenloaitoa;
     seatData.value = car;
     selectedSeatsByCar.value[car.type] = selectedSeatsByCar.value[car.type] || [];
+    // Lấy trạng thái ghế khi chọn toa
+    await fetchSeatStatus(car.id);
   }
 };
 
@@ -184,7 +200,7 @@ const updateSelectedSeats = (carType, newSelected) => {
 
   const updatedSeatsByCar = { ...selectedSeatsByCar.value };
 
-  // Kiểm tra trùng lặp ghế với Set
+  // Kiểm tra trùng lặp ghế
   const seatNumberSet = new Set(newSelected.map((seat) => seat.sohieu));
   if (seatNumberSet.size !== newSelected.length) {
     ElNotification.error("Không thể chọn cùng một ghế cho nhiều vé trong cùng toa!");
@@ -217,9 +233,8 @@ const updateSelectedSeats = (carType, newSelected) => {
   selectedSeatsByCar.value = updatedSeatsByCar;
 };
 
-// Booking.vue
 const handleBook = async () => {
-  // Kiểm tra ràng buộc vé trẻ em trực tiếp
+  // Kiểm tra ràng buộc vé trẻ em
   for (const [carType, selections] of Object.entries(selectedSeatsByCar.value)) {
     const hasChild = selections.some((seat) => seat.ticketType === "Trẻ em");
     const hasAdult = selections.some((seat) => seat.ticketType === "Người lớn");
@@ -242,26 +257,25 @@ const handleBook = async () => {
     departureTime: props.departureTime,
     arrivalTime: props.arrivalTime,
     malichtrinh: props.malichtrinh,
+    matoa: carOptions.value[selectedCar.value].id,
     totalPrice: totalPrice.value,
   };
 
   try {
-    // Gửi yêu cầu đặt vé đến API
-
     const response = await axios.post("/datve", {
       sohieu: selectedSeatsByCar.value[carOptions.value[selectedCar.value].type].map(
         (seat) => seat.sohieu
       ),
       malichtrinh: props.malichtrinh,
       matoa: carOptions.value[selectedCar.value].id,
-
-      });
+    });
 
     if (response.data.success) {
-      ElNotification.success("Đặt vé thành công !");
+      ElNotification.success("Giữ ghế thành công! Vui lòng thanh toán trong 3 phút.");
 
-      // Tải lại dữ liệu ghế để cập nhật giao diện
+      // Tải lại dữ liệu ghế
       await fetchTrainCars();
+      await fetchSeatStatus(carOptions.value[selectedCar.value].id);
 
       // Emit dữ liệu đặt vé
       emits("submit", bookingData);
@@ -276,10 +290,10 @@ const handleBook = async () => {
         closeDialog();
       }
     } else {
-      ElNotification.error(response.data.error || "Đặt vé thất bại!");
+      ElNotification.error(response.data.error || "Giữ ghế thất bại!");
     }
   } catch (error) {
-    ElNotification.error("Lỗi khi đặt vé: " + error.message);
+    ElNotification.error("Lỗi khi giữ ghế: " + error.message);
   }
 };
 

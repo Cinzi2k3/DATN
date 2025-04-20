@@ -86,7 +86,9 @@ Route::apiResource('thanhtoan', ThanhToanController::class);
 
 //Đặt vé
 Route::any('/datve', [DatVeController::class, 'DatVe']);
-Route::get('/seats', [DatVeController::class, 'getSeats']);
+Route::get('/seat-status', [DatVeController::class, 'getSeatStatus']);
+Route::post('/release-seats', [DatVeController::class, 'releaseSeats']);
+Route::get('/check-reservation', [DatVeController::class, 'checkReservation']);
 
 //Vnpay
 Route::post('/vnpay/create', [VNPayController::class, 'createPayment']);

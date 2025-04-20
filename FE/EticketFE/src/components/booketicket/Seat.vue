@@ -25,6 +25,8 @@
             :class="{
               selected: isSeatSelected(seat.sohieu),
               unavailable: seat.trangthai === 'dadat',
+              danggiu: seat.trangthai === 'danggiu',
+
             }"
           >
             <div class="seat-backrest"></div>
@@ -75,6 +77,15 @@
           </div>
           <span class="ms-2">Ghế đang chọn</span>
         </div>
+        <div class="d-flex align-items-center me-4">
+          <div class="legend-item dang-giu">
+            <div class="legend-backrest"></div>
+            <div class="legend-top"></div>
+            <div class="legend-square"></div>
+            <div class="legend-bottom"></div>
+          </div>
+          <span class="ms-2">Ghế đang giữ</span>
+        </div>
         <div class="d-flex align-items-center">
           <div class="legend-item unavailable">
             <div class="legend-backrest"></div>
@@ -87,15 +98,15 @@
       </div>
 
       <div v-if="seats && seats.length > 0" class="mt-4 text-center d-flex">
-        <div class="d-flex flex-column align-items-end"> 
+        <div class="d-flex flex-column align-items-end">
           <span>Đã chọn : <strong class="fs-6">{{ totalSelected }} / {{ totalTickets }} chỗ</strong></span>
           <div v-if="totalPrice === 0" class="textseat">Quý khách vui lòng chọn chỗ trống ở trên tương ứng loại vé</div>
-          <span v-else-if="totalPrice > 0 " class="fw-bold fs-6">Tổng tiền : <span class="fs-4 text-primary">{{ formatTotalPrice(totalPrice) }}</span></span>
-        </div> 
+          <span v-else-if="totalPrice > 0" class="fw-bold fs-6">Tổng tiền : <span class="fs-4 text-primary">{{ formatTotalPrice(totalPrice) }}</span></span>
+        </div>
         <button
           class="btn btn-primary ms-3"
           :disabled="totalSelected !== totalTickets"
-          @click="bookTickets(selectedSeats,totalPrice)"
+          @click="bookTickets(selectedSeats, totalPrice)"
         >
           Đặt vé
         </button>
@@ -105,23 +116,27 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, onMounted, watch } from "vue";
+import { useRouter } from "vue-router";
+import { ElMessage } from "element-plus";
 import { useFormatPrice } from "@/composables/useFormatPrice";
 import { useTicketSelection } from "@/composables/useTicketSelection";
 import { useTotalPrice } from "@/composables/useTotalPrice";
 
 const { formatPrice, formatTotalPrice } = useFormatPrice();
+const router = useRouter();
+
 const props = defineProps({
   car: Object,
   seats: Array,
+  seatStatus: Array,
   totalTickets: { type: Number, default: 1 },
   selectedSeats: { type: Array, default: () => [] },
   totalSelected: Number,
   ticketDetails: Array,
   selectedSeatsByCar: Object,
+  malichtrinh: [String, Number] // Thêm malichtrinh
 });
-
-const { totalPrice } = useTotalPrice(props);
 
 const emit = defineEmits(["update:selected-seats", "book"]);
 const { ticketList, currentTicketIndex, selectTicket, toggleSelection, bookTickets } =
@@ -129,6 +144,8 @@ const { ticketList, currentTicketIndex, selectTicket, toggleSelection, bookTicke
     itemType: "Ghế",
     updateEvent: "update:selected-seats",
   });
+
+const { totalPrice } = useTotalPrice(props);
 
 const rows = 4;
 const columns = computed(() => Math.ceil((props.seats?.length || 0) / rows));
@@ -145,9 +162,29 @@ const getSeatsForRow = (row) => {
 const isSeatSelected = (seatNumber) => {
   return props.selectedSeats.some((seat) => seat.sohieu === seatNumber);
 };
+
+const updateSeatStatus = () => {
+  if (props.seatStatus && props.seats) {
+    props.seats.forEach((seat) => {
+      const status = props.seatStatus.find((s) => s.sohieu === seat.sohieu)?.status || 'controng';
+      seat.trangthai = status;
+    });
+  }
+};
+
+watch(
+  () => props.seatStatus,
+  () => {
+    updateSeatStatus();
+  },
+  { deep: true }
+);
+
+onMounted(() => {
+  updateSeatStatus();
+});
 </script>
 
 <style scoped>
 @import url("@/assets/css/seat.css");
-
 </style>

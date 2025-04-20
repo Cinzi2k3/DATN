@@ -41,6 +41,7 @@
                 :class="{
                   selected: isBedSelected(bed.sohieu),
                   unavailable: bed.trangthai === 'dadat',
+                  danggiu: bed.trangthai === 'danggiu',
                 }"
               >
                 <div class="bed-number">{{ bed.sohieu }}</div>
@@ -79,21 +80,25 @@
           <div class="beds selected"></div>
           <span class="ms-2">Giường đang chọn</span>
         </div>
+        <div class="d-flex align-items-center me-4">
+          <div class="beds dang-giu"></div>
+          <span class="ms-2">Giường đang giữ</span>
+        </div>
         <div class="d-flex align-items-center">
           <div class="beds unavailable"></div>
           <span class="ms-2">Giường đã đặt</span>
         </div>
       </div>
       <div v-if="beds && beds.length > 0" class="mt-4 text-center d-flex">
-        <div class="d-flex flex-column align-items-end"> 
+        <div class="d-flex flex-column align-items-end">
           <span>Đã chọn : <strong class="fs-6">{{ totalSelected }} / {{ totalTickets }} chỗ</strong></span>
-          <div v-if="totalPrice === 0" class="textbed ">Quý khách vui lòng chọn chỗ trống ở trên tương ứng loại vé</div>
-          <span v-else-if="totalPrice > 0 " class="fw-bold fs-6">Tổng tiền : <span class="fs-4 text-primary">{{ formatTotalPrice(totalPrice) }}</span></span>
+          <div v-if="totalPrice === 0" class="textbed">Quý khách vui lòng chọn chỗ trống ở trên tương ứng loại vé</div>
+          <span v-else-if="totalPrice > 0" class="fw-bold fs-6">Tổng tiền : <span class="fs-4 text-primary">{{ formatTotalPrice(totalPrice) }}</span></span>
         </div>
         <button
           class="btn btn-primary ms-3"
           :disabled="totalSelected !== totalTickets"
-          @click="bookTickets(selectedBeds,totalPrice)"
+          @click="bookTickets(selectedBeds, totalPrice)"
         >
           Đặt vé
         </button>
@@ -103,23 +108,27 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, onMounted, watch, onUnmounted } from "vue";
+import { useRouter } from "vue-router";
+import { ElNotification } from "element-plus";
 import { useFormatPrice } from "@/composables/useFormatPrice";
 import { useTicketSelection } from "@/composables/useTicketSelection";
 import { useTotalPrice } from "@/composables/useTotalPrice";
 
 const { formatPrice, formatTotalPrice } = useFormatPrice();
+const router = useRouter();
+
 const props = defineProps({
   car: Object,
   beds: Array,
+  seatStatus: Array,
   totalTickets: { type: Number, default: 1 },
   selectedBeds: { type: Array, default: () => [] },
   totalSelected: Number,
   ticketDetails: Array,
   selectedSeatsByCar: Object,
+  malichtrinh: [String, Number]
 });
-
-const { totalPrice } = useTotalPrice(props);
 
 const emit = defineEmits(["update:selected-beds", "book"]);
 const { ticketList, currentTicketIndex, selectTicket, toggleSelection, bookTickets } =
@@ -127,6 +136,8 @@ const { ticketList, currentTicketIndex, selectTicket, toggleSelection, bookTicke
     itemType: "Giường",
     updateEvent: "update:selected-beds",
   });
+
+const { totalPrice } = useTotalPrice(props);
 
 const rows = 2;
 const numCompartments = computed(() => {
@@ -145,10 +156,33 @@ const getBedsForCompartment = (tang, khoang) => {
 const isBedSelected = (bedNumber) => {
   return props.selectedBeds.some((bed) => bed.sohieu === bedNumber);
 };
+
+const updateBedStatus = () => {
+  if (props.seatStatus && props.beds) {
+    props.beds.forEach((bed) => {
+      const newStatus = props.seatStatus.find((s) => s.sohieu === bed.sohieu)?.status || 'controng';
+      bed.trangthai = newStatus;
+    });
+  }
+};
+
+watch(
+  () => props.seatStatus,
+  () => {
+    updateBedStatus();
+  },
+  { deep: true }
+);
+
+onMounted(() => {
+  updateBedStatus();
+});
+
+onUnmounted(() => {
+});
 </script>
 
 <style scoped>
 @import url("@/assets/css/bed.css");
-
 
 </style>
