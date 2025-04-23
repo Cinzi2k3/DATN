@@ -19,7 +19,7 @@ class VNPayController extends Controller
             Log::info('VNPay createPayment request:', $request->all());
 
             $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-                $vnp_Returnurl = "http://127.0.0.1:8000/api/vnpay/return";
+                $vnp_Returnurl = "http://192.168.0.105:8000/api/vnpay/return";
                 $vnp_TmnCode = "KHT30JML";
                 $vnp_HashSecret = "YDKXVCGC7KL9KGJ8Y83JTORK8MWXCFSV";
 
@@ -28,6 +28,7 @@ class VNPayController extends Controller
 
             // Lưu thông tin đơn hàng
             $order = new Order();
+            $order->user_id = $request->user_id;
             $order->transaction_id = $vnp_TxnRef;
             $order->contact_name = $request->contact['name'] ?? 'Unknown';
             $order->contact_email = $request->contact['email'] ?? 'Unknown';
@@ -160,6 +161,27 @@ class VNPayController extends Controller
             ], 500);
         }
     }
+    private function mapCarNameToMatoa($carName)
+    {
+        $toaName = explode(':', $carName)[0]; // Lấy "Toa 2" từ "Toa 2 :Toa ghế ngồi"
+        $toaName = trim($toaName); // Loại bỏ khoảng trắng thừa
+
+        // Tìm matoa trong bảng toa dựa trên tentoa
+        $toa = DB::table('toa')
+            ->where('tentoa', $toaName)
+            ->select('matoa')
+            ->first();
+
+        if ($toa) {
+            return $toa->matoa;
+        }
+
+        Log::error('Cannot find matoa for car_name in toa table', [
+            'car_name' => $carName,
+            'toa_name' => $toaName
+        ]);
+        return null;
+    }
 
     public function returnPayment(Request $request)
     {
@@ -191,8 +213,10 @@ class VNPayController extends Controller
                     // Thanh toán thành công, cập nhật trạng thái ghế thành dadat
                     $orderDetails = OrderDetail::where('order_id', $order->id)->get();
                     foreach ($orderDetails as $detail) {
+                        $matoa = $this->mapCarNameToMatoa($detail->car_name);
                         $seatInfo = DB::table('cho')
                             ->where('sohieu', $detail->seat_number)
+                            ->where('matoa', $matoa)
                             ->first();
 
                         if ($seatInfo) {

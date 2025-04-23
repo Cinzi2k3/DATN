@@ -33,6 +33,8 @@ Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
 
 //Thông tin người dùng
 Route::get('/user', [UserController::class, 'getUserByEmail']);
+Route::any('/update', [UserController::class, 'updateProfile']);
+
 
 //Loại toa
 Route::apiResource('loaitoa', LoaiToaController::class);

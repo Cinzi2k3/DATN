@@ -279,7 +279,6 @@ const handleBook = async () => {
 
       // Emit dữ liệu đặt vé
       emits("submit", bookingData);
-
       if (props.isReturnTrip) {
         emits("proceed-to-return");
       } else {

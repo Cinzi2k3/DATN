@@ -6,7 +6,7 @@
       </div>
     </template>
     
-    <el-form :model="form" label-position="top"  :rules="rules"  >
+    <el-form :model="form" label-position="top" :rules="rules" ref="contactForm">
       <el-row :gutter="20">
         <el-col :span="8">
           <el-form-item label="Họ và tên" prop="name" required>
@@ -14,7 +14,7 @@
               v-model="form.name" 
               placeholder="Nguyễn Văn A"
               @change="emitContactInfo"
-              ref="input"   
+              ref="nameInput"   
             />
           </el-form-item>
         </el-col>
@@ -24,6 +24,7 @@
               v-model="form.phone" 
               placeholder="0123456789"
               @change="emitContactInfo"
+              ref="phoneInput"
             />
           </el-form-item>
         </el-col>
@@ -33,6 +34,7 @@
               v-model="form.email" 
               placeholder="example@gmail.com"
               @change="emitContactInfo"
+              ref="emailInput"
             />
           </el-form-item>
         </el-col>
@@ -47,11 +49,20 @@
 
 <script setup>
 import { reactive, ref, onMounted } from 'vue';
+import { useAuthStore } from '@/stores/authStore';
+// Khởi tạo refs cho các input để focus
+const nameInput = ref(null);
+const phoneInput = ref(null);
+const emailInput = ref(null);
+const contactForm = ref(null);
 
-const input = ref(null);
+// Khởi tạo authStore
+const authStore = useAuthStore();
 
+// Khởi tạo emits
 const emits = defineEmits(['update:contactInfo']);
 
+// Khởi tạo form với giá trị mặc định
 const form = reactive({
   name: '',
   phone: '',
@@ -59,6 +70,7 @@ const form = reactive({
   eticketChecked: false
 });
 
+// Quy tắc validation
 const rules = {
   phone: [
     { required: true, message: 'Vui lòng nhập số điện thoại', trigger: 'blur' },
@@ -69,23 +81,33 @@ const rules = {
     { pattern: /^[a-zA-Z0-9._%+-]+@gmail\.com$/, message: 'Email không hợp lệ', trigger: 'blur' }
   ],
   name: [
-  { required: true, message: 'Vui lòng nhập họ và tên', trigger: 'blur' },
-  { pattern: /^[a-zA-ZÀ-ỹ]+(\s[a-zA-ZÀ-ỹ]+)+$/, message: 'Nhập đầy đủ họ và tên', trigger: 'blur'}
-]
-
+    { required: true, message: 'Vui lòng nhập họ và tên', trigger: 'blur' },
+    { pattern: /^[a-zA-ZÀ-ỹ]+(\s[a-zA-ZÀ-ỹ]+)+$/, message: 'Nhập đầy đủ họ và tên', trigger: 'blur' }
+  ]
 };
 
+// Hàm emit thông tin liên hệ
 const emitContactInfo = () => {
   emits('update:contactInfo', { ...form });
 };
 
-// Emit initial empty form
-emitContactInfo();
-
+// Điền thông tin người dùng và focus vào trường email
 onMounted(() => {
-input.value.focus();
+  if (authStore.isLoggedIn) {
+    form.name = authStore.userName || '';
+    form.email = authStore.userEmail || '';
+    form.phone = authStore.phoneNumber || '';
+    emitContactInfo(); // Emit ngay sau khi điền
+    if (emailInput.value) {
+      emailInput.value.focus(); // Focus vào trường email
+    }
+  } else {
+    if (nameInput.value) {
+      nameInput.value.focus(); // Focus vào trường name nếu chưa đăng nhập
+    }
+    emitContactInfo(); // Emit form rỗng
+  }
 });
-
 </script>
 
 <style scoped>

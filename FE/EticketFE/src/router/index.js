@@ -3,8 +3,7 @@ import Home from '@/views/Home.vue';
 import Buyeticket from '@/views/Buyeticket.vue';
 import Signin from '@/views/Signin.vue';
 import Payment from '@/views/Payment.vue';
-// import Boking from '@/views/Boking.vue';
-
+import Account from '@/views/Account.vue';
 
 // Định nghĩa các route
 const routes = [
@@ -37,7 +36,12 @@ const routes = [
     path: '/check-in',
     name: 'CheckIn',
     component: () => import('../views/CheckIn.vue')
-  }
+  },
+  {
+    path: '/account',
+    name: 'Account',
+    component: Account,
+  },
 ];
 
 // Tạo instance router
@@ -45,6 +49,8 @@ const router = createRouter({
   history: createWebHistory(),
   routes,
 });
+
+
 
 export default router;
 

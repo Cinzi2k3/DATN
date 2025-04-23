@@ -8,6 +8,7 @@ class Order extends Model
 {
     protected $fillable = [
         'transaction_id',
+        'user_id',
         'ticket_type',
         'contact_name',
         'contact_email',
@@ -16,6 +17,11 @@ class Order extends Model
         'status',
         'checkin',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function passengers()
     {

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\UserProfile;
 use Hash;
 
 class AuthController extends Controller
@@ -23,6 +24,10 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+        ]);
+
+        UserProfile::create([
+            'user_id' =>$user->id,
         ]);
 
         return response()->json(['message' => 'Registration successful']);

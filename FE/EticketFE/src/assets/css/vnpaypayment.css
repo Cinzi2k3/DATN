@@ -1,0 +1,114 @@
+.vnpay-card {
+    margin-bottom: 20px;
+  }
+  
+  .card-header h2 {
+    margin: 0;
+    font-size: 18px;
+    color: #104c8a;
+  }
+  
+  .payment-methods {
+    margin-bottom: 20px;
+  }
+  
+  .payment-radio-group {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+  }
+  
+  .payment-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px;
+  }
+  
+  .vnpay-banks {
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .bank-list {
+    margin-top: 10px;
+  }
+  
+  .bank-radio-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .payment-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .countdown {
+    margin-bottom: 20px;
+    font-weight: bold;
+    color: #104c8a;
+  }
+  
+  .countdown.expired {
+    color: red;
+  }
+  
+  .timeout-dialog :deep(.el-dialog) {
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-top: 4px solid #ff6200;
+    background: #ffffff;
+    overflow: hidden;
+  }
+  
+  .timeout-dialog :deep(.el-dialog__header) {
+    padding: 15px;
+    margin: 0;
+    border-bottom: 1px solid #e8e8e8;
+  }
+  
+  .timeout-dialog :deep(.el-dialog__title) {
+    color: #333;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  
+  .timeout-dialog :deep(.el-dialog__body) {
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .dialog-content p {
+    margin: 0;
+    font-size: 14px;
+    color: #666;
+    line-height: 1.5;
+  }
+  
+  .dialog-footer {
+    display: flex;
+    justify-content: center;
+    padding: 15px;
+  }
+  
+  .book-again-button {
+    background: #ff6200;
+    border: none;
+    color: #ffffff;
+    border-radius: 4px;
+    padding: 10px 30px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+  
+  .book-again-button:hover {
+    background: #ff8533;
+  }
+  
+  .book-again-button:active {
+    background: #e65c00;
+  }

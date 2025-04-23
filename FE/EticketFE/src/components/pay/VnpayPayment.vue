@@ -80,7 +80,9 @@ import { ArrowRight, ArrowLeft } from '@element-plus/icons-vue';
 import { useFormatPrice } from '@/composables/useFormatprice';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
-
+import { useAuthStore } from '@/stores/authStore';
+import { ElNotification } from 'element-plus';
+const authStore = useAuthStore();
 const router = useRouter();
 const props = defineProps({
   departureData: { 
@@ -254,13 +256,14 @@ const bookAgain = () => {
 
 // Xóa countdown
 const clearCountdown = () => {
-  localStorage.removeItem('countdownStartTime');
+  localStorage.removeItem('countdownTimeLeft');
+  localStorage.removeItem('countdownServerTime');
 };
 
 // Kiểm tra trạng thái đặt vé và khởi tạo đếm ngược
 const initializeCountdown = async () => {
-  const totalDuration = 3 * 60;
- // Kiểm tra xem có ghế nào đang được giữ không
+  const totalDuration = 3 * 60; // 3 phút
+
   try {
     const response = await axios.get('http://192.168.0.105:8000/api/check-reservation', {
       params: {
@@ -270,36 +273,42 @@ const initializeCountdown = async () => {
       withCredentials: true
     });
 
-    const { hasReservation, thoihan_giu } = response.data;
+    const { hasReservation, timeLeft: serverTimeLeft, serverTime } = response.data;
 
-    if (!hasReservation) {
-            // Không có ghế nào đang được giữ, reset đếm ngược
-      clearCountdown();
-      localStorage.setItem('countdownStartTime', Math.floor(Date.now() / 1000).toString());
-      timeLeft.value = totalDuration;
+    console.log('Server response:', { hasReservation, serverTimeLeft, serverTime });
+
+    if (hasReservation && serverTimeLeft > 0) {
+      // Sử dụng thời gian còn lại từ backend
+      timeLeft.value = serverTimeLeft;
+      localStorage.setItem('countdownTimeLeft', serverTimeLeft.toString());
+      localStorage.setItem('countdownServerTime', serverTime);
     } else {
-      // Có ghế đang được giữ, tính thời gian còn lại từ backend
-      const now = Math.floor(Date.now() / 1000);
-      const remaining = Math.max(0, Math.floor((new Date(thoihan_giu).getTime() / 1000) - now));
-      timeLeft.value = remaining;
+      // Không có ghế hoặc thời gian hết hạn, bắt đầu mới
+      clearCountdown();
+      timeLeft.value = totalDuration;
+      localStorage.setItem('countdownTimeLeft', totalDuration.toString());
+      localStorage.setItem('countdownServerTime', new Date().toISOString());
+    }
 
-      if (remaining <= 0) {
-        clearCountdown();
-        showTimeoutDialog.value = true;
-        releaseSeatsWithAxios();
-        return;
-      }
+    if (timeLeft.value <= 0) {
+      clearCountdown();
+      showTimeoutDialog.value = true;
+      await releaseSeatsWithAxios();
+      return;
     }
   } catch (error) {
     console.error('Lỗi khi kiểm tra trạng thái đặt vé:', error);
     clearCountdown();
-    localStorage.setItem('countdownStartTime', Math.floor(Date.now() / 1000).toString());
     timeLeft.value = totalDuration;
+    localStorage.setItem('countdownTimeLeft', totalDuration.toString());
+    localStorage.setItem('countdownServerTime', new Date().toISOString());
   }
+
   // Chạy bộ đếm ngược
   countdownInterval = setInterval(() => {
     if (timeLeft.value > 0) {
       timeLeft.value -= 1;
+      localStorage.setItem('countdownTimeLeft', timeLeft.value.toString());
     } else {
       clearInterval(countdownInterval);
       clearCountdown();
@@ -310,9 +319,9 @@ const initializeCountdown = async () => {
 };
 
 // Khởi tạo đếm ngược khi component được mount
-onMounted(() => {
-  initializeCountdown();
-});
+  onMounted(() => {
+    initializeCountdown();
+  });
 
 // Dọn dẹp interval
 onUnmounted(() => {
@@ -326,6 +335,7 @@ const processPayment = async () => {
       loading.value = true;
 
       const bookingData = {
+        user_id: authStore.userId,
         departure: props.departureData,
         return: props.returnData,
         contact: props.contactInfo,
@@ -333,7 +343,6 @@ const processPayment = async () => {
         amount: totalPrice.value,
         bankCode: selectedBank.value
       };
-
       const vnpayResponse = await axios.post('http://192.168.0.105:8000/api/vnpay/create', bookingData);
 
       if (vnpayResponse.data && vnpayResponse.data.data) {
@@ -344,7 +353,7 @@ const processPayment = async () => {
       }
     } catch (error) {
       console.error('Lỗi khi xử lý thanh toán:', error);
-      ElMessage.error('Đã xảy ra lỗi khi xử lý thanh toán. Vui lòng thử lại sau.');
+      ElNotification.error('Đã xảy ra lỗi khi xử lý thanh toán. Vui lòng thử lại sau.');
     } finally {
       loading.value = false;
     }
@@ -353,118 +362,5 @@ const processPayment = async () => {
 </script>
 
 <style scoped>
-.vnpay-card {
-  margin-bottom: 20px;
-}
-
-.card-header h2 {
-  margin: 0;
-  font-size: 18px;
-  color: #104c8a;
-}
-
-.payment-methods {
-  margin-bottom: 20px;
-}
-
-.payment-radio-group {
-  display: flex;
-  gap: 10px;
-  width: 100%;
-}
-
-.payment-option {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 5px;
-}
-
-.vnpay-banks {
-  margin-top: 20px;
-  margin-bottom: 20px;
-}
-
-.bank-list {
-  margin-top: 10px;
-}
-
-.bank-radio-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.payment-actions {
-  margin-top: 20px;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.countdown {
-  margin-bottom: 20px;
-  font-weight: bold;
-  color: #104c8a;
-}
-
-.countdown.expired {
-  color: red;
-}
-
-.timeout-dialog :deep(.el-dialog) {
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-top: 4px solid #ff6200;
-  background: #ffffff;
-  overflow: hidden;
-}
-
-.timeout-dialog :deep(.el-dialog__header) {
-  padding: 15px;
-  margin: 0;
-  border-bottom: 1px solid #e8e8e8;
-}
-
-.timeout-dialog :deep(.el-dialog__title) {
-  color: #333;
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.timeout-dialog :deep(.el-dialog__body) {
-  padding: 20px;
-  text-align: center;
-}
-
-.dialog-content p {
-  margin: 0;
-  font-size: 14px;
-  color: #666;
-  line-height: 1.5;
-}
-
-.dialog-footer {
-  display: flex;
-  justify-content: center;
-  padding: 15px;
-}
-
-.book-again-button {
-  background: #ff6200;
-  border: none;
-  color: #ffffff;
-  border-radius: 4px;
-  padding: 10px 30px;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.book-again-button:hover {
-  background: #ff8533;
-}
-
-.book-again-button:active {
-  background: #e65c00;
-}
+@import url(@/assets/css/vnpaypayment.css);
 </style>

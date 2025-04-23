@@ -66,20 +66,20 @@ class DatVeController extends Controller
                 }
 
                 // Cập nhật hoặc thêm ghế vào trạng thái danggiu
-                DB::table('datve')->updateOrInsert(
-                    [
-                        'macho' => $macho,
-                        'malichtrinh' => $malichtrinh
-                    ],
-                    [
-                        'trangthai' => 'danggiu',
-                        'thoihan_giu' => Carbon::now()->addMinutes(3),
-                    ]
-                );
+                $thoihanGiu = Carbon::now('UTC')->addMinutes(3);
+            DB::table('datve')->updateOrInsert(
+                [
+                    'macho' => $macho,
+                    'malichtrinh' => $malichtrinh
+                ],
+                [
+                    'trangthai' => 'danggiu',
+                    'thoihan_giu' => $thoihanGiu->toDateTimeString(), // Lưu dưới dạng UTC
+                ]
+            );
 
-                // Dispatch Job để kiểm tra và trả ghế về controng sau 3 phút
-                ReleaseSeatReservation::dispatch($macho, $malichtrinh)
-                    ->delay(now()->addMinutes(3));
+            ReleaseSeatReservation::dispatch($macho, $malichtrinh)
+                ->delay($thoihanGiu);
             }
 
             DB::commit();
@@ -221,7 +221,7 @@ class DatVeController extends Controller
                 ->join('cho', 'datve.macho', '=', 'cho.macho')
                 ->where('datve.malichtrinh', $malichtrinh)
                 ->where('cho.matoa', $matoa)
-                ->where('datve.thoihan_giu', '>', now())
+                ->where('datve.thoihan_giu', '>', now('UTC'))
                 ->select('datve.thoihan_giu')
                 ->first();
 
