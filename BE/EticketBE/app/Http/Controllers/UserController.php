@@ -81,5 +81,56 @@ class UserController extends Controller
             return response()->json(['success' => false, 'message' => 'Cập nhật thất bại: ' . $e->getMessage()], 500);
         }
     }
+    public function changePassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|integer|exists:users,id',
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:8|confirmed',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Dữ liệu không hợp lệ',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            $user = User::find($request->user_id);
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Người dùng không tồn tại'
+                ], 404);
+            }
+
+            // Kiểm tra mật khẩu hiện tại
+            if (!Hash::check($request->current_password, $user->password)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Mật khẩu hiện tại không đúng'
+                ], 401);
+            }
+
+            // Cập nhật mật khẩu mới
+            $user->password = Hash::make($request->new_password);
+            $user->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Đổi mật khẩu thành công'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Lỗi khi đổi mật khẩu: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Đổi mật khẩu thất bại: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    
 
 }

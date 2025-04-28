@@ -101,7 +101,7 @@
               <el-radio v-model="selectedTicket" label="one-way">Một chiều</el-radio>
             </div>
             <el-date-picker v-model="departureDate" type="date" @change="onDepartureDateChange"
-              placeholder="Chọn ngày đi" style="width: 100%" />
+              placeholder="Chọn ngày đi" style="width: 100%"  />
           </el-col>
 
           <el-col :span="12" style="padding: 10px">

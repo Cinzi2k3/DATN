@@ -333,7 +333,6 @@ const processPayment = async () => {
   if (paymentMethod.value === 'vnpay') {
     try {
       loading.value = true;
-
       const bookingData = {
         user_id: authStore.userId,
         departure: props.departureData,
@@ -346,7 +345,6 @@ const processPayment = async () => {
       const vnpayResponse = await axios.post('http://192.168.0.105:8000/api/vnpay/create', bookingData);
 
       if (vnpayResponse.data && vnpayResponse.data.data) {
-        localStorage.setItem('bookingData', JSON.stringify(bookingData));
         clearCountdown();
         isNavigatingToPayment.value = true; // Đặt cờ trước khi chuyển hướng
         window.location.href = vnpayResponse.data.data;

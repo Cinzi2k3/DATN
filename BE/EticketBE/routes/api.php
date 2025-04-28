@@ -24,16 +24,21 @@ use App\Http\Controllers\DatVeController;
 use App\Http\Controllers\VNPayController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\CheckInController;
+use App\Http\Controllers\ForgotPasswordController;
 
 //Đăng nhập, đăng kí
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout']);
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('/verify-code', [AuthController::class, 'verifyCode']);
+
+//Quên mật khẩu
+Route::post('/password/email', [ForgotPasswordController::class, 'sendResetCode']);
+Route::post('/password/reset', [ForgotPasswordController::class, 'verifyResetCode']);
 
 //Thông tin người dùng
 Route::get('/user', [UserController::class, 'getUserByEmail']);
 Route::any('/update', [UserController::class, 'updateProfile']);
+Route::post('/change-password', [UserController::class, 'changePassword']);
 
 
 //Loại toa

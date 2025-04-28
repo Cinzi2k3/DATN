@@ -4,6 +4,9 @@ import Buyeticket from '@/views/Buyeticket.vue';
 import Signin from '@/views/Signin.vue';
 import Payment from '@/views/Payment.vue';
 import Account from '@/views/Account.vue';
+import PaymentResult from '@/views/PaymentResult.vue';
+import CheckIn from '@/views/CheckIn.vue';
+import ResetPassword from '@/views/ResetPassword.vue';
 
 // Định nghĩa các route
 const routes = [
@@ -30,18 +33,23 @@ const routes = [
   {
     path: '/payment/result',
     name: 'PaymentResult',
-    component: () => import('@/views/PaymentResult.vue'),
+    component: PaymentResult,
   },
   {
     path: '/check-in',
     name: 'CheckIn',
-    component: () => import('../views/CheckIn.vue')
+    component: CheckIn,
   },
   {
     path: '/account',
     name: 'Account',
     component: Account,
   },
+  {
+    path: '/reset-password',
+    name: 'ResetPassword',
+    component: ResetPassword,
+  }
 ];
 
 // Tạo instance router

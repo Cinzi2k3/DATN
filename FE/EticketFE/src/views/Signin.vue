@@ -1,3 +1,4 @@
+```vue
 <template>
   <div class="container" :class="{ 'right-panel-active': isSignUp }">
     <div v-if="loading" class="loading-overlay">
@@ -12,9 +13,10 @@
           <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
           <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
         </div>
-        <input type="text" v-model="name" placeholder="Name" required />
-        <input type="email" v-model="email" placeholder="Email" required />
-        <input type="password" v-model="password" placeholder="Password" required />
+        <input type="text" v-model="name" :placeholder="$t('Họ và tên')" required />
+        <input type="email" v-model="email" :placeholder="$t('Email')" required />
+        <input type="password" v-model="password" :placeholder="$t('Mật khẩu')" required />
+        <input type="password" v-model="passwordConfirmation" :placeholder="$t('Xác nhận mật khẩu')" required />
         <button type="submit" :disabled="loading">{{ $t('Đăng ký') }}</button>
       </form>
     </div>
@@ -28,9 +30,9 @@
           <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
           <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
         </div>
-        <input type="email" v-model="email" placeholder="Email" required />
-        <input type="password" v-model="password" placeholder="Password" required />
-        <a href="#">{{ $t('Quên mật khẩu?') }}</a>
+        <input type="email" v-model="email" :placeholder="$t('Email')" required />
+        <input type="password" v-model="password" :placeholder="$t('Mật khẩu')" required />
+        <router-link to="/reset-password">{{ $t('Quên mật khẩu?') }}</router-link>
         <button type="submit" :disabled="loading">{{ $t('Đăng nhập') }}</button>
       </form>
     </div>
@@ -50,37 +52,93 @@
         </div>
       </div>
     </div>
+
+    <!-- Verification Code Dialog -->
+    <el-dialog title="Xác nhận email" v-model="showVerificationDialog" width="400px" center>
+      <el-form :model="verificationForm" :rules="verificationRules" ref="verificationFormRef" label-width="120px">
+        <el-form-item label="Mã xác nhận" prop="code">
+          <el-input v-model="verificationForm.code" placeholder="Nhập mã xác nhận" maxlength="6"></el-input>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="showVerificationDialog = false">Hủy</el-button>
+        <el-button type="primary" @click="verifyCode">Xác nhận</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
-import axios from "axios";
-import { useRouter } from "vue-router";
-import { ElNotification } from "element-plus";
+import { ref } from 'vue';
+import axios from 'axios';
+import { useRouter } from 'vue-router';
+import { ElNotification } from 'element-plus';
 import { useAuthStore } from '@/stores/authStore';
 
 const authStore = useAuthStore();
-const name = ref("");
-const email = ref("");
-const password = ref("");
+const name = ref('');
+const email = ref('');
+const password = ref('');
+const passwordConfirmation = ref('');
 const router = useRouter();
 const loading = ref(false);
 const isSignUp = ref(false);
+const showVerificationDialog = ref(false);
+const verificationForm = ref({ email: '', code: '' });
+const verificationFormRef = ref(null);
+
+const verificationRules = {
+  code: [
+    { required: true, message: 'Vui lòng nhập mã xác nhận', trigger: 'blur' },
+    { pattern: /^\d{6}$/, message: 'Mã xác nhận phải là 6 chữ số', trigger: 'blur' },
+  ],
+};
 
 const signup = async () => {
+  if (password.value !== passwordConfirmation.value) {
+    ElNotification.error('Mật khẩu xác nhận không khớp');
+    return;
+  }
+
   loading.value = true;
   try {
-    const response = await axios.post("/register", {
+    const response = await axios.post('/register', {
       name: name.value,
       email: email.value,
       password: password.value,
-      password_confirmation: password.value,
+      password_confirmation: passwordConfirmation.value,
     });
-    isSignUp.value = false;
-    ElNotification.success("Đăng ký thành công");
+    ElNotification.success(response.data.message);
+    verificationForm.value.email = email.value;
+    showVerificationDialog.value = true;
+    name.value = '';
+    email.value = '';
+    password.value = '';
+    passwordConfirmation.value = '';
   } catch (error) {
-    const errorMessage = error.response?.data?.message || "Có lỗi xảy ra trong quá trình đăng ký";
+    const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra trong quá trình đăng ký';
+    ElNotification.error(errorMessage);
+  } finally {
+    loading.value = false;
+  }
+};
+
+const verifyCode = async () => {
+  if (!verificationFormRef.value) return;
+  try {
+    await verificationFormRef.value.validate();
+    loading.value = true;
+    const response = await axios.post('/verify-code', {
+      email: verificationForm.value.email,
+      code: verificationForm.value.code,
+    });
+    ElNotification.success(response.data.message);
+    showVerificationDialog.value = false;
+    isSignUp.value = false;
+    verificationFormRef.value.resetFields();
+    verificationForm.value.email = '';
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || 'Xác nhận mã thất bại';
     ElNotification.error(errorMessage);
   } finally {
     loading.value = false;
@@ -90,7 +148,7 @@ const signup = async () => {
 const signin = async () => {
   loading.value = true;
   try {
-    const loginResponse = await axios.post("/login", {
+    const loginResponse = await axios.post('/login', {
       email: email.value,
       password: password.value,
     });
@@ -98,14 +156,13 @@ const signin = async () => {
     if (userResponse.data.success) {
       const { id, name, email, phone_number, address, birth_date } = userResponse.data.user;
       authStore.login(id, name, email, phone_number, address, birth_date);
-      localStorage.setItem('userEmail', email);
       ElNotification.success(`Xin chào, ${name}`);
-      router.push("/");
+      router.push('/');
     } else {
-      ElNotification.error("Không thể lấy thông tin người dùng");
+      ElNotification.error('Thông tin tài khoản hoặc mật khẩu không chính xác');
     }
   } catch (error) {
-    const errorMessage = error.response?.data?.message || "Thông tin đăng nhập không hợp lệ";
+    const errorMessage = error.response?.data?.message || 'Thông tin tài khoản hoặc mật khẩu không chính xác';
     ElNotification.error(errorMessage);
   } finally {
     loading.value = false;
