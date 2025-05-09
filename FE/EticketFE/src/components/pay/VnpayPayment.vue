@@ -1,3 +1,4 @@
+```vue
 <template>
   <el-card class="vnpay-card">
     <template #header>
@@ -82,6 +83,7 @@ import axios from 'axios';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/authStore';
 import { ElNotification } from 'element-plus';
+
 const authStore = useAuthStore();
 const router = useRouter();
 const props = defineProps({
@@ -120,6 +122,7 @@ const prepareSeatsToRelease = () => {
   const returnSeats = props.returnData?.selectedSeatsByCar || {};
   const seatsToRelease = [];
 
+  // Luôn xóa ghế vé đi
   Object.keys(departureSeats).forEach(carName => {
     departureSeats[carName].forEach(seat => {
       if (seat.sohieu && props.departureData.malichtrinh && props.departureData.matoa) {
@@ -132,6 +135,7 @@ const prepareSeatsToRelease = () => {
     });
   });
 
+  // Xóa ghế vé về nếu có
   if (props.returnData && props.returnData.malichtrinh && props.returnData.matoa) {
     Object.keys(returnSeats).forEach(carName => {
       returnSeats[carName].forEach(seat => {
@@ -256,8 +260,32 @@ const bookAgain = () => {
 
 // Xóa countdown
 const clearCountdown = () => {
+  if (countdownInterval) {
+    clearInterval(countdownInterval);
+    countdownInterval = null;
+  }
   localStorage.removeItem('countdownTimeLeft');
   localStorage.removeItem('countdownServerTime');
+  timeLeft.value = 0;
+};
+
+// Khởi tạo hoặc reset bộ đếm ngược
+const startCountdown = (duration = 3 * 60) => {
+  clearCountdown();
+  timeLeft.value = duration;
+  localStorage.setItem('countdownTimeLeft', duration.toString());
+  localStorage.setItem('countdownServerTime', new Date().toISOString());
+
+  countdownInterval = setInterval(() => {
+    if (timeLeft.value > 0) {
+      timeLeft.value -= 1;
+      localStorage.setItem('countdownTimeLeft', timeLeft.value.toString());
+    } else {
+      clearCountdown();
+      showTimeoutDialog.value = true;
+      releaseSeatsWithAxios();
+    }
+  }, 1000);
 };
 
 // Kiểm tra trạng thái đặt vé và khởi tạo đếm ngược
@@ -278,54 +306,24 @@ const initializeCountdown = async () => {
     console.log('Server response:', { hasReservation, serverTimeLeft, serverTime });
 
     if (hasReservation && serverTimeLeft > 0) {
-      // Sử dụng thời gian còn lại từ backend
-      timeLeft.value = serverTimeLeft;
-      localStorage.setItem('countdownTimeLeft', serverTimeLeft.toString());
-      localStorage.setItem('countdownServerTime', serverTime);
+      startCountdown(serverTimeLeft);
     } else {
-      // Không có ghế hoặc thời gian hết hạn, bắt đầu mới
-      clearCountdown();
-      timeLeft.value = totalDuration;
-      localStorage.setItem('countdownTimeLeft', totalDuration.toString());
-      localStorage.setItem('countdownServerTime', new Date().toISOString());
-    }
-
-    if (timeLeft.value <= 0) {
-      clearCountdown();
-      showTimeoutDialog.value = true;
-      await releaseSeatsWithAxios();
-      return;
+      startCountdown(totalDuration);
     }
   } catch (error) {
     console.error('Lỗi khi kiểm tra trạng thái đặt vé:', error);
-    clearCountdown();
-    timeLeft.value = totalDuration;
-    localStorage.setItem('countdownTimeLeft', totalDuration.toString());
-    localStorage.setItem('countdownServerTime', new Date().toISOString());
+    startCountdown(totalDuration);
   }
-
-  // Chạy bộ đếm ngược
-  countdownInterval = setInterval(() => {
-    if (timeLeft.value > 0) {
-      timeLeft.value -= 1;
-      localStorage.setItem('countdownTimeLeft', timeLeft.value.toString());
-    } else {
-      clearInterval(countdownInterval);
-      clearCountdown();
-      showTimeoutDialog.value = true;
-      releaseSeatsWithAxios();
-    }
-  }, 1000);
 };
 
 // Khởi tạo đếm ngược khi component được mount
-  onMounted(() => {
-    initializeCountdown();
-  });
+onMounted(() => {
+  initializeCountdown();
+});
 
 // Dọn dẹp interval
 onUnmounted(() => {
-  clearInterval(countdownInterval);
+  clearCountdown();
 });
 
 // Gọi clearCountdown trong processPayment
@@ -346,7 +344,7 @@ const processPayment = async () => {
 
       if (vnpayResponse.data && vnpayResponse.data.data) {
         clearCountdown();
-        isNavigatingToPayment.value = true; // Đặt cờ trước khi chuyển hướng
+        isNavigatingToPayment.value = true;
         window.location.href = vnpayResponse.data.data;
       }
     } catch (error) {
@@ -362,3 +360,4 @@ const processPayment = async () => {
 <style scoped>
 @import url(@/assets/css/vnpaypayment.css);
 </style>
+```

@@ -9,7 +9,7 @@ import CheckIn from '@/views/CheckIn.vue';
 import ResetPassword from '@/views/ResetPassword.vue';
 
 // Định nghĩa các route
-const routes = [
+const userRoutes = [
   {
     path : '/',
     name : 'Home',
@@ -51,6 +51,21 @@ const routes = [
     component: ResetPassword,
   }
 ];
+
+const adminRoutes = [
+  { path: '/admin/dashboard', component: () => import('@/components/admin/Dashboard.vue'), meta: { requiresAdmin: true } },
+  { path: '/admin/orders', component: () => import('@/components/admin/Orders.vue') },
+  { path: '/admin/reports', component: () => import('@/components/admin/Reports.vue') },
+  { path: '/admin/users', component: () => import('@/components/admin/Users.vue') },
+  
+];
+
+const routes = [
+  ...userRoutes,
+  ...adminRoutes,
+  { path: '/admin', redirect: '/admin/dashboard' },
+];
+
 
 // Tạo instance router
 const router = createRouter({

@@ -25,6 +25,13 @@ use App\Http\Controllers\VNPayController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\CheckInController;
 use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\DashboardController;
+
+    Route::get('/dashboard/stats', [DashboardController::class, 'getStats']);
+    Route::get('/dashboard/revenue', [DashboardController::class, 'getRevenue']);
+    Route::get('/dashboard/occupancy', [DashboardController::class, 'getOccupancy']);
+    Route::get('/dashboard/recent-orders', [DashboardController::class, 'getRecentOrders']);
+
 
 //Đăng nhập, đăng kí
 Route::post('/login', [AuthController::class, 'login']);
@@ -39,6 +46,7 @@ Route::post('/password/reset', [ForgotPasswordController::class, 'verifyResetCod
 Route::get('/user', [UserController::class, 'getUserByEmail']);
 Route::any('/update', [UserController::class, 'updateProfile']);
 Route::post('/change-password', [UserController::class, 'changePassword']);
+Route::get('/admin-users', [UserController::class, 'index']);
 
 
 //Loại toa
@@ -104,6 +112,8 @@ Route::get('/vnpay/return', [VNPayController::class, 'returnPayment']);
 //order
 Route::get('/orders', [OrderController::class, 'index']);
 Route::get('/orders/{txnRef}', [OrderController::class, 'show']);
+Route::get('/admin-orders', [OrderController::class, 'admin']);
+
 
 //checkin
 Route::post('/check-in', [CheckInController::class, 'checkIn']);

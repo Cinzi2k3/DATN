@@ -9,6 +9,31 @@ use App\Models\User;
 
 class UserController extends Controller
 {
+    public function index()
+{
+    try {
+        $users = User::with('profile')->get();
+        return response()->json([
+            'success' => true,
+            'users' => $users->map(function ($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'phone_number' => $user->profile->phone_number,
+                    'address' => $user->profile->address,
+                    'birth_date' => $user->profile->birth_date,
+                ];
+            }),
+        ]);
+    } catch (\Exception $e) {
+        Log::error('Lỗi khi lấy danh sách người dùng: ' . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'Lấy danh sách người dùng thất bại',
+        ], 500);
+    }
+}
     public function getUserByEmail(Request $request)
     {
         $email = $request->query('email');
