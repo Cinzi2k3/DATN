@@ -57,6 +57,7 @@ const adminRoutes = [
   { path: '/admin/orders', component: () => import('@/components/admin/Orders.vue') },
   { path: '/admin/reports', component: () => import('@/components/admin/Reports.vue') },
   { path: '/admin/users', component: () => import('@/components/admin/Users.vue') },
+  { path: '/admin/status', component: () => import('@/components/admin/status.vue') },
   
 ];
 

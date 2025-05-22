@@ -131,14 +131,16 @@
             </div>
           </template>
           <el-table :data="recentOrders" style="width: 100%" :border="false">
-            <el-table-column prop="id" label="Mã đơn" width="120" />
-            <el-table-column prop="customer" label="Khách hàng" />
-            <el-table-column prop="date" label="Ngày đặt" width="120" />
+            <el-table-column prop="id" label="Mã đơn hàng" width="220" />
+            <el-table-column prop="customer" label="Khách hàng" width="180"/>
+            <el-table-column prop="date" label="Ngày đặt" width="130" />
+            <el-table-column prop="email" label="Email" width="250" />
+            <el-table-column prop="phone" label="Sdt" width="120" />
             <el-table-column prop="amount" label="Số tiền" width="110" />
             <el-table-column prop="status" label="Trạng thái" width="120">
               <template #default="scope">
-                <el-tag :type="getOrderStatusType(scope.row.status)">
-                  {{ scope.row.status }}
+                <el-tag :type="getOrderStatusType(scope.row.status)" effect="dark">
+                  {{ scope.row.status === 'Hoàn thành' ? 'Hoàn thành' : scope.row.status === 'Chờ xử lý' ? 'Chờ xử lý' : 'Đã hủy' }}
                 </el-tag>
               </template>
             </el-table-column>
@@ -190,8 +192,8 @@ const formatCurrency = (value) => {
 };
 
 const getOrderStatusType = (status) => {
-  if (status === 'completed') return 'success';
-  if (status === 'pending') return 'warning';
+  if (status === 'Hoàn thành') return 'success';
+  if (status === 'Chờ xử lý') return 'warning';
   return '';
 };
 
@@ -252,6 +254,7 @@ const fetchRecentOrders = async () => {
   }
 };
 
+
 const fetchAllData = async () => {
   await Promise.all([
     fetchStats(),
@@ -287,4 +290,5 @@ onMounted(fetchAllData);
   min-height: 350px;
   position: relative;
 }
+
 </style>

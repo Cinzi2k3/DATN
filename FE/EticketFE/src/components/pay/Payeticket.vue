@@ -3,14 +3,14 @@
     <el-card class="passenger-card">
       <template #header>
         <div class="card-header">
-          <h2>Thông tin hành khách</h2>
+          <h2>{{ $t('Thông tin hành khách') }}</h2>
         </div>
       </template>
 
       <div>
         <div v-for="(ticket, index) in tickets" :key="index" class="passenger-section">
           <h3 class="passenger-type">
-            {{ ticket.departure?.ticketType === 'Người lớn' ? 'Người lớn (Từ 11 tuổi trở lên)' : 'Trẻ em (Từ 6-10 tuổi)' }}
+            {{ ticket.departure?.ticketType === 'Người lớn' ? $t('Người lớn (Từ 11 tuổi trở lên)') : $t('Trẻ em (Dưới 10 tuổi)') }}
           </h3>
 
           <el-row gutter="0" class="pb-3">
@@ -18,11 +18,11 @@
             <el-col :span="10" class="departure-return">
               <el-row class="p-2">
                 <el-col :span="12">
-                  <p class="seat-label">Chiều đi</p>
-                  <p class="seat-value">{{ ticket.departure ? getCarNumber(ticket.departure.carType) : 'N/A' }}</p>
+                  <p class="seat-label">{{ $t('Chiều đi') }}</p>
+                  <p class="seat-value">{{ $t(ticket.departure ? getCarNumber(ticket.departure.carType) : 'N/A') }}</p>
                 </el-col>
                 <el-col :span="12" class="text-end">
-                  <p class="seat-label">{{ ticket.departure ? getCarType(ticket.departure.carType) : 'N/A' }}</p>
+                  <p class="seat-label">{{ $t(ticket.departure ? getCarType(ticket.departure.carType) : 'N/A') }}</p>
                   <p class="seat-value">
                     {{ ticket.departure ? `${ticket.departure.seat} - ${formatTotalPrice(ticket.departure.price)}` : 'N/A' }}
                   </p>
@@ -34,7 +34,7 @@
             <el-col v-if="ticket.return" :span="10" class="departure-return">
               <el-row class="p-2">
                 <el-col :span="10">
-                  <p class="seat-label">Chiều về</p>
+                  <p class="seat-label">{{ $t('Chiều về') }}</p>
                   <p class="seat-value">{{ ticket.return ? getCarNumber(ticket.return.carType) : 'N/A' }}</p>
                 </el-col>
                 <el-col :span="12" class="text-end">
@@ -51,31 +51,31 @@
           <el-form :model="form[index]" label-position="top" :rules="rules">
             <el-row :gutter="20">
               <el-col :span="8">
-                <el-form-item label="Họ và tên" prop="name" required>
+                <el-form-item :label="$t('Họ và tên')" prop="name" required>
                   <el-input 
                     v-model="form[index].name" 
-                    placeholder="Vd: Nguyễn Văn Nam"
+                    :placeholder="$t('Vd: Nguyễn Văn Nam')"
                     @change="emitPassengerInfo"
                   />
                 </el-form-item>
               </el-col>
 
               <el-col :span="8">
-                <el-form-item label="Ngày sinh" required>
+                <el-form-item :label="$t('Ngày sinh')" required>
                   <el-row :gutter="8">
                     <el-col :span="8">
                       <el-form-item prop="day">
-                        <el-input v-model="form[index].day" placeholder="DD" />
+                        <el-input v-model="form[index].day" :placeholder="$t('DD')" />
                       </el-form-item>
                     </el-col>
                     <el-col :span="8">
                       <el-form-item prop="month">
-                        <el-input v-model="form[index].month" placeholder="MM" />
+                        <el-input v-model="form[index].month" :placeholder="$t('MM')" />
                       </el-form-item>
                     </el-col>
                     <el-col :span="8">
                       <el-form-item prop="year">
-                        <el-input v-model="form[index].year" placeholder="YYYY" />
+                        <el-input v-model="form[index].year" :placeholder="$t('YYYY')" />
                       </el-form-item>
                     </el-col>
                   </el-row>
@@ -84,15 +84,15 @@
 
               <el-col :span="8">
                 <el-form-item prop="idNumber">
-                    <div class="label-with-icon">
-                      CCCD / Passport
-                      <el-tooltip content="Thông tin được yêu cầu bởi đường sắt Việt Nam" placement="top">
-                        <el-icon><InfoFilled /></el-icon>
-                      </el-tooltip>
-                    </div>
+                  <div class="label-with-icon">
+                    {{ $t('CCCD / Passport') }}
+                    <el-tooltip :content="$t('Thông tin được yêu cầu bởi đường sắt Việt Nam')" placement="top">
+                      <el-icon><InfoFilled /></el-icon>
+                    </el-tooltip>
+                  </div>
                   <el-input 
                     v-model="form[index].idNumber" 
-                    placeholder="Nhập CCCD hoặc Passport"
+                    :placeholder="$t('CCCD hoặc Passport')"
                     @change="emitPassengerInfo"
                   />
                 </el-form-item>

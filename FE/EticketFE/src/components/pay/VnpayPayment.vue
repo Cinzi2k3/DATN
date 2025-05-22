@@ -3,7 +3,7 @@
   <el-card class="vnpay-card">
     <template #header>
       <div class="card-header">
-        <h2>Phương thức thanh toán</h2>
+        <h2>{{ $t('Phương thức thanh toán') }}</h2>
       </div>
     </template>
     
@@ -11,14 +11,14 @@
       <el-radio-group v-model="paymentMethod" class="payment-radio-group">
         <el-radio label="vnpay" border>
           <div class="payment-option">
-            <span>Thanh toán qua VNPay</span>
+            <span>{{ $t('Thanh toán qua VNPay') }}</span>
           </div>
         </el-radio>
       </el-radio-group>
     </div>
     
     <div class="vnpay-banks">
-      <h3>Chọn ngân hàng thanh toán (tùy chọn)</h3>
+      <h3>{{ $t('Chọn ngân hàng thanh toán (tùy chọn)') }}</h3>
       <div class="bank-list">
         <el-radio-group v-model="selectedBank" class="bank-radio-group">
           <el-radio label="" border>VNPay</el-radio>
@@ -31,15 +31,16 @@
     </div>
     
     <div class="countdown" v-if="timeLeft > 0">
-      <p>Thời gian còn lại để thanh toán: {{ formatTime(timeLeft) }}</p>
+      <p>{{ $t('Thời gian còn lại để thanh toán') }}: {{ formatTime(timeLeft) }}</p>
     </div>
     <div class="countdown expired" v-else>
-      <p>Thời gian giữ ghế đã hết hạn. Vui lòng chọn lại ghế.</p>
+      <p>{{ $t('Thời gian giữ chỗ đã hết hạn. Vui lòng chọn lại chỗ') }}.</p>
     </div>
     
     <div class="payment-actions">
       <el-button @click="gotoback">
-        <el-icon><ArrowLeft /></el-icon> Quay lại
+        <el-icon><ArrowLeft /></el-icon> 
+        {{ $t('Quay lại') }}
       </el-button>
       <el-button 
         type="primary" 
@@ -47,7 +48,7 @@
         :disabled="timeLeft <= 0" 
         @click="processPayment"
       >
-        Thanh toán {{ formatTotalPrice(totalPrice) }}
+        {{ $t('Thanh toán') }} {{ formatTotalPrice(totalPrice) }}
         <el-icon class="el-icon--right"><ArrowRight /></el-icon>
       </el-button>
     </div>

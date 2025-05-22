@@ -26,6 +26,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\CheckInController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ReportAdminController;
 
     Route::get('/dashboard/stats', [DashboardController::class, 'getStats']);
     Route::get('/dashboard/revenue', [DashboardController::class, 'getRevenue']);
@@ -114,6 +115,8 @@ Route::get('/orders', [OrderController::class, 'index']);
 Route::get('/orders/{txnRef}', [OrderController::class, 'show']);
 Route::get('/admin-orders', [OrderController::class, 'admin']);
 
-
 //checkin
 Route::post('/check-in', [CheckInController::class, 'checkIn']);
+
+//Thống kê admin
+Route::get('/statistics', [ReportAdminController::class, 'statistics']);

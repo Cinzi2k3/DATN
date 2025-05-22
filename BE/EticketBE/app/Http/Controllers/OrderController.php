@@ -6,6 +6,7 @@ use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -187,4 +188,5 @@ class OrderController extends Controller
         ], 500);
     }
 }
+
 }

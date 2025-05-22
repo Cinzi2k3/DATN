@@ -22,9 +22,9 @@
           <el-icon><i class="fas fa-shopping-cart"></i></el-icon>
           <template #title>Đơn hàng</template>
         </el-menu-item>
-        <el-menu-item index="/admin/seats">
+        <el-menu-item index="/admin/status">
           <el-icon><i class="fas fa-chair"></i></el-icon>
-          <template #title>Trạng thái ghế</template>
+          <template #title>Giá chỗ</template>
         </el-menu-item>
         <el-menu-item index="/admin/support">
           <el-icon><i class="fas fa-headset"></i></el-icon>
@@ -36,7 +36,7 @@
         </el-menu-item>
         <el-menu-item index="/admin/reports">
           <el-icon><i class="fas fa-chart-bar"></i></el-icon>
-          <template #title>Báo cáo</template>
+          <template #title>Thống kê</template>
         </el-menu-item>
         <el-menu-item index="/admin/settings">
           <el-icon><i class="fas fa-cogs"></i></el-icon>
@@ -121,7 +121,7 @@ const currentPage = computed(() => {
   const path = route.path
   if (path.includes('dashboard')) return 'Dashboard'
   if (path.includes('orders')) return 'Đơn hàng'
-  if (path.includes('seats')) return 'Trạng thái ghế'
+  if (path.includes('status')) return 'Trạng thái ghế'
   if (path.includes('support')) return 'Hỗ trợ khách hàng'
   if (path.includes('users')) return 'Người dùng'
   if (path.includes('reports')) return 'Báo cáo'

@@ -1,8 +1,8 @@
 <template>
-  <el-card >
+  <el-card>
     <!-- Lịch trình chuyến đi -->
     <div class="mb-4">
-      <h5 v-if="returnData">Chiều đi</h5>
+      <h5 v-if="returnData">{{ $t('Chiều đi') }}</h5>
       <el-row class="mb-3">
         <el-col :span="24" class="d-flex align-items-center">
           <span class="fw-medium fs-6">{{ departureData.searchgadi }}</span>
@@ -49,7 +49,7 @@
 
     <!-- Lịch trình chuyến về -->
     <div v-if="returnData" class="mb-4">
-      <h5>Chiều về</h5>
+      <h5>{{ $t('Chiều về') }}</h5>
       <el-row class="mb-3">
         <el-col :span="24" class="d-flex align-items-center">
           <span class="fw-medium fs-6">{{ returnData.searchgadi }}</span>
@@ -97,7 +97,7 @@
     <!-- Chi tiết giá -->
     <div class="mb-4">
       <el-row class="mb-2">
-        <el-col :span="12">Tổng tiền vé</el-col>
+        <el-col :span="12">{{ $t('Tổng tiền vé') }}</el-col>
         <el-col :span="12" class="text-end fw-bold">{{
           formatTotalPrice(totalTicketPrice)
         }}</el-col>
@@ -105,24 +105,24 @@
       <el-row class="mb-2">
         <el-col :span="12">
           <div class="d-flex align-items-center gap-2">
-            Phí bảo hiểm
-            <el-tooltip content="Phí bảo hiểm hành khách" placement="top">
+            {{ $t('Phí bảo hiểm') }}
+            <el-tooltip :content="$t('Phí bảo hiểm hành khách')" placement="top">
               <el-icon><InfoFilled /></el-icon>
             </el-tooltip>
           </div>
         </el-col>
-        <el-col :span="12" class="text-end">Chưa có</el-col>
+        <el-col :span="12" class="text-end">{{ $t('Chưa có') }}</el-col>
       </el-row>
       <el-row>
         <el-col :span="12">
           <div class="d-flex align-items-center gap-2">
-            Phí dịch vụ
-            <el-tooltip content="Phí xử lý giao dịch" placement="top">
+            {{ $t('Phí dịch vụ') }}
+            <el-tooltip :content="$t('Phí xử lý giao dịch')" placement="top">
               <el-icon><InfoFilled /></el-icon>
             </el-tooltip>
           </div>
         </el-col>
-        <el-col :span="12" class="text-end">Chưa có</el-col>
+        <el-col :span="12" class="text-end">{{ $t('Chưa có') }}</el-col>
       </el-row>
     </div>
 
@@ -130,7 +130,7 @@
 
     <!-- Tổng tiền -->
     <div class="d-flex justify-content-between align-items-center">
-      <span class="fs-5 fw-medium">Tổng tiền</span>
+      <span class="fs-5 fw-medium">{{ $t('Tổng tiền') }}</span>
       <span class="fs-4 fw-bold text-warning">{{
         formatTotalPrice(totalTicketPrice)
       }}</span>
@@ -138,7 +138,7 @@
   </el-card>
 </template>
   
-  <script setup>
+<script setup>
 import { InfoFilled } from "@element-plus/icons-vue";
 import { computed } from "vue";
 import { useFormatPrice } from "@/composables/useFormatprice";

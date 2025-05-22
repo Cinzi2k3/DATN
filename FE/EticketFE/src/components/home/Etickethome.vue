@@ -3,8 +3,8 @@
     <div class="spinner"></div>
   </div>
   <div style="color: #fff">
-    <h1 style="font-size: 45px">MUA VÉ TÀU TRỰC TUYẾN</h1>
-    <h5>Tính năng chọn chỗ thanh toán và in vé điện tử</h5>
+    <h1 style="font-size: 45px">{{ $t('MUA VÉ TÀU TRỰC TUYẾN') }}</h1>
+    <h5>{{ $t('Tính năng chọn chỗ thanh toán và in vé điện tử') }}</h5>
   </div>
   <div style="
       background-color: rgba(0, 0, 0, 0.3);
@@ -21,8 +21,8 @@
         ">
         <el-col :span="24" style="display: flex; align-items: center; margin-top: 10px">
           <div style="flex: 1; margin-right: 10px">
-            <label style="opacity: 0.5; margin-left: 10px">Ga đi:</label>
-            <el-select v-model="gadi" placeholder="Chọn ga đi" style="width: 100%">
+            <label style="opacity: 0.5; margin-left: 10px">{{ $t('Ga đi') }}:</label>
+            <el-select v-model="gadi" :placeholder="$t('Chọn ga đi')" style="width: 100%">
               <el-option v-for="station in stations" :key="station.maga" :label="station.tenga"
                 :value="station.tenga" />
             </el-select>
@@ -31,8 +31,8 @@
             <Refresh />
           </el-icon>
           <div style="flex: 1">
-            <label style="opacity: 0.5; margin-left: 10px">Ga đến:</label>
-            <el-select v-model="gaden" placeholder="Chọn ga đến" style="width: 100%">
+            <label style="opacity: 0.5; margin-left: 10px">{{ $t('Ga đến') }}:</label>
+            <el-select v-model="gaden" :placeholder="$t('Chọn ga đến')" style="width: 100%">
               <el-option v-for="station in stations" :key="station.maga" :label="station.tenga"
                 :value="station.tenga" />
             </el-select>
@@ -51,8 +51,8 @@
             <div class="d-flex align-items-center">
               <i class="fa-solid fa-user me-2"></i>
               <div class="d-flex flex-column align-items-start">
-                <span>Số lượng vé</span>
-                <span>{{ tempTotalTickets }} vé</span>
+                <span>{{ $t('Số lượng vé') }}</span>
+                <span>{{ tempTotalTickets }} {{ $t('vé') }}</span>
               </div>
             </div>
           </button>
@@ -61,8 +61,8 @@
             <div v-for="category in ticketCategories" :key="category.id"
               class="d-flex align-items-center justify-content-between p-3 border-bottom">
               <div>
-                <p class="mb-0 font-weight-bold">{{ category.label }}</p>
-                <p class="mb-0 text-muted small">{{ category.description }}</p>
+                <p class="mb-0 font-weight-bold">{{ $t(category.label) }}</p>
+                <p class="mb-0 text-muted small">{{ $t(category.description) }}</p>
                 <p v-if="category.discount" class="mb-0 text-warning small">
                   -{{ category.discount }}%
                 </p>
@@ -79,7 +79,7 @@
               </div>
             </div>
             <p class="text-muted small p-3">
-              Một người lớn được kèm 2 trẻ dưới 6 tuổi miễn vé, ngồi chung chỗ.
+              {{ $t('Vé trẻ em dưới 10 tuổi được giảm 25% giá vé') }}
             </p>
           </div>
         </div>
@@ -97,11 +97,11 @@
               <el-icon style="font-size: 25px; margin-right: 10px">
                 <Calendar />
               </el-icon>
-              <label style="opacity: 0.5; margin-right: 10px">Ngày đi:</label>
-              <el-radio v-model="selectedTicket" label="one-way">Một chiều</el-radio>
+              <label style="opacity: 0.5; margin-right: 10px">{{ $t('Ngày đi') }}:</label>
+              <el-radio v-model="selectedTicket" label="one-way">{{ $t('Một chiều') }}</el-radio>
             </div>
             <el-date-picker v-model="departureDate" type="date" @change="onDepartureDateChange"
-              placeholder="Chọn ngày đi" style="width: 100%"  />
+              :placeholder="$t('Chọn ngày đi')" style="width: 100%" />
           </el-col>
 
           <el-col :span="12" style="padding: 10px">
@@ -109,10 +109,10 @@
               <el-icon style="font-size: 25px; margin-right: 10px">
                 <Calendar />
               </el-icon>
-              <label style="opacity: 0.5; margin-right: 10px">Ngày về:</label>
-              <el-radio v-model="selectedTicket" label="round-trip">Khứ hồi</el-radio>
+              <label style="opacity: 0.5; margin-right: 10px">{{ $t('Ngày về') }}:</label>
+              <el-radio v-model="selectedTicket" label="round-trip">{{ $t('Khứ hồi') }}</el-radio>
             </div>
-            <el-date-picker v-model="returnDate" type="date" placeholder="Chọn ngày về" style="width: 100%"
+            <el-date-picker v-model="returnDate" type="date" :placeholder="$t('Chọn ngày về')" style="width: 100%"
               :disabled="selectedTicket !== 'round-trip'" @change="onReturnDateChange" />
           </el-col>
         </el-row>
@@ -127,7 +127,7 @@
           margin: 30px 10px 0px 0px;
           border-radius: 5px;
         " @click="searchTickets" :disabled="loading">
-        <h3 style="color: white; font-size: 20px">Tìm</h3>
+        <h3 style="color: white; font-size: 20px">{{ $t('Tìm') }}</h3>
       </button>
     </el-row>
   </div>

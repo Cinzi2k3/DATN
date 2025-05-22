@@ -10,6 +10,7 @@ class Cho extends Model
     use HasFactory;
     protected $primaryKey = 'macho';
     protected $table = 'cho';
+    public $timestamps = false;
     protected $fillable = [
         'macho',
         'maloaicho',

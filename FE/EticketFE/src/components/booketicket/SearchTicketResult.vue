@@ -5,7 +5,7 @@
   >
     <div style="display: flex; justify-content: space-between">
       <h3 style="margin: 0; font-size: 20px; color: #333399; padding: 5px 0 0 5px">
-        Chọn chiều đi
+        {{ $t('Tuyến đường') }}
       </h3>
       <h3 style="margin: 0; font-size: 20px; padding: 5px 5px 0 0px">
         {{ searchgadi }} → {{ searchgaden }}

@@ -5,10 +5,10 @@
         <el-row :gutter="20" style="align-items: center">
           <!-- Phần thông tin tàu -->
           <el-col :span="6">
-            <p style="font-size: 20px;">{{ traintau }}</p>
+            <p style="font-size: 20px;">{{ $t(traintau) }}</p>
             <h3>{{ trainCode }}</h3>
             <div class="cho">
-              <p class="cho1">Còn {{ availableSeats }} chỗ</p>
+              <p class="cho1">{{ $t('Còn') }} {{ availableSeats }} {{ $t('chỗ') }}</p>
             </div>
           </el-col>
 
@@ -44,7 +44,7 @@
           <el-col :span="6">
             <div class="price">
               <el-button class="hover-button" @click="openDialog">
-                <h4>Đặt</h4>
+                <h4>{{ $t('Đặt') }}</h4>
               </el-button>
               <h2 class="ticket-price">{{ ticketPrice }}</h2>
             </div>

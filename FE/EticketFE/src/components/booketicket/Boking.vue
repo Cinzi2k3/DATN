@@ -11,7 +11,7 @@
         <div class="route-info">
           <span>{{ searchgadi }} → {{ searchgaden }} | {{ selectedDay }}</span>
         </div>
-        <h2 class="train-title">{{ traintau }} {{ trainCode }}</h2>
+        <h2 class="train-title">{{ $t(traintau) }} {{ trainCode }}</h2>
       </div>
       <div class="car-selection-wrapper">
         <div class="car-selection" ref="carSelectionRef">
@@ -23,8 +23,8 @@
               :class="{ active: selectedCar === index }"
               @click="selectCar(index)"
             >
-              <div class="car-type">{{ car.type }}</div>
-              <div class="seat-info">{{ car.seatInfo }}</div>
+              <div class="car-type">{{ $t(car.type) }}</div>
+              <div class="seat-info">{{ $t('Còn') }} {{ $t(car.seatInfo) }} {{ $t('chỗ trống') }}</div>
             </div>
             <img
               class="image-head"
@@ -141,7 +141,7 @@ const fetchTrainCars = async () => {
           id: car.matoa,
           tentau: car.tentau,
           type: `${car.tentoa}: ${car.tenloaitoa}`,
-          seatInfo: `Còn ${car.sochocon} chỗ trống`,
+          seatInfo: car.sochocon,
           tenloaitoa: car.tenloaitoa,
           cho: car.cho || [],
         }))

@@ -61,10 +61,10 @@
             <h4 class="mt-4">Đơn hàng đã đặt</h4>
           <el-table :data="userOrders" style="width: 100%" border stripe @row-click="showOrderDetails">
             <el-table-column prop="id" label="ID" width="73" />
-            <el-table-column prop="transaction_id" label="Mã giao dịch" width="150" />
+            <el-table-column prop="transaction_id" label="Mã giao dịch" width="140" />
             <el-table-column prop="contact_name" label="Tên liên hệ" width="150" />
             <el-table-column prop="contact_email" label="Email" width="220" />
-            <el-table-column prop="contact_phone" label="Số điện thoại" width="150" />
+            <el-table-column prop="contact_phone" label="Số điện thoại" width="149" />
             <el-table-column prop="total_amount" label="Tổng tiền" width="120">
               <template #default="{ row }">
                 {{ formatCurrency(row.total_amount) }}

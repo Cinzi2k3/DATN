@@ -86,9 +86,9 @@
                 <div v-for="category in ticketCategories" :key="category.id"
                   class="d-flex align-items-center justify-content-between p-3 border-bottom">
                   <div>
-                    <p class="mb-0 font-weight-bold">{{ category.label }}</p>
+                    <p class="mb-0 font-weight-bold">{{ $t(category.label) }}</p>
                     <p class="mb-0 text-muted small">
-                      {{ category.description }}
+                      {{ $t(category.description) }}
                     </p>
                     <p v-if="category.discount" class="mb-0 text-warning small">
                       -{{ category.discount }}%
@@ -107,7 +107,7 @@
                 </div>
 
                 <p class="text-muted small p-3">
-                  {{ $t('Một người lớn được kèm 2 trẻ dưới 6 tuổi miễn vé, ngồi chung chỗ.') }}
+                  {{ $t('Vé trẻ em dưới 10 tuổi được giảm 25% giá vé') }}
                 </p>
               </div>
             </div>

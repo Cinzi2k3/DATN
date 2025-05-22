@@ -16,6 +16,8 @@ class Order extends Model
         'total_amount',
         'status',
         'checkin',
+        'created_at',
+        'updated_at',
     ];
 
     public function user()

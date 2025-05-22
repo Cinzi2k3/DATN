@@ -217,6 +217,8 @@ class DashboardController extends Controller
                 return [
                     'id' => $order->transaction_id,
                     'customer' => $order->contact_name ?? $order->user->name,
+                    'email' => $order->contact_email ?? $order->user->email,
+                    'phone' => $order->contact_phone ?? $order->user->profile->phone_number,
                     'date' => $order->created_at->format('d/m/Y'),
                     'amount' => number_format($order->total_amount) . 'đ',
                     'status' => match ($order->status) {

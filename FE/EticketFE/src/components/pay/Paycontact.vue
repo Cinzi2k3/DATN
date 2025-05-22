@@ -2,37 +2,37 @@
   <el-card class="contact-card">
     <template #header>
       <div class="card-header">
-        <h2>Thông tin liên hệ</h2>
+        <h2>{{ $t('Thông tin liên hệ') }}</h2>
       </div>
     </template>
     
     <el-form :model="form" label-position="top" :rules="rules" ref="contactForm">
       <el-row :gutter="20">
         <el-col :span="8">
-          <el-form-item label="Họ và tên" prop="name" required>
+          <el-form-item :label="$t('Họ và tên')" prop="name" required>
             <el-input 
               v-model="form.name" 
-              placeholder="Nguyễn Văn A"
+              :placeholder="$t('Nguyễn Văn A')"
               @change="emitContactInfo"
               ref="nameInput"   
             />
           </el-form-item>
         </el-col>
         <el-col :span="8">
-          <el-form-item label="Số điện thoại" prop="phone" required>
+          <el-form-item :label="$t('Số điện thoại')" prop="phone" required>
             <el-input 
               v-model="form.phone" 
-              placeholder="0123456789"
+              :placeholder="$t('0123456789')"
               @change="emitContactInfo"
               ref="phoneInput"
             />
           </el-form-item>
         </el-col>
         <el-col :span="8">
-          <el-form-item label="Email" prop="email" required>
+          <el-form-item :label="$t('Email')" prop="email" required>
             <el-input 
               v-model="form.email" 
-              placeholder="example@gmail.com"
+              :placeholder="$t('example@gmail.com')"
               @change="emitContactInfo"
               ref="emailInput"
             />
@@ -41,7 +41,7 @@
       </el-row>
       
       <el-checkbox v-model="form.eticketChecked" @change="emitContactInfo">
-        Xuất hóa đơn điện tử
+        {{ $t('Xuất hóa đơn điện tử') }}
       </el-checkbox>
     </el-form>
   </el-card>

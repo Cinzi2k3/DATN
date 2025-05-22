@@ -1,6 +1,6 @@
 <template>
   <div class="seat-selection">
-    <h3 class="text-center mb-4">{{ car.type }}</h3>
+    <h3 class="text-center mb-4">{{ $t(car.type) }}</h3>
     <div v-if="!seats" class="text-center">
       <p>Đang tải dữ liệu ghế...</p>
     </div>
@@ -51,8 +51,8 @@
         :class="{ 'btn-primary': currentTicketIndex === index, 'btn-outline-primary': currentTicketIndex !== index }"
         @click="selectTicket(index)"
       >
-        {{ ticket.type }} {{ ticket.ticketNumber }}
-        <span v-if="ticket.sohieu"> ({{ ticket.sohieu }} - {{ ticket.carType }})</span>
+        {{ $t(ticket.type) }} {{ ticket.ticketNumber }}
+        <span v-if="ticket.sohieu"> ({{ ticket.sohieu }} - {{ $t(ticket.carType) }})</span>
         <span v-if="ticket.type === 'Trẻ em'" class="discount-badge"> -25%</span>
       </button>
     </div>
@@ -66,7 +66,7 @@
             <div class="legend-square"></div>
             <div class="legend-bottom"></div>
           </div>
-          <span class="ms-2">Ghế trống</span>
+          <span class="ms-2">{{ $t('Ghế trống') }}</span>
         </div>
         <div class="d-flex align-items-center me-4">
           <div class="legend-item selected">
@@ -75,7 +75,7 @@
             <div class="legend-square"></div>
             <div class="legend-bottom"></div>
           </div>
-          <span class="ms-2">Ghế đang chọn</span>
+          <span class="ms-2">{{ $t('Ghế đang chọn') }}</span>
         </div>
         <div class="d-flex align-items-center me-4">
           <div class="legend-item dang-giu">
@@ -84,7 +84,7 @@
             <div class="legend-square"></div>
             <div class="legend-bottom"></div>
           </div>
-          <span class="ms-2">Ghế đang giữ</span>
+          <span class="ms-2">{{ $t('Ghế đang giữ') }}</span>
         </div>
         <div class="d-flex align-items-center">
           <div class="legend-item unavailable">
@@ -93,22 +93,22 @@
             <div class="legend-square"></div>
             <div class="legend-bottom"></div>
           </div>
-          <span class="ms-2">Ghế đã đặt</span>
+          <span class="ms-2">{{ $t('Ghế đã đặt') }}</span>
         </div>
       </div>
 
       <div v-if="seats && seats.length > 0" class="mt-4 text-center d-flex">
         <div class="d-flex flex-column align-items-end">
-          <span>Đã chọn : <strong class="fs-6">{{ totalSelected }} / {{ totalTickets }} chỗ</strong></span>
-          <div v-if="totalPrice === 0" class="textseat">Quý khách vui lòng chọn chỗ trống ở trên tương ứng loại vé</div>
-          <span v-else-if="totalPrice > 0" class="fw-bold fs-6">Tổng tiền : <span class="fs-4 text-primary">{{ formatTotalPrice(totalPrice) }}</span></span>
+          <span>{{ $t('Đã chọn') }} : <strong class="fs-6">{{ totalSelected }} / {{ totalTickets }}</strong></span>
+          <div v-if="totalPrice === 0" class="textseat">{{ $t('Quý khách vui lòng chọn chỗ trống ở trên tương ứng loại vé') }}</div>
+          <span v-else-if="totalPrice > 0" class="fw-bold fs-6">{{ $t('Tổng tiền') }} : <span class="fs-4 text-primary">{{ formatTotalPrice(totalPrice) }}</span></span>
         </div>
         <button
           class="btn btn-primary ms-3"
           :disabled="totalSelected !== totalTickets"
           @click="bookTickets(selectedSeats, totalPrice)"
         >
-          Đặt vé
+          {{ $t('Đặt vé') }}
         </button>
       </div>
     </div>
