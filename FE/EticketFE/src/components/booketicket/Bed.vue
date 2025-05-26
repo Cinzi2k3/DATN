@@ -67,6 +67,8 @@
         {{ $t(ticket.type) }} {{ ticket.ticketNumber }}
         <span v-if="ticket.sohieu"> ({{ ticket.sohieu }} - {{ ticket.carType }})</span>
         <span v-if="ticket.type === 'Trẻ em'" class="discount-badge"> -25%</span>
+        <span v-if="ticket.type === 'Người cao tuổi'" class="discount-badge"> -15%</span>
+        <span v-if="ticket.type === 'Sinh viên'" class="discount-badge"> -10%</span>
       </button>
     </div>
 

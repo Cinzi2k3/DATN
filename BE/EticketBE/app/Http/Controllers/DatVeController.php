@@ -66,7 +66,7 @@ class DatVeController extends Controller
                 }
 
                 // Cập nhật hoặc thêm ghế vào trạng thái danggiu
-                $thoihanGiu = Carbon::now('UTC')->addMinutes(3);
+                $thoihanGiu = Carbon::now('UTC')->addMinutes(15);
             DB::table('datve')->updateOrInsert(
                 [
                     'macho' => $macho,

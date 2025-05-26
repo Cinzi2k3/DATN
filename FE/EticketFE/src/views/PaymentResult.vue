@@ -90,7 +90,7 @@
                           <p><el-icon class="me-2 text-muted"><Money /></el-icon><strong>Giá vé:</strong> {{ formatTotalPrice(detail.price) }}</p>
                           <p><el-icon class="me-2 text-muted"><User /></el-icon><strong>Hành khách:</strong> {{ detail.passenger?.name || 'Không có thông tin' }}</p>
                           <p><el-icon class="me-2 text-muted"><Document /></el-icon><strong>CCCD/Passport:</strong> {{ detail.passenger?.cccd || 'N/A' }}</p>
-                          <p><el-icon class="me-2 text-muted"><Discount /></el-icon><strong>Loại vé:</strong> {{ getTicketType(detail.ticket_type) }}</p>
+                          <p><el-icon class="me-2 text-muted"><Discount /></el-icon><strong>Loại vé:</strong> {{ detail.ticket_type }}</p>
                         </div>
                       </div>
                     </div>
@@ -142,7 +142,7 @@
                           <p><el-icon class="me-2 text-muted"><Money /></el-icon><strong>Giá vé:</strong> {{ formatTotalPrice(detail.price) }}</p>
                           <p><el-icon class="me-2 text-muted"><User /></el-icon><strong>Hành khách:</strong> {{ detail.passenger?.name || 'Không có thông tin' }}</p>
                           <p><el-icon class="me-2 text-muted"><Document /></el-icon><strong>CCCD/Passport:</strong> {{ detail.passenger?.cccd || 'N/A' }}</p>
-                          <p><el-icon class="me-2 text-muted"><Discount /></el-icon><strong>Loại vé:</strong> {{ getTicketType(detail.ticket_type) }}</p>
+                          <p><el-icon class="me-2 text-muted"><Discount /></el-icon><strong>Loại vé:</strong> {{ detail.ticket_type }}</p>
                         </div>
                       </div>
                     </div>
@@ -370,14 +370,6 @@ const calculateDuration = (start, end) => {
   const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
   
   return `${hours} giờ ${minutes} phút`;
-};
-
-const getTicketType = (ticket_type) => {
-  const types = {
-    'adult': 'Người lớn',
-    'child': 'Trẻ em',
-  };
-  return types[ticket_type] || 'N/A';
 };
 
 const getCurrentDate = () => {

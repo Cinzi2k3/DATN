@@ -58,7 +58,7 @@
           </button>
 
           <div v-if="isOpen" class="dropdown-menu show w-100 mt-2 p-0 border rounded shadow-sm">
-            <div v-for="category in ticketCategories" :key="category.id"
+            <div v-for="category in ticketCategories" :key="category.label"
               class="d-flex align-items-center justify-content-between p-3 border-bottom">
               <div>
                 <p class="mb-0 font-weight-bold">{{ $t(category.label) }}</p>
@@ -68,12 +68,12 @@
                 </p>
               </div>
               <div class="d-flex align-items-center">
-                <button @click="decrement(category.id)" class="btn btn-sm btn-outline-secondary"
+                <button @click="decrement(category.label)" class="btn btn-sm btn-outline-secondary"
                   :disabled="category.count <= 0">
                   -
                 </button>
                 <span class="mx-2">{{ category.count }}</span>
-                <button @click="increment(category.id)" class="btn btn-sm btn-outline-secondary">
+                <button @click="increment(category.label)" class="btn btn-sm btn-outline-secondary">
                   +
                 </button>
               </div>
@@ -156,7 +156,7 @@ const selectedTicket = ref("one-way");
 const {swapStations} = useSwapStations(gadi, gaden)
 const { isOpen, toggleDropdown } = useDown();
 const {fetchStations, stations} = useFetchStations();
-const { ticketCategories, totalTickets,tempTotalTickets, increment, decrement, calculateTempTotal,updateTicketDataInStore } = useTicketManagement();
+const { ticketCategories, totalTickets,tempTotalTickets, increment, decrement, calculateTempTotal,updateTicketDataInStore,loadTicketCategories } = useTicketManagement();
 
 const onDepartureDateChange = (date) => {
   departureDate.value = date;
@@ -191,6 +191,7 @@ const searchTickets = async () => {
       const ticketDetails = ticketCategories.value.map((category) => ({
         type: category.label,
         count: category.count,
+        discount: category.discount, // Thêm discount
       }));
 
       const searchData = {
@@ -220,7 +221,10 @@ const searchTickets = async () => {
   }
 };
 
-onMounted(fetchStations);
+onMounted(() => {
+  fetchStations();
+  loadTicketCategories();
+});
 
 </script>
 

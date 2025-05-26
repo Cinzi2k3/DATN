@@ -1,3 +1,4 @@
+```vue
 <template>
   <div>
     <div class="footer">
@@ -12,19 +13,37 @@
         </el-col>
         <el-col :span="9">
           <div class="about">
-            <h6>{{ $t('ĐĂNG KÍ NHẬN TIN')}}</h6>
-            <h7>{{ $t('Các chương trình khuyến mãi sẽ tự động gửi đến bạn')}}</h7>
+            <h6>{{ $t('GỬI HỖ TRỢ') }}</h6>
+            <h7>{{ $t('Gửi yêu cầu của bạn, đội ngũ hỗ trợ sẽ liên hệ sớm') }}</h7>
           </div>
         </el-col>
         <el-col :span="9">
           <div class="newsletter">
             <el-input
               v-model="email"
-              v-bind:placeholder="$t('Nhập email của bạn')"
+              :placeholder="$t('Nhập email của bạn')"
               clearable
               class="newsletter-input"
             />
-            <el-button type="primary" @click="submitEmail">{{ $t('Gửi')}}</el-button>
+            <el-select
+              v-model="reason"
+              :placeholder="$t('Chọn lý do hỗ trợ')"
+              clearable
+              class="newsletter-input"
+            >
+              <el-option :label="$t('Không thể thanh toán')" value="Không thể thanh toán" />
+              <el-option :label="$t('Lỗi đặt vé')" value="Lỗi đặt vé" />
+              <el-option :label="$t('Chọn lý do khác')" value="Chọn lý do khác" />
+            </el-select>
+            <el-input
+              v-if="reason === 'Chọn lý do khác'"
+              v-model="customReason"
+              type="textarea"
+              :placeholder="$t('Mô tả chi tiết vấn đề')"
+              class="newsletter-input"
+              :rows="3"
+            />
+            <el-button type="primary" @click="submitSupportRequest">{{ $t('Gửi') }}</el-button>
           </div>
         </el-col>
       </el-row>
@@ -133,14 +152,39 @@
 
 <script setup>
 import { ref } from "vue";
+import axios from "axios";
+import { ElMessage } from "element-plus";
 
 const email = ref("");
-const submitEmail = () => {
-  if (email.value) {
-    alert("Đã gửi yêu cầu hỗ trợ");
+const reason = ref("");
+const customReason = ref("");
+
+const submitSupportRequest = async () => {
+  if (!email.value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+    ElMessage.error("Vui lòng nhập email hợp lệ");
+    return;
+  }
+  if (!reason.value) {
+    ElMessage.error("Vui lòng chọn lý do hỗ trợ");
+    return;
+  }
+  if (reason.value === "Chọn lý do khác" && !customReason.value) {
+    ElMessage.error("Vui lòng mô tả chi tiết vấn đề");
+    return;
+  }
+
+  try {
+    const supportData = {
+      email: email.value,
+      reason: reason.value === "Chọn lý do khác" ? customReason.value : reason.value,
+    };
+    const response = await axios.post("/support-requests", supportData);
+    ElMessage.success(response.data.message || "Yêu cầu hỗ trợ đã được gửi");
     email.value = "";
-  } else {
-    alert("Vui lòng nhập email hợp lệ");
+    reason.value = "";
+    customReason.value = "";
+  } catch (error) {
+    ElMessage.error("Lỗi khi gửi yêu cầu hỗ trợ: " + (error.response?.data?.message || "Vui lòng thử lại"));
   }
 };
 </script>
@@ -169,19 +213,12 @@ const submitEmail = () => {
   flex: 1;
   text-align: left;
   display: flex;
+  flex-direction: column;
   margin-left: 20px;
-}
-.newsletter h3 {
-  color: #ff7f50;
-  margin-bottom: 15px;
-}
-.newsletter p {
-  color: #bbb;
-  margin-bottom: 15px;
+  gap: 10px;
 }
 .newsletter-input {
   width: 100%;
-  margin-bottom: 10px;
 }
 .logo {
   background-color: rgba(0, 0, 0, 0.2);
@@ -202,13 +239,7 @@ span:hover {
   color: white;
   cursor: pointer;
 }
-.duong2 {
-  margin-left: 20px;
-}
-.duong3 {
-  margin-left: 20px;
-}
-.duong4 {
+.duong2, .duong3, .duong4 {
   margin-left: 20px;
 }
 .footer1-col {
@@ -258,7 +289,6 @@ span em {
     font-size: 14px;
   }
   .newsletter {
-    flex-direction: column;
     margin-left: 0;
     align-items: stretch;
   }
@@ -295,7 +325,6 @@ span em {
   .duong1, .duong2, .duong3, .duong4 {
     margin-left: 0;
   }
-  /* Stack columns vertically on mobile */
   .el-col {
     width: 100% !important;
     margin-bottom: 15px;
@@ -306,3 +335,4 @@ span em {
   }
 }
 </style>
+```

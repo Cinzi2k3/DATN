@@ -305,6 +305,13 @@
                     </div>
                   </template>
                 </el-table-column>
+                <el-table-column label="Loại vé" width="350">
+                  <template #default="{ row }">
+                    <div>
+                      <div class="mb-2">{{ row.ticket_type }}</div>
+                    </div>
+                  </template>
+                </el-table-column>
                 <el-table-column label="Toa/Ghế" width="350">
                   <template #default="{ row }">
                     <div>
@@ -372,6 +379,13 @@
                           <i class="fas fa-id-card me-1"></i> {{ row.passenger.cccd }}
                         </span>
                       </div>
+                    </div>
+                  </template>
+                </el-table-column>
+                <el-table-column label="Loại vé" width="350">
+                  <template #default="{ row }">
+                    <div>
+                      <div class="mb-2">{{ row.ticket_type }}</div>
                     </div>
                   </template>
                 </el-table-column>

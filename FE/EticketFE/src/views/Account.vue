@@ -92,6 +92,11 @@
               <div v-if="activeMenu === 'orders'">
                 <h3 class="fw-bold text-dark mb-4">{{ $t('Lịch sử đơn hàng') }}</h3>
                 <el-table :data="filteredOrders" v-if="filteredOrders.length" class="table table-hover">
+                  <el-table-column label="STT" width="70">
+                    <template #default="scope">
+                      {{ scope.$index + 1 }}
+                    </template>
+                  </el-table-column>
                   <el-table-column prop="transaction_id" :label="$t('Mã giao dịch')" width="150" />
                   <el-table-column prop="created_at" :label="$t('Ngày đặt')" width="150" />
                   <el-table-column :label="$t('Tổng tiền')" width="120">
@@ -99,7 +104,7 @@
                       {{ formatTotalPrice(scope.row.total_amount) }}
                     </template>
                   </el-table-column>
-                  <el-table-column prop="status" :label="$t('Trạng thái')" width="130">
+                  <el-table-column prop="status" :label="$t('Trạng thái')" width="150">
                     <template #default="scope">
                       <el-tag :type="getStatusTagType(scope.row.checkin)">
                         {{ scope.row.checkin === 'unused' ? $t('Chưa check-in') : scope.row.checkin === 'used' ? $t('Đã check-in') : $t('Thất bại') }}
@@ -167,7 +172,7 @@
                         <el-table-column prop="seat_number" :label="$t('Chỗ ngồi')" width="120"/>
                         <el-table-column prop="ticket_type" :label="$t('Loại vé')">
                           <template #default="scope">
-                            {{ scope.row.ticket_type === 'adult' ? $t('Người lớn') : $t('Trẻ em') }}
+                            {{ scope.row.ticket_type }}
                           </template>
                         </el-table-column>
                         <el-table-column :label="$t('Giá')">
@@ -190,10 +195,14 @@
                         <el-table-column prop="seat_number" :label="$t('Chỗ ngồi')" width="120" />
                         <el-table-column prop="ticket_type" :label="$t('Loại vé')">
                           <template #default="scope">
-                            {{ scope.row.ticket_type === 'adult' ? $t('Người lớn') : $t('Trẻ em') }}
+                            {{ scope.row.ticket_type }}
                           </template>
                         </el-table-column>
-                        <el-table-column prop="price" :label="$t('Giá')" />
+                        <el-table-column :label="$t('Giá')">
+                          <template #default="scope">
+                            {{ formatTotalPrice(scope.row.price) }}
+                          </template>
+                        </el-table-column>
                       </el-table>
                     </div>
 

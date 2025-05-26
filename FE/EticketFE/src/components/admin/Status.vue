@@ -1,7 +1,7 @@
 ```vue
 <template>
   <div>
-    <h1 class="mb-4 text-2xl font-bold">Quản lý giá chỗ</h1>
+    <h2 class="mb-4 text-2xl font-bold">Quản lý giá chỗ</h2>
 
     <!-- Thông báo -->
     <el-alert

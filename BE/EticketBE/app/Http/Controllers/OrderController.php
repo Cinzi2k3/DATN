@@ -27,6 +27,7 @@ class OrderController extends Controller
         try {
             $orders = Order::where('user_id', $request->user_id)
                 ->with(['details.passenger'])
+                ->latest()
                 ->get();
 
             return response()->json([
@@ -135,7 +136,7 @@ class OrderController extends Controller
     public function admin(Request $request)
 {
     try {
-        $orders = Order::with(['details.passenger'])->get();
+        $orders = Order::with(['details.passenger'])->latest()->get();
         return response()->json([
             'success' => true,
             'orders' => $orders->map(function ($order) {

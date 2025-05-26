@@ -10,7 +10,8 @@
       <div>
         <div v-for="(ticket, index) in tickets" :key="index" class="passenger-section">
           <h3 class="passenger-type">
-            {{ ticket.departure?.ticketType === 'Người lớn' ? $t('Người lớn (Từ 11 tuổi trở lên)') : $t('Trẻ em (Dưới 10 tuổi)') }}
+{{ ticket.departure?.ticketType  }}
+
           </h3>
 
           <el-row gutter="0" class="pb-3">
@@ -106,53 +107,42 @@
 </template>
 
 <script setup>
-import { reactive, computed, watch } from 'vue';
+import { reactive, computed, watch, ref } from 'vue';
 import { InfoFilled } from '@element-plus/icons-vue';
 import { useFormatPrice } from '@/composables/useFormatprice';
 
 const emits = defineEmits(['update:passengerInfo']);
 const { formatTotalPrice } = useFormatPrice();
-
-// Nhận dữ liệu từ props
 const props = defineProps({
-  departureData: {
-    type: Object,
-    required: true,
-  },
-  returnData: {
-    type: Object,
-    default: null,
-  },
+  departureData: { type: Object, required: true },
+  returnData: { type: Object, default: null },
 });
 
 const rules = {
   name: [
-  { required: true, message: 'Vui lòng nhập họ và tên', trigger: 'blur' },
-  { pattern: /^[a-zA-ZÀ-ỹ]+(\s[a-zA-ZÀ-ỹ]+)+$/, message: 'Nhập đầy đủ họ và tên', trigger: 'blur'}
- ],
+    { required: true, message: 'Vui lòng nhập họ và tên', trigger: 'blur' },
+    { pattern: /^[a-zA-ZÀ-ỹ]+(\s[a-zA-ZÀ-ỹ]+)+$/, message: 'Nhập đầy đủ họ và tên', trigger: 'blur' },
+  ],
   day: [
     { required: true, message: 'Nhập ngày', trigger: 'blur' },
-    { pattern: /^(0?[1-9]|[12][0-9]|3[01])$/, message: 'Ngày không hợp lệ', trigger: 'blur' }
+    { pattern: /^(0?[1-9]|[12][0-9]|3[01])$/, message: 'Ngày không hợp lệ', trigger: 'blur' },
   ],
   month: [
     { required: true, message: 'Nhập tháng', trigger: 'blur' },
-    { pattern: /^(0?[1-9]|1[0-2])$/, message: 'Tháng không hợp lệ', trigger: 'blur' }
+    { pattern: /^(0?[1-9]|1[0-2])$/, message: 'Tháng không hợp lệ', trigger: 'blur' },
   ],
   year: [
     { required: true, message: 'Nhập năm', trigger: 'blur' },
-    { pattern: /^(19|20)\d{2}$/, message: 'Năm không hợp lệ', trigger: 'blur' }
+    { pattern: /^(19|20)\d{2}$/, message: 'Năm không hợp lệ', trigger: 'blur' },
   ],
   idNumber: [
     { required: true, message: 'Vui lòng nhập CCCD/Passport', trigger: 'blur' },
-    { min: 9, message: 'CCCD/Passport phải có ít nhất 9 ký tự', trigger: 'blur' }
-  ]
+    { min: 9, message: 'CCCD/Passport phải có ít nhất 9 ký tự', trigger: 'blur' },
+  ],
 };
 
-// Tạo danh sách vé kết hợp từ departureData và returnData
 const tickets = computed(() => {
   const ticketList = [];
-
-  // Lấy tất cả ghế từ departureData
   let departureSeats = [];
   for (const carType in props.departureData.selectedSeatsByCar) {
     const seats = props.departureData.selectedSeatsByCar[carType];
@@ -168,7 +158,6 @@ const tickets = computed(() => {
     }
   }
 
-  // Lấy tất cả ghế từ returnData
   let returnSeats = [];
   if (props.returnData && props.returnData.selectedSeatsByCar) {
     for (const carType in props.returnData.selectedSeatsByCar) {
@@ -186,7 +175,6 @@ const tickets = computed(() => {
     }
   }
 
-  // Ghép thông tin ghế "Chiều đi" và "Chiều về"
   const maxTickets = Math.max(departureSeats.length, returnSeats.length);
   for (let i = 0; i < maxTickets; i++) {
     const ticket = {
@@ -195,11 +183,9 @@ const tickets = computed(() => {
     };
     ticketList.push(ticket);
   }
-
   return ticketList;
 });
 
-// Chuyển cartype thành số toa
 const getCarNumber = (carType) => {
   if (typeof carType === 'string' && carType.includes(':')) {
     return carType.split(':')[0].trim();
@@ -207,14 +193,12 @@ const getCarNumber = (carType) => {
   return carType;
 };
 
-// Chuyển cartype thành loại toa
 const getCarType = (carType) => {
   if (typeof carType === 'string' && carType.includes(':')) {
     return carType.split(':')[1].trim();
   }
 };
 
-// Khởi tạo form cho từng vé
 const form = reactive(
   tickets.value.map(() => ({
     name: '',
@@ -225,17 +209,62 @@ const form = reactive(
   }))
 );
 
-// Emit thông tin hành khách khi có thay đổi
-const emitPassengerInfo = () => {
-  const passengerInfo = form.map((passenger, index) => ({
-    ...passenger,
-    ticketInfo: tickets.value[index]
-  }));
-  emits('update:passengerInfo', passengerInfo);
+const formRefs = ref([]);
+
+const emitPassengerInfo = async () => {
+  let isValid = true;
+  for (let i = 0; i < formRefs.value.length; i++) {
+    if (formRefs.value[i]) {
+      await formRefs.value[i].validate((valid) => {
+        if (!valid) {
+          isValid = false;
+        }
+      });
+    }
+  }
+
+  if (isValid) {
+    const passengerInfo = form.map((passenger, index) => ({
+      ...passenger,
+      ticketInfo: tickets.value[index],
+    }));
+    console.log('Dữ liệu hành khách gửi đi:', passengerInfo); // Debug
+    emits('update:passengerInfo', passengerInfo);
+  } else {
+    console.log('Validation thất bại, không gửi dữ liệu');
+  }
 };
 
-// Emit thông tin ban đầu
-emitPassengerInfo();
+// Chỉ watch sự thay đổi của form khi cần thiết
+let isUpdating = false; // Flag để ngăn vòng lặp
+watch(
+  form,
+  () => {
+    if (!isUpdating) {
+      isUpdating = true;
+      emitPassengerInfo().finally(() => {
+        isUpdating = false;
+      });
+    }
+  },
+  { deep: true }
+);
+
+// Đồng bộ form khi tickets thay đổi
+watch(tickets, (newTickets) => {
+  while (form.length < newTickets.length) {
+    form.push({
+      name: '',
+      day: '',
+      month: '',
+      year: '',
+      idNumber: '',
+    });
+  }
+  while (form.length > newTickets.length) {
+    form.pop();
+  }
+});
 </script>
 
 <style scoped>

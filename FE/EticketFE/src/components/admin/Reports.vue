@@ -1,6 +1,6 @@
 <template>
   <div class="statistics-container container">
-    <h2 class="text-center my-4">Thống kê doanh thu</h2>
+    <h2>Thống kê doanh thu</h2>
 
     <!-- Tabs chọn loại thống kê -->
     <el-tabs v-model="activeTab" @tab-change="setTab" class="mb-4">

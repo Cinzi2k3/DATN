@@ -19,6 +19,7 @@ class OrderDetail extends Model
         'car-name',
         'seat_number',
         'price',
+        'malichtrinh'
     ];
 
     public function order()

@@ -235,7 +235,7 @@ const { formatTotalPrice } = useFormatPrice();
 const paymentMethod = ref('vnpay');
 const selectedBank = ref('');
 const loading = ref(false);
-const timeLeft = ref(3 * 60);
+const timeLeft = ref(15 * 60);
 let countdownInterval = null;
 
 const totalPrice = computed(() => {
@@ -271,7 +271,7 @@ const clearCountdown = () => {
 };
 
 // Khởi tạo hoặc reset bộ đếm ngược
-const startCountdown = (duration = 3 * 60) => {
+const startCountdown = (duration = 15 * 60) => {
   clearCountdown();
   timeLeft.value = duration;
   localStorage.setItem('countdownTimeLeft', duration.toString());
@@ -291,7 +291,7 @@ const startCountdown = (duration = 3 * 60) => {
 
 // Kiểm tra trạng thái đặt vé và khởi tạo đếm ngược
 const initializeCountdown = async () => {
-  const totalDuration = 3 * 60; // 3 phút
+  const totalDuration = 15 * 60; // 3 phút
 
   try {
     const response = await axios.get('http://192.168.0.105:8000/api/check-reservation', {

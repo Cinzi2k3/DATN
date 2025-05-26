@@ -74,7 +74,7 @@ class VNPayController extends Controller
                         $orderDetail->order_id = $orderId;
                         $orderDetail->passenger_id = $passengerIds[$passengerIndex];
                         $orderDetail->trip_type = $tripType;
-                        $orderDetail->ticket_type = $passenger['ticket_type'] ?? ($seat['ticketType'] === 'Người lớn' ? 'adult' : 'child');
+                        $orderDetail->ticket_type = $seat['ticketType'] ?? 'Default';
                         $orderDetail->schedule_route = ($tripData['searchgadi'] ?? 'Unknown') . ' - ' . ($tripData['searchgaden'] ?? 'Unknown');
                         $orderDetail->car_name = $carName;
                         $orderDetail->departure_time = Carbon::createFromFormat('Y-m-d H:i', $tripData['selectedDay'] . ' ' . $tripData['departureTime'])->toDateTimeString();
@@ -83,8 +83,13 @@ class VNPayController extends Controller
                         $orderDetail->train_type = $tripData['traintau'] ?? 'Unknown';
                         $orderDetail->seat_number = $seat['sohieu'] ?? 'Unknown';
                         $orderDetail->price = $seat['gia'] ?? ($request->amount / count($passengers));
-                        $orderDetail->save();
-                        Log::info("OrderDetail ($tripType) saved:", ['detail_id' => $orderDetail->id, 'car_name' => $carName]);
+$orderDetail->malichtrinh = $tripData['malichtrinh'] ?? null; // Thêm
+            $orderDetail->save();
+            Log::info('OrderDetail saved:', [
+                'detail_id' => $orderDetail->id,
+                'car_name' => $carName,
+                'malichtrinh' => $orderDetail->malichtrinh
+            ]);
 
                         $passengerIndex++;
                     }
@@ -161,79 +166,123 @@ class VNPayController extends Controller
             ], 500);
         }
     }
-    private function mapCarNameToMatoa($carName)
-    {
-        $toaName = explode(':', $carName)[0]; // Lấy "Toa 2" từ "Toa 2 :Toa ghế ngồi"
-        $toaName = trim($toaName); // Loại bỏ khoảng trắng thừa
+private function mapCarNameToMatoa($carName, $expectedMatoa = null, $matau = null)
+{
+    $toaName = explode(':', $carName)[0]; // Lấy "Toa 1" hoặc "Toa 6"
+    $toaName = trim($toaName);
+    $toaNameStandardized = str_replace('Toa ', 'Toa 0', $toaName); // "Toa 1" -> "Toa 01"
 
-        // Tìm matoa trong bảng toa dựa trên tentoa
-        $toa = DB::table('toa')
-            ->where('tentoa', $toaName)
-            ->select('matoa')
-            ->first();
+    Log::info('Mapping car_name to matoa', [
+        'car_name' => $carName,
+        'toa_name' => $toaName,
+        'toa_name_standardized' => $toaNameStandardized,
+        'expected_matoa' => $expectedMatoa,
+        'matau' => $matau
+    ]);
 
-        if ($toa) {
-            return $toa->matoa;
-        }
-
-        Log::error('Cannot find matoa for car_name in toa table', [
-            'car_name' => $carName,
-            'toa_name' => $toaName
-        ]);
-        return null;
+    $query = DB::table('toa');
+    if ($expectedMatoa) {
+        $query->where('matoa', $expectedMatoa); // Ưu tiên matoa từ request
+    } else {
+        $query->where(function ($q) use ($toaName, $toaNameStandardized) {
+            $q->where('tentoa', $toaName)
+              ->orWhere('tentoa', $toaNameStandardized);
+        });
+    }
+    if ($matau) {
+        $query->where('matau', $matau); // Lọc theo mã tàu
     }
 
+    $toa = $query->select('matoa')->first();
+
+    if ($toa) {
+        Log::info('Found matoa', ['matoa' => $toa->matoa]);
+        return $toa->matoa;
+    }
+
+    Log::error('Cannot find matoa for car_name', [
+        'car_name' => $carName,
+        'toa_name' => $toaName,
+        'toa_name_standardized' => $toaNameStandardized,
+        'expected_matoa' => $expectedMatoa,
+        'matau' => $matau,
+        'available_tentoa' => DB::table('toa')->pluck('tentoa')->toArray()
+    ]);
+    return null;
+}
+
     public function returnPayment(Request $request)
-    {
-        $vnp_HashSecret = "YDKXVCGC7KL9KGJ8Y83JTORK8MWXCFSV";
-        $inputData = $request->all();
+{
+    $vnp_HashSecret = 'YDKXVCGC7KL9KGJ8Y83JTORK8MWXCFSV';
+    $inputData = $request->all();
+    $vnp_SecureHash = $inputData['vnp_SecureHash'] ?? '';
+    unset($inputData['vnp_SecureHash']);
+    ksort($inputData);
+    $hashData = '';
+    $i = 0;
+    foreach ($inputData as $key => $value) {
+        $hashData .= ($i == 1 ? '&' : '') . urlencode($key) . '=' . urlencode($value);
+        $i = 1;
+    }
+    $secureHash = hash_hmac('sha512', $hashData, $vnp_HashSecret);
 
-        $vnp_SecureHash = $inputData['vnp_SecureHash'] ?? '';
-        unset($inputData['vnp_SecureHash']);
-        ksort($inputData);
-        $hashData = "";
-        $i = 0;
+    if ($secureHash == $vnp_SecureHash) {
+        $order = Order::where('transaction_id', $inputData['vnp_TxnRef'])->first();
+        if ($order) {
+            if ($inputData['vnp_ResponseCode'] == '00') {
+                $orderDetails = OrderDetail::where('order_id', $order->id)->get();
+                foreach ($orderDetails as $detail) {
+                    // Lấy matau từ bảng lichtrinh hoặc order
+                    $matau = DB::table('lichtrinh')
+                        ->where('malichtrinh', $detail->malichtrinh)
+                        ->value('matau');
+                    $matoa = $this->mapCarNameToMatoa($detail->car_name, $order->matoa, $matau);
+                    Log::info('Processing seat update', [
+                        'order_id' => $order->id,
+                        'car_name' => $detail->car_name,
+                        'matoa' => $matoa,
+                        'seat_number' => $detail->seat_number,
+                        'malichtrinh' => $detail->malichtrinh,
+                        'matau' => $matau
+                    ]);
 
-        foreach ($inputData as $key => $value) {
-            if ($i == 1) {
-                $hashData .= '&' . urlencode($key) . "=" . urlencode($value);
-            } else {
-                $hashData .= urlencode($key) . "=" . urlencode($value);
-                $i = 1;
-            }
-        }
+                    $seatInfo = DB::table('cho')
+                        ->where('sohieu', $detail->seat_number)
+                        ->where('matoa', $matoa)
+                        ->first();
 
-        $secureHash = hash_hmac('sha512', $hashData, $vnp_HashSecret);
-
-        if ($secureHash == $vnp_SecureHash) {
-            $order = Order::where('transaction_id', $inputData['vnp_TxnRef'])->first();
-
-            if ($order) {
-                if ($inputData['vnp_ResponseCode'] == '00') {
-                    // Thanh toán thành công, cập nhật trạng thái ghế thành dadat
-                    $orderDetails = OrderDetail::where('order_id', $order->id)->get();
-                    foreach ($orderDetails as $detail) {
-                        $matoa = $this->mapCarNameToMatoa($detail->car_name);
-                        $seatInfo = DB::table('cho')
-                            ->where('sohieu', $detail->seat_number)
-                            ->where('matoa', $matoa)
-                            ->first();
-
-                        if ($seatInfo) {
-                            DB::table('datve')
-                                ->where('macho', $seatInfo->macho)
-                                ->update([
-                                    'trangthai' => 'dadat',
-                                    'thoihan_giu' => null,
-                                ]);
+                    if ($seatInfo) {
+                        $updated = DB::table('datve')
+                            ->where('macho', $seatInfo->macho)
+                            ->where('malichtrinh', $detail->malichtrinh)
+                            ->update([
+                                'trangthai' => 'dadat',
+                                'thoihan_giu' => null,
+                            ]);
+                        if ($updated) {
+                            Log::info('Updated datve to dadat', [
+                                'macho' => $seatInfo->macho,
+                                'malichtrinh' => $detail->malichtrinh
+                            ]);
+                        } else {
+                            Log::error('No datve record found', [
+                                'macho' => $seatInfo->macho,
+                                'malichtrinh' => $detail->malichtrinh
+                            ]);
                         }
+                    } else {
+                        Log::error('Seat not found in cho', [
+                            'seat_number' => $detail->seat_number,
+                            'matoa' => $matoa,
+                            'malichtrinh' => $detail->malichtrinh
+                        ]);
                     }
-
-                    $order->status = 'completed';
-                    $order->save();
-                    $redirectUrl = env('FRONTEND_URL') . '/payment/result?vnp_TxnRef=' . $inputData['vnp_TxnRef'] . '&vnp_ResponseCode=' . $inputData['vnp_ResponseCode'];
-                } else {
-                    // Thanh toán thất bại, cập nhật trạng thái ghế về controng
+                }
+                $order->status = 'completed';
+                $order->save();
+                 $redirectUrl = env('FRONTEND_URL') . '/payment/result?vnp_TxnRef=' . $inputData['vnp_TxnRef'] . '&vnp_ResponseCode=' . $inputData['vnp_ResponseCode'];
+            } else {
+                // Thanh toán thất bại, cập nhật trạng thái ghế về controng
                     $orderDetails = OrderDetail::where('order_id', $order->id)->get();
                     foreach ($orderDetails as $detail) {
                         $seatInfo = DB::table('cho')
@@ -249,10 +298,9 @@ class VNPayController extends Controller
                                 ]);
                         }
                     }
-
-                    $order->status = 'failed';
-                    $order->save();
-                    $redirectUrl = env('FRONTEND_URL', 'http://localhost:5173') . '/payment/result?vnp_ResponseCode=' . ($inputData['vnp_ResponseCode'] ?? '99') . '&status=failed';
+                $order->status = 'failed';
+                $order->save();
+               $redirectUrl = env('FRONTEND_URL', 'http://localhost:5173') . '/payment/result?vnp_ResponseCode=' . ($inputData['vnp_ResponseCode'] ?? '99') . '&status=failed';
                 }
                 return redirect()->to($redirectUrl);
             } else {

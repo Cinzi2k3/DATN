@@ -22,25 +22,25 @@
           <el-icon><i class="fas fa-shopping-cart"></i></el-icon>
           <template #title>Đơn hàng</template>
         </el-menu-item>
-        <el-menu-item index="/admin/status">
-          <el-icon><i class="fas fa-chair"></i></el-icon>
-          <template #title>Giá chỗ</template>
-        </el-menu-item>
-        <el-menu-item index="/admin/support">
-          <el-icon><i class="fas fa-headset"></i></el-icon>
-          <template #title>Hỗ trợ khách hàng</template>
-        </el-menu-item>
         <el-menu-item index="/admin/users">
           <el-icon><i class="fas fa-users"></i></el-icon>
           <template #title>Người dùng</template>
+        </el-menu-item>
+        <el-menu-item index="/admin/ticket">
+          <el-icon><i class="fas fa-cog"></i></el-icon>
+          <template #title>Loại vé</template>
+        </el-menu-item>
+        <el-menu-item index="/admin/status">
+          <el-icon><i class="fas fa-chair"></i></el-icon>
+          <template #title>Giá chỗ</template>
         </el-menu-item>
         <el-menu-item index="/admin/reports">
           <el-icon><i class="fas fa-chart-bar"></i></el-icon>
           <template #title>Thống kê</template>
         </el-menu-item>
-        <el-menu-item index="/admin/settings">
-          <el-icon><i class="fas fa-cogs"></i></el-icon>
-          <template #title>Cấu hình</template>
+        <el-menu-item index="/admin/support">
+          <el-icon><i class="fas fa-headset"></i></el-icon>
+          <template #title>Hỗ trợ khách hàng</template>
         </el-menu-item>
       </el-menu>
     </div>

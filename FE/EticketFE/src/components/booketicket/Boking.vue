@@ -271,7 +271,7 @@ const handleBook = async () => {
     });
 
     if (response.data.success) {
-      ElNotification.success("Giữ ghế thành công! Vui lòng thanh toán trong 3 phút.");
+      ElNotification.success("Giữ ghế thành công! Vui lòng thanh toán trong 15 phút.");
 
       // Tải lại dữ liệu ghế
       await fetchTrainCars();

@@ -84,7 +84,13 @@
   "Tuyệt vời": "Great",
   "đánh giá": "Evaluate",
   "Hiển thị thêm đánh giá": "Show more reviews",
-  "ĐĂNG KÍ NHẬN TIN": "SIGN UP TO RECEIVE NEWS",
+  "GỬI HỖ TRỢ": "SEND SUPPORT",
+  "Gửi yêu cầu của bạn, đội ngũ hỗ trợ sẽ liên hệ sớm": "Send your request, the support team will contact you soon",
+  "Chọn lý do hỗ trợ": "Select support reason",
+  "Không thể thanh toán": "Unable to pay",
+  "Lỗi đặt vé": "Ticket booking error",
+  "Chọn lý do khác": "Select other reason",
+  "Mô tả chi tiết vấn đề": "Describe the issue in detail",
   "Các chương trình khuyến mãi sẽ tự động gửi đến bạn": "Promotions will be automatically sent to you",
   "Nhập email của bạn": "Enter your email",
   "Bản quyền thuộc về Vé tàu hoả Bắc Nam tại Saomaifly. Thiết kế bởi ĐỖ MẠNH CƯỜNG.": "Copyright belongs to North-South train tickets at Saomaifly. Designed by DO MANH CUONG.",
@@ -223,5 +229,9 @@
   "Giá": "Price",
   "Chi tiết vé đi": "Departure ticket details",
   "Chi tiết vé về": "Return ticket details",
-  "Tên hành khách": "Passenger name"
+  "Tên hành khách": "Passenger name",
+  "Người cao tuổi": "Elderly",
+  "Sinh viên": "Student",
+  "Trên 59 tuổi": "Over 59 years old",
+  "Có thẻ sinh viên hợp lệ": "Have a valid student card"
 }

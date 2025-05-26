@@ -27,11 +27,25 @@ use App\Http\Controllers\CheckInController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReportAdminController;
+use App\Http\Controllers\SupportRequestController;
+use App\Http\Controllers\TicketCategoryController;
 
-    Route::get('/dashboard/stats', [DashboardController::class, 'getStats']);
-    Route::get('/dashboard/revenue', [DashboardController::class, 'getRevenue']);
-    Route::get('/dashboard/occupancy', [DashboardController::class, 'getOccupancy']);
-    Route::get('/dashboard/recent-orders', [DashboardController::class, 'getRecentOrders']);
+//Loại vé
+Route::get('/ticket-categories', [TicketCategoryController::class, 'index']);
+Route::post('/ticket-categories', [TicketCategoryController::class, 'store']);
+Route::put('/ticket-categories/{id}', [TicketCategoryController::class, 'update']);
+Route::delete('/ticket-categories/{id}', [TicketCategoryController::class, 'destroy']);
+
+//Hỗ trợ
+Route::post('/support-requests', [SupportRequestController::class, 'store']);
+Route::get('/support-requests', [SupportRequestController::class, 'index']);
+Route::put('/support-requests/{id}', [SupportRequestController::class, 'update']);;
+
+// dashboard
+Route::get('/dashboard/stats', [DashboardController::class, 'getStats']);
+Route::get('/dashboard/revenue', [DashboardController::class, 'getRevenue']);
+Route::get('/dashboard/occupancy', [DashboardController::class, 'getOccupancy']);
+Route::get('/dashboard/recent-orders', [DashboardController::class, 'getRecentOrders']);
 
 
 //Đăng nhập, đăng kí
