@@ -244,6 +244,27 @@ const handleBook = async () => {
     }
   }
 
+  // Thu thập tất cả ghế đã chọn từ mọi toa
+  const allSelectedSeats = [];
+  const seatMatoaMapping = {}; // Ánh xạ carType sang matoa
+  for (const [carType, seats] of Object.entries(selectedSeatsByCar.value)) {
+    const car = carOptions.value.find((c) => c.type === carType);
+    if (car && seats.length > 0) {
+      allSelectedSeats.push({
+        matoa: car.id,
+        sohieu: seats.map((seat) => seat.sohieu),
+      });
+      seatMatoaMapping[carType] = car.id; // Lưu matoa cho carType
+    }
+  }
+
+  // Kiểm tra nếu không có ghế nào được chọn
+  if (allSelectedSeats.length === 0) {
+    ElNotification.error("Vui lòng chọn ít nhất một ghế!");
+    return;
+  }
+
+  // Dữ liệu đặt vé
   const bookingData = {
     trainCode: props.trainCode,
     traintau: props.traintau,
@@ -257,25 +278,33 @@ const handleBook = async () => {
     departureTime: props.departureTime,
     arrivalTime: props.arrivalTime,
     malichtrinh: props.malichtrinh,
-    matoa: carOptions.value[selectedCar.value].id,
     totalPrice: totalPrice.value,
+    carOptions: carOptions.value,
+    seatMatoaMapping, // Thêm ánh xạ matoa
   };
 
   try {
-    const response = await axios.post("/datve", {
-      sohieu: selectedSeatsByCar.value[carOptions.value[selectedCar.value].type].map(
-        (seat) => seat.sohieu
-      ),
-      malichtrinh: props.malichtrinh,
-      matoa: carOptions.value[selectedCar.value].id,
+    // Gửi yêu cầu giữ ghế cho từng toa
+    const bookingPromises = allSelectedSeats.map(async ({ matoa, sohieu }) => {
+      const response = await axios.post("/datve", {
+        sohieu,
+        malichtrinh: props.malichtrinh,
+        matoa,
+      });
+      return response.data;
     });
 
-    if (response.data.success) {
+    const results = await Promise.all(bookingPromises);
+    const allSuccessful = results.every((result) => result.success);
+
+    if (allSuccessful) {
       ElNotification.success("Giữ ghế thành công! Vui lòng thanh toán trong 15 phút.");
 
-      // Tải lại dữ liệu ghế
+      // Tải lại dữ liệu toa và trạng thái ghế
       await fetchTrainCars();
-      await fetchSeatStatus(carOptions.value[selectedCar.value].id);
+      if (carOptions.value[selectedCar.value]) {
+        await fetchSeatStatus(carOptions.value[selectedCar.value].id);
+      }
 
       // Emit dữ liệu đặt vé
       emits("submit", bookingData);
@@ -289,13 +318,15 @@ const handleBook = async () => {
         closeDialog();
       }
     } else {
-      ElNotification.error(response.data.error || "Giữ ghế thất bại!");
+      const errors = results
+        .filter((result) => !result.success)
+        .map((result) => result.error || "Giữ ghế thất bại!");
+      ElNotification.error(errors.join("; "));
     }
   } catch (error) {
     ElNotification.error("Lỗi khi giữ ghế: " + error.message);
   }
 };
-
 // Lifecycle
 onMounted(() => {
   fetchTrainCars();

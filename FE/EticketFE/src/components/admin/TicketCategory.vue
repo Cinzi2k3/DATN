@@ -260,7 +260,7 @@ const deleteCategoryAction = async (id) => {
 
 <style scoped>
 .admin-ticket-management {
-  max-width: 1220px;
+  max-width: 1180px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 

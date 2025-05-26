@@ -127,7 +127,7 @@
       <div class="card-body">
         <el-table
           :data="paginatedOrders"
-          style="width: 100%"
+          style="width: 99%"
           stripe
           border
           highlight-current-row
@@ -250,7 +250,7 @@
 
         <!-- Chi tiết chuyến đi -->
         <h4 class="mt-4 mb-3">
-          <i class="fas fa-route me-2"></i> Chi tiết chuyến đi
+          <i class="fas fa-route me-2"></i> Chi tiết vé
         </h4>
         <el-tabs type="border-card">
           <el-tab-pane label="Chiều đi">

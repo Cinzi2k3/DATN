@@ -114,41 +114,42 @@ const isNavigatingToPayment = ref(false);
 
 // Hàm chuẩn bị dữ liệu ghế để xóa
 const prepareSeatsToRelease = () => {
-  if (!props.departureData || !props.departureData.selectedSeatsByCar) {
-    console.warn('Không có dữ liệu ghế đi để xóa.');
-    return [];
-  }
-
-  const departureSeats = props.departureData.selectedSeatsByCar || {};
-  const returnSeats = props.returnData?.selectedSeatsByCar || {};
   const seatsToRelease = [];
 
-  // Luôn xóa ghế vé đi
-  Object.keys(departureSeats).forEach(carName => {
-    departureSeats[carName].forEach(seat => {
-      if (seat.sohieu && props.departureData.malichtrinh && props.departureData.matoa) {
-        seatsToRelease.push({
-          sohieu: seat.sohieu,
-          malichtrinh: props.departureData.malichtrinh,
-          matoa: props.departureData.matoa
-        });
-      }
-    });
-  });
+  // Hàm helper để thu thập ghế từ dữ liệu chuyến
+  const collectSeats = (tripData, tripType) => {
+    if (!tripData || !tripData.selectedSeatsByCar || !tripData.malichtrinh) {
+      console.warn(`Không có dữ liệu ghế cho chuyến ${tripType}`);
+      return;
+    }
 
-  // Xóa ghế vé về nếu có
-  if (props.returnData && props.returnData.malichtrinh && props.returnData.matoa) {
-    Object.keys(returnSeats).forEach(carName => {
-      returnSeats[carName].forEach(seat => {
+    Object.entries(tripData.selectedSeatsByCar).forEach(([carName, seats]) => {
+      // Tìm matoa từ seatMatoaMapping hoặc carOptions
+      const matoa = tripData.seatMatoaMapping?.[carName] ||
+        tripData.carOptions?.find((car) => car.type === carName)?.id;
+      if (!matoa) {
+        console.warn(`Không tìm thấy matoa cho carName: ${carName} trong chuyến ${tripType}`);
+        return;
+      }
+
+      seats.forEach((seat) => {
         if (seat.sohieu) {
           seatsToRelease.push({
             sohieu: seat.sohieu,
-            malichtrinh: props.returnData.malichtrinh,
-            matoa: props.returnData.matoa
+            malichtrinh: tripData.malichtrinh,
+            matoa: matoa,
           });
         }
       });
     });
+  };
+
+  // Thu thập ghế từ vé đi
+  collectSeats(props.departureData, 'departure');
+
+  // Thu thập ghế từ vé về (nếu có)
+  if (props.returnData) {
+    collectSeats(props.returnData, 'return');
   }
 
   return seatsToRelease;
@@ -185,14 +186,20 @@ const releaseSeatsWithAxios = async () => {
   }
 
   try {
-    await axios.post(
+    const response = await axios.post(
       'http://192.168.0.105:8000/api/release-seats',
       { seats: seatsToRelease },
       { withCredentials: true }
     );
-    console.log('Xóa ghế thành công:', seatsToRelease);
+    if (response.data.success) {
+      console.log('Xóa ghế thành công:', seatsToRelease);
+    } else {
+      console.error('API trả về lỗi khi xóa ghế:', response.data);
+      ElNotification.error('Không thể xóa ghế: ' + (response.data.message || 'Lỗi không xác định'));
+    }
   } catch (error) {
-    console.error('Lỗi khi xóa ghế:', error);
+    console.error('Lỗi khi xóa ghế:', error.message);
+    ElNotification.error('Lỗi khi xóa ghế: ' + error.message);
   }
 };
 
@@ -252,8 +259,9 @@ const formatTime = (seconds) => {
 };
 
 // Xử lý nút "Đặt vé lại"
-const bookAgain = () => {
+const bookAgain = async () => {
   showTimeoutDialog.value = false;
+  await releaseSeatsWithAxios(); // Xóa ghế trước khi chuyển hướng
   clearCountdown();
   localStorage.removeItem('bookingSession');
   router.push({ name: 'Home' });
@@ -334,12 +342,20 @@ const processPayment = async () => {
       loading.value = true;
       const bookingData = {
         user_id: authStore.userId,
-        departure: props.departureData,
-        return: props.returnData,
+        departure: {
+          ...props.departureData,
+          seatMatoaMapping: props.departureData.seatMatoaMapping, // Thêm ánh xạ matoa
+        },
+        return: props.returnData
+          ? {
+              ...props.returnData,
+              seatMatoaMapping: props.returnData.seatMatoaMapping || {},
+            }
+          : null,
         contact: props.contactInfo,
         passengers: props.passengerInfo,
         amount: totalPrice.value,
-        bankCode: selectedBank.value
+        bankCode: selectedBank.value,
       };
       const vnpayResponse = await axios.post('http://192.168.0.105:8000/api/vnpay/create', bookingData);
 
