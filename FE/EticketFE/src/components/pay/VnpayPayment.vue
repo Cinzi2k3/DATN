@@ -166,7 +166,7 @@ const releaseSeatsWithBeacon = () => {
   try {
     const data = JSON.stringify({ seats: seatsToRelease });
     const blob = new Blob([data], { type: 'application/json' });
-    const success = navigator.sendBeacon('http://192.168.0.105:8000/api/release-seats', blob);
+    const success = navigator.sendBeacon('http://172.20.10.6:8000/api/release-seats', blob);
     if (!success) {
       console.error('Gửi sendBeacon thất bại.');
     } else {
@@ -187,7 +187,7 @@ const releaseSeatsWithAxios = async () => {
 
   try {
     const response = await axios.post(
-      'http://192.168.0.105:8000/api/release-seats',
+      'http://172.20.10.6:8000/api/release-seats',
       { seats: seatsToRelease },
       { withCredentials: true }
     );
@@ -302,7 +302,7 @@ const initializeCountdown = async () => {
   const totalDuration = 15 * 60; // 3 phút
 
   try {
-    const response = await axios.get('http://192.168.0.105:8000/api/check-reservation', {
+    const response = await axios.get('http://172.20.10.6:8000/api/check-reservation', {
       params: {
         malichtrinh: props.departureData.malichtrinh,
         matoa: props.departureData.matoa
@@ -357,7 +357,7 @@ const processPayment = async () => {
         amount: totalPrice.value,
         bankCode: selectedBank.value,
       };
-      const vnpayResponse = await axios.post('http://192.168.0.105:8000/api/vnpay/create', bookingData);
+      const vnpayResponse = await axios.post('http://172.20.10.6:8000/api/vnpay/create', bookingData);
 
       if (vnpayResponse.data && vnpayResponse.data.data) {
         clearCountdown();

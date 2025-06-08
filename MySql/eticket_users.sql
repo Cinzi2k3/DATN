@@ -29,9 +29,11 @@ CREATE TABLE `users` (
   `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
+  `password_reset_token` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `password_reset_expires` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_email_unique` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -40,7 +42,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (23,'Đỗ Mạnh Cường','domanhcuong2k3@gmail.com','$2y$12$yQfdx.YdEsCp4azQ4G1j8eNVLT.aeZyuQPofiLoeuQhKGkXmRZRUq','2025-03-05 04:19:09','2025-03-05 04:19:09');
+INSERT INTO `users` VALUES (31,'Trần Anh Dũng','trananhdung123@gmail.com','$2y$12$RD/.18YIPw/o7h5X8jar7urtmsx4wA9D2LYqMQGwmHhlCWorNuDzC','2025-04-23 09:41:30','2025-04-23 09:41:30',NULL,NULL),(36,'Đỗ Mạnh Cường','domanhcuong2k3@gmail.com','$2y$12$dR5IzG/iVlC7PK7A8e7rOe/gyX6y1Cu7sV4cjuKoolVi45N4cXDHi','2025-05-09 02:38:35','2025-05-09 02:38:35',NULL,NULL);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -53,4 +55,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-03-28  0:25:09
+-- Dump completed on 2025-06-08 17:08:10

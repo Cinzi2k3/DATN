@@ -19,7 +19,8 @@ class Cho extends Model
         'sohieu',
         'tang',
         'khoang',
-        'gia'
+        'gia',
+        'malichtrinh',
     ];
     public function LoaiCho(){
         return $this -> belongsTo(LoaiCho::class,'maloaicho');
@@ -35,5 +36,9 @@ class Cho extends Model
     }
     public function DatVe(){
         return $this -> hasOne(DatVe::class,'macho');
+    }
+     public function LichTrinh()
+    {
+        return $this->belongsTo(LichTrinh::class, 'malichtrinh');
     }
 }

@@ -27,16 +27,15 @@ CREATE TABLE `toa` (
   `maloaitoa` int DEFAULT NULL,
   `matau` int DEFAULT NULL,
   `tentoa` varchar(45) DEFAULT NULL,
-  `sotang` int DEFAULT NULL,
   `socho` int DEFAULT NULL,
-  `sochocon` varchar(45) DEFAULT NULL,
-  `sochodadat` varchar(45) DEFAULT NULL,
+  `created_at` timestamp(5) NULL DEFAULT NULL,
+  `updated_at` timestamp(5) NULL DEFAULT NULL,
   PRIMARY KEY (`matoa`),
   KEY `mlt_idx` (`maloaitoa`),
   KEY `sffff_idx` (`matau`),
   CONSTRAINT `mlt` FOREIGN KEY (`maloaitoa`) REFERENCES `loaitoa` (`maloaitoa`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `sffff` FOREIGN KEY (`matau`) REFERENCES `tau` (`matau`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -45,7 +44,7 @@ CREATE TABLE `toa` (
 
 LOCK TABLES `toa` WRITE;
 /*!40000 ALTER TABLE `toa` DISABLE KEYS */;
-INSERT INTO `toa` VALUES (1,1,1,'Toa 1',1,40,'36','4'),(2,1,1,'Toa 2',1,40,'40','0'),(6,2,1,'Toa 3',1,20,'20','0'),(7,2,1,'Toa 4',1,0,'0','0'),(8,2,1,'Toa 5',1,0,'0','0'),(9,2,1,'Toa 6',1,0,'0','0'),(10,1,4,'Toa 1',1,0,'0','0'),(11,1,4,'Toa 2',1,0,'0','0'),(12,2,4,'Toa 3',1,0,'0','0');
+INSERT INTO `toa` VALUES (1,1,1,'Toa 1',40,NULL,'2025-06-07 08:33:21.00000'),(2,1,1,'Toa 2',40,NULL,'2025-06-07 08:33:21.00000'),(6,2,1,'Toa 3',20,NULL,'2025-06-07 08:33:21.00000'),(7,2,1,'Toa 4',20,NULL,'2025-06-07 08:33:21.00000'),(8,2,1,'Toa 5',20,NULL,'2025-06-07 08:33:21.00000'),(9,2,1,'Toa 6',20,NULL,'2025-06-07 08:33:21.00000'),(10,1,4,'Toa 1',40,NULL,'2025-06-07 08:33:21.00000'),(11,1,4,'Toa 2',40,NULL,'2025-06-07 08:33:21.00000'),(12,2,4,'Toa 3',20,NULL,'2025-06-07 08:33:21.00000'),(13,2,4,'Toa 4',20,NULL,'2025-06-07 08:33:21.00000'),(14,1,5,'Toa 1',40,NULL,'2025-06-07 08:13:44.00000'),(15,1,5,'Toa 2',40,NULL,'2025-06-07 08:13:44.00000'),(16,2,5,'Toa 3',20,NULL,'2025-06-07 08:13:44.00000'),(17,2,5,'Toa 4',20,NULL,'2025-06-07 08:13:44.00000'),(18,2,5,'Toa 5',20,NULL,'2025-06-07 08:13:44.00000'),(19,2,5,'Toa 6',20,NULL,'2025-06-07 08:13:44.00000');
 /*!40000 ALTER TABLE `toa` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -58,4 +57,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-03-28  0:25:10
+-- Dump completed on 2025-06-08 17:08:10

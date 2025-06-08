@@ -38,6 +38,7 @@ class DatVeController extends Controller
                 $seat = DB::table('cho')
                     ->where('sohieu', $seatNumber)
                     ->where('matoa', $matoa)
+                    ->where('malichtrinh', $malichtrinh) // Thêm điều kiện malichtrinh
                     ->first();
 
                 if (!$seat) {
@@ -116,6 +117,7 @@ class DatVeController extends Controller
             // Lấy tất cả ghế trong toa từ bảng cho
             $seats = DB::table('cho')
                 ->where('matoa', $matoa)
+                ->where('malichtrinh', $malichtrinh) // Thêm điều kiện malichtrinh
                 ->get(['sohieu', 'macho']);
 
             // Lấy trạng thái ghế từ bảng datve
@@ -154,63 +156,92 @@ class DatVeController extends Controller
     }
     // Xoá trạng thái ghế khi trở về trang trước
     public function releaseSeats(Request $request)
-    {
-        // Validate input
-        $request->validate([
-            'seats' => 'required|array',
-            'seats.*.sohieu' => 'required|string',
-            'seats.*.malichtrinh' => 'required|integer',
-            'seats.*.matoa' => 'required|integer',
-        ]);
+{
+    $request->validate([
+        'seats' => 'required|array',
+        'seats.*.sohieu' => 'required|string',
+        'seats.*.malichtrinh' => 'required|integer',
+        'seats.*.matoa' => 'required|integer',
+    ]);
 
-        $seats = $request->input('seats');
+    $seats = $request->input('seats');
 
-        Log::info('releaseSeats input:', ['seats' => $seats]);
+    Log::info('releaseSeats input:', ['seats' => $seats]);
 
-        try {
-            DB::beginTransaction();
+    try {
+        DB::beginTransaction();
 
-            foreach ($seats as $seat) {
-                $sohieu = $seat['sohieu'];
-                $malichtrinh = $seat['malichtrinh'];
-                $matoa = $seat['matoa'];
+        foreach ($seats as $seat) {
+            $sohieu = $seat['sohieu'];
+            $malichtrinh = $seat['malichtrinh'];
+            $matoa = $seat['matoa'];
 
-                // Lấy macho từ bảng cho
-                $seatInfo = DB::table('cho')
-                    ->where('sohieu', $sohieu)
-                    ->where('matoa', $matoa)
-                    ->first();
+            // Lấy macho từ bảng cho
+            $seatInfo = DB::table('cho')
+                ->where('sohieu', $sohieu)
+                ->where('matoa', $matoa)
+                ->where('malichtrinh', $malichtrinh) // Thêm điều kiện malichtrinh
+                ->first();
 
-                if (!$seatInfo) {
-                    Log::warning("Ghế với số hiệu $sohieu không tồn tại trong toa $matoa.");
-                    continue; // Bỏ qua nếu ghế không tồn tại
-                }
-
-                // Xóa ghế khỏi bảng datve
-                DB::table('datve')
-                    ->where('macho', $seatInfo->macho)
-                    ->where('malichtrinh', $malichtrinh)
-                    ->delete();
+            if (!$seatInfo) {
+                Log::warning("Ghế với số hiệu $sohieu không tồn tại trong toa $matoa và lịch trình $malichtrinh.", [
+                    'available_seats' => DB::table('cho')
+                        ->where('sohieu', $sohieu)
+                        ->where('matoa', $matoa)
+                        ->get(['macho', 'malichtrinh'])
+                        ->toArray()
+                ]);
+                continue;
             }
 
-            DB::commit();
-            Log::info('Xóa ghế thành công', ['seats' => $seats]);
+            // Kiểm tra trạng thái ghế trong datve
+            $datveRecord = DB::table('datve')
+                ->where('macho', $seatInfo->macho)
+                ->where('malichtrinh', $malichtrinh)
+                ->first();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Ghế đã được xóa thành công.'
-            ]);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Lỗi khi xóa ghế: ' . $e->getMessage(), ['seats' => $seats]);
+            if ($datveRecord && $datveRecord->trangthai === 'dadat') {
+                Log::warning("Ghế đã được đặt, không thể xóa.", [
+                    'macho' => $seatInfo->macho,
+                    'malichtrinh' => $malichtrinh,
+                    'sohieu' => $sohieu
+                ]);
+                continue;
+            }
 
-            return response()->json([
-                'success' => false,
-                'error' => $e->getMessage(),
-                'message' => 'Có lỗi xảy ra khi xóa ghế.'
-            ], 500);
+            // Xóa ghế khỏi bảng datve
+            $deleted = DB::table('datve')
+                ->where('macho', $seatInfo->macho)
+                ->where('malichtrinh', $malichtrinh)
+                ->delete();
+
+            if ($deleted) {
+                Log::info("Deleted datve record", [
+                    'macho' => $seatInfo->macho,
+                    'malichtrinh' => $malichtrinh,
+                    'sohieu' => $sohieu
+                ]);
+            }
         }
+
+        DB::commit();
+        Log::info('Xóa ghế thành công', ['seats' => $seats]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Ghế đã được xóa thành công.'
+        ]);
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('Lỗi khi xóa ghế: ' . $e->getMessage(), ['seats' => $seats]);
+
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'message' => 'Có lỗi xảy ra khi xóa ghế.'
+        ], 500);
     }
+}
     public function checkReservation(Request $request)
     {
         try {

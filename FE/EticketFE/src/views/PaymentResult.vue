@@ -319,7 +319,7 @@ onMounted(async () => {
 
       // Tạo mã QR chứa URL
       if (bookingData.value) {
-        qrCodeData.value = `http://192.168.0.105:5173/check-in?vnp_txn_ref=${vnpTxnRef}`;
+        qrCodeData.value = `http://172.20.10.6:5173/check-in?vnp_txn_ref=${vnpTxnRef}`;
       }
     } catch (error) {
       console.error('Lỗi khi lấy dữ liệu đơn hàng:', error.response?.data || error.message);

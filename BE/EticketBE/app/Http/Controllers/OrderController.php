@@ -44,7 +44,7 @@ class OrderController extends Controller
                         'checkin' => $order->checkin,
                         'ticket_type' => $order->ticket_type,
                         'created_at' => $order->created_at->format('Y-m-d H:i:s'),
-                        'qr_code' => env('FRONTEND_URL', 'http://192.168.0.105:5173') . '/check-in?vnp_txn_ref=' . $order->transaction_id, // Thêm URL mã QR
+                        'qr_code' => env('FRONTEND_URL', 'http://172.20.10.6:5173') . '/check-in?vnp_txn_ref=' . $order->transaction_id, // Thêm URL mã QR
                         'order_details' => $order->details->map(function ($detail) {
                             return [
                                 'trip_type' => $detail->trip_type,
@@ -100,7 +100,7 @@ class OrderController extends Controller
                     'status' => $order->status,
                     'checkin' => $order->checkin,
                     'ticket_type' => $order->ticket_type,
-                    'qr_code' => env('FRONTEND_URL', 'http://192.168.0.105:5173') . '/check-in?vnp_txn_ref=' . $order->transaction_id, // Thêm URL mã QR
+                    'qr_code' => env('FRONTEND_URL', 'http://172.20.10.6:5173') . '/check-in?vnp_txn_ref=' . $order->transaction_id, // Thêm URL mã QR
                     'details' => $order->details->map(function ($detail) {
                         return [
                             'trip_type' => $detail->trip_type,
@@ -152,7 +152,7 @@ class OrderController extends Controller
                     'checkin' => $order->checkin,
                     'ticket_type' => $order->ticket_type,
                     'created_at' => $order->created_at->format('Y-m-d H:i:s'),
-                    'qr_code' => env('FRONTEND_URL', 'http://192.168.0.105:5173') . '/check-in?vnp_txn_ref=' . $order->transaction_id,
+                    'qr_code' => env('FRONTEND_URL', 'http://172.20.10.6:5173') . '/check-in?vnp_txn_ref=' . $order->transaction_id,
                     'order_details' => $order->details->map(function ($detail) {
                         return [
                             'trip_type' => $detail->trip_type,

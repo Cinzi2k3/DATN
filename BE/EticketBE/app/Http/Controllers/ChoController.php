@@ -11,7 +11,7 @@ class ChoController extends Controller
     // Lấy danh sách tất cả chỗ
     public function index(): JsonResponse
     {
-        $cho = Cho::with(['LoaiCho', 'Toa', 'Tau'])->get();
+        $cho = Cho::with(['LoaiCho', 'Toa', 'Tau','LichTrinh'])->get();
 
         return response()->json([
             'success' => true,
@@ -24,6 +24,7 @@ class ChoController extends Controller
                     'tang' => $item->tang,
                     'khoang' => $item->khoang,
                     'gia' => $item->gia ?? null,
+                    'malichtrinh' => $item->malichtrinh,
                 ];
             })
         ], 200);

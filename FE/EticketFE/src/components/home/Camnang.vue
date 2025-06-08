@@ -128,7 +128,7 @@
   <p v-if="selectedTab === 'tab6'">
     {{ $t('Các loại tàu trên đường sắt Việt Nam:') }} <br />
     - {{ $t('Tàu nhanh SE') }} <br />
-    - {{ $t('Tàu thường TN') }} <br />
+    - {{ $t('Tàu thường') }} <br />
     - {{ $t('Tàu chất lượng cao') }} <br />
     - {{ $t('Tàu tốc hành') }}
   </p>

@@ -19,7 +19,7 @@ class VNPayController extends Controller
         //Log::info('VNPay createPayment request:', $request->all());
 
         $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-        $vnp_Returnurl = "http://192.168.0.105:8000/api/vnpay/return";
+        $vnp_Returnurl = "http://172.20.10.6:8000/api/vnpay/return";
         $vnp_TmnCode = "KHT30JML";
         $vnp_HashSecret = "YDKXVCGC7KL9KGJ8Y83JTORK8MWXCFSV";
 
@@ -74,6 +74,7 @@ class VNPayController extends Controller
                     $seatInfo = DB::table('cho')
                         ->where('sohieu', $seat['sohieu'])
                         ->where('matoa', $matoa)
+                        ->where('malichtrinh', $tripData['malichtrinh'] ?? null) // Thêm điều kiện malichtrinh nếu có
                         ->first();
 
                     if (!$seatInfo) {
@@ -254,6 +255,7 @@ private function mapCarNameToMatoa($carName, $expectedMatoa = null, $matau = nul
                     $seatInfo = DB::table('cho')
                         ->where('sohieu', $detail->seat_number)
                         ->where('matoa', $matoa)
+                        ->where('malichtrinh', $detail->malichtrinh) // Thêm điều kiện malichtrinh
                         ->first();
 
                     if ($seatInfo) {

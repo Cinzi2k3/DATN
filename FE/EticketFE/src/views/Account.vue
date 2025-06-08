@@ -90,11 +90,26 @@
 
               <!-- Orders Section -->
               <div v-if="activeMenu === 'orders'">
-                <h3 class="fw-bold text-dark mb-4">{{ $t('Lịch sử đơn hàng') }}</h3>
-                <el-table :data="filteredOrders" v-if="filteredOrders.length" class="table table-hover">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                  <h3 class="fw-bold text-dark mb-0">{{ $t('Lịch sử đơn hàng') }}</h3>
+                  
+                  <!-- Orders per page selector -->
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="text-muted small">{{ $t('Hiển thị') }}:</span>
+                    <el-select v-model="pageSize" @change="handlePageSizeChange" size="small" style="width: 80px">
+                      <el-option :value="5" label="5"></el-option>
+                      <el-option :value="10" label="10"></el-option>
+                      <el-option :value="20" label="20"></el-option>
+                      <el-option :value="50" label="50"></el-option>
+                    </el-select>
+                  </div>
+                </div>
+
+                <!-- Orders table -->
+                <el-table :data="paginatedOrders" v-if="filteredOrders.length" class="table table-hover mb-4">
                   <el-table-column label="STT" width="70">
                     <template #default="scope">
-                      {{ scope.$index + 1 }}
+                      {{ (currentPage - 1) * pageSize + scope.$index + 1 }}
                     </template>
                   </el-table-column>
                   <el-table-column prop="transaction_id" :label="$t('Mã giao dịch')" width="150" />
@@ -127,6 +142,77 @@
                     </template>
                   </el-table-column>
                 </el-table>
+
+                <!-- Pagination Component -->
+                <div v-if="filteredOrders.length > 0" class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 gap-3">
+                  <!-- Orders info -->
+                  <div class="text-muted small">
+                    {{ $t('Hiển thị') }} {{ (currentPage - 1) * pageSize + 1 }} - {{ Math.min(currentPage * pageSize, filteredOrders.length) }} {{ $t('của') }} {{ filteredOrders.length }} {{ $t('đơn hàng') }}
+                  </div>
+
+                  <!-- Pagination controls -->
+                  <div class="pagination-container">
+                    <nav aria-label="Pagination">
+                      <ul class="pagination pagination-modern mb-0">
+                        <!-- First page -->
+                        <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                          <button class="page-link" @click="goToPage(1)" :disabled="currentPage === 1">
+                            <i class="fas fa-angle-double-left"></i>
+                          </button>
+                        </li>
+                        
+                        <!-- Previous page -->
+                        <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                          <button class="page-link" @click="previousPage" :disabled="currentPage === 1">
+                            <i class="fas fa-angle-left"></i>
+                          </button>
+                        </li>
+
+                        <!-- Page numbers -->
+                        <li 
+                          v-for="page in visiblePages" 
+                          :key="page" 
+                          class="page-item" 
+                          :class="{ active: page === currentPage }"
+                        >
+                          <button class="page-link" @click="goToPage(page)">
+                            {{ page }}
+                          </button>
+                        </li>
+
+                        <!-- Next page -->
+                        <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+                          <button class="page-link" @click="nextPage" :disabled="currentPage === totalPages">
+                            <i class="fas fa-angle-right"></i>
+                          </button>
+                        </li>
+                        
+                        <!-- Last page -->
+                        <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+                          <button class="page-link" @click="goToPage(totalPages)" :disabled="currentPage === totalPages">
+                            <i class="fas fa-angle-double-right"></i>
+                          </button>
+                        </li>
+                      </ul>
+                    </nav>
+                  </div>
+
+                  <!-- Quick page jump -->
+                  <div class="d-flex align-items-center gap-2" v-if="totalPages > 10">
+                    <span class="text-muted small">{{ $t('Đến trang') }}:</span>
+                    <el-input 
+                      v-model="jumpToPage" 
+                      size="small" 
+                      style="width: 70px"
+                      @keyup.enter="handlePageJump"
+                      type="number"
+                      :min="1"
+                      :max="totalPages"
+                    />
+                    <el-button size="small" @click="handlePageJump">{{ $t('Đi') }}</el-button>
+                  </div>
+                </div>
+
                 <p v-else class="text-muted">{{ $t('Chưa có đơn hàng nào.') }}</p>
 
                 <!-- QR Code Dialog -->
@@ -250,6 +336,12 @@ const dialogVisible = ref(false);
 const qrDialogVisible = ref(false);
 const selectedOrder = ref(null);
 const { formatTotalPrice } = useFormatPrice();
+
+// Pagination variables
+const currentPage = ref(1);
+const pageSize = ref(10);
+const jumpToPage = ref('');
+
 const form = ref({
   user_id: null,
   name: '',
@@ -280,10 +372,94 @@ const rules = {
   ],
 };
 
-//lấy những đơn hàng thanh toán thành công
+// Filtered orders (successful payments only)
 const filteredOrders = computed(() => {
   return orders.value.filter(order => order.status === 'completed');
 });
+
+// Pagination computed properties
+const totalPages = computed(() => {
+  return Math.ceil(filteredOrders.value.length / pageSize.value);
+});
+
+const paginatedOrders = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value;
+  const end = start + pageSize.value;
+  return filteredOrders.value.slice(start, end);
+});
+
+const visiblePages = computed(() => {
+  const total = totalPages.value;
+  const current = currentPage.value;
+  const pages = [];
+  
+  if (total <= 7) {
+    // Show all pages if total is 7 or less
+    for (let i = 1; i <= total; i++) {
+      pages.push(i);
+    }
+  } else {
+    // Show smart pagination
+    if (current <= 4) {
+      // Show first 5 pages
+      for (let i = 1; i <= 5; i++) {
+        pages.push(i);
+      }
+      pages.push('...');
+      pages.push(total);
+    } else if (current >= total - 3) {
+      // Show last 5 pages
+      pages.push(1);
+      pages.push('...');
+      for (let i = total - 4; i <= total; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Show middle pages
+      pages.push(1);
+      pages.push('...');
+      for (let i = current - 1; i <= current + 1; i++) {
+        pages.push(i);
+      }
+      pages.push('...');
+      pages.push(total);
+    }
+  }
+  
+  return pages;
+});
+
+// Pagination methods
+const goToPage = (page) => {
+  if (page !== '...' && page >= 1 && page <= totalPages.value) {
+    currentPage.value = page;
+  }
+};
+
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++;
+  }
+};
+
+const previousPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--;
+  }
+};
+
+const handlePageSizeChange = (newSize) => {
+  pageSize.value = newSize;
+  currentPage.value = 1; // Reset to first page
+};
+
+const handlePageJump = () => {
+  const page = parseInt(jumpToPage.value);
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page;
+    jumpToPage.value = '';
+  }
+};
 
 // Check login status
 if (!authStore.isLoggedIn) {
@@ -316,6 +492,9 @@ onMounted(async () => {
 // Handle menu selection
 const handleMenuSelect = (index) => {
   activeMenu.value = index;
+  if (index === 'orders') {
+    currentPage.value = 1; // Reset pagination when switching to orders
+  }
 };
 
 // Enable edit mode
@@ -398,4 +577,201 @@ const getStatusTagType = (checkin) => {
 
 <style scoped>
 @import url(@/assets/css/account.css);
-</style>  
+
+/* Modern Pagination Styles */
+.pagination-modern {
+  gap: 0.25rem;
+}
+
+.pagination-modern .page-link {
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  color: #6c757d;
+  background-color: #fff;
+  transition: all 0.2s ease-in-out;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  font-weight: 500;
+}
+
+.pagination-modern .page-link:hover {
+  color: #0d6efd;
+  background-color: #e7f1ff;
+  border-color: #0d6efd;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(13, 110, 253, 0.15);
+}
+
+.pagination-modern .page-item.active .page-link {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  color: #fff;
+  box-shadow: 0 3px 6px rgba(13, 110, 253, 0.3);
+}
+
+.pagination-modern .page-item.disabled .page-link {
+  color: #adb5bd;
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+  cursor: not-allowed;
+}
+
+.pagination-modern .page-item.disabled .page-link:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Responsive pagination */
+@media (max-width: 576px) {
+  .pagination-modern .page-link {
+    padding: 0.375rem 0.5rem;
+    min-width: 35px;
+    height: 35px;
+    font-size: 0.875rem;
+  }
+  
+  .pagination-container {
+    overflow-x: auto;
+    padding: 0.5rem 0;
+  }
+  
+  .pagination-modern {
+    flex-wrap: nowrap;
+    min-width: max-content;
+  }
+}
+
+/* Table responsive improvements */
+@media (max-width: 768px) {
+  .el-table {
+    font-size: 0.875rem;
+  }
+  
+  .el-table .el-table__cell {
+    padding: 8px 4px;
+  }
+}
+
+/* Enhanced hover effects for buttons */
+.el-button {
+  transition: all 0.2s ease-in-out;
+}
+
+.el-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Loading animation enhancement */
+.spinner-border {
+  animation: spinner-border 0.75s linear infinite;
+}
+
+@keyframes spinner-border {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Card shadow enhancement */
+.card {
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.card:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Status tag animations */
+.el-tag {
+  transition: all 0.2s ease-in-out;
+}
+
+.el-tag:hover {
+  transform: scale(1.05);
+}
+
+/* Input focus states */
+.el-input__inner:focus,
+.el-select .el-input__inner:focus {
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Smooth transitions for menu items */
+.nav-link,
+.el-menu-item {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Dialog enhancements */
+.el-dialog {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.el-dialog__header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1.5rem 2rem;
+}
+
+.el-dialog__title {
+  color: white;
+  font-weight: 600;
+}
+
+/* QR Code dialog special styling */
+.qr-dialog .el-dialog__body {
+  padding: 2rem;
+  text-align: center;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+/* Page size selector styling */
+.el-select .el-input {
+  border-radius: 6px;
+}
+
+.el-select .el-input__inner {
+  border: 1px solid #d1d5db;
+  transition: all 0.2s ease-in-out;
+}
+
+.el-select .el-input__inner:hover {
+  border-color: #0d6efd;
+}
+
+/* Jump to page input styling */
+.pagination-jump input {
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  text-align: center;
+}
+
+/* Mobile responsiveness for pagination info */
+@media (max-width: 767px) {
+  .pagination-container .d-flex {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .pagination-container .text-muted {
+    text-align: center;
+    order: 2;
+  }
+  
+  .pagination-container nav {
+    order: 1;
+  }
+  
+  .pagination-container .d-flex.align-items-center.gap-2 {
+    order: 3;
+    justify-content: center;
+  }
+}
+</style>

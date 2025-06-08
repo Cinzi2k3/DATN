@@ -50,13 +50,26 @@ class ToaController extends Controller
 public function chotoa(Request $request): JsonResponse
 {
     $trainCode = $request->query('trainCode');
-    $malichtrinh = $request->query('malichtrinh'); // Lấy mã lịch trình
-    \Log::info('malichtrinh received:', ['malichtrinh' => $malichtrinh]);
+    $malichtrinh = $request->query('malichtrinh');
+    \Log::info('Request params:', ['trainCode' => $trainCode, 'malichtrinh' => $malichtrinh]);
 
-    // Truy vấn các toa, bao gồm cả quan hệ với loaitoa, tau và cho (ghế)
-    $query = Toa::with(['loaitoa', 'tau', 'cho']);
+    // Kiểm tra tham số bắt buộc
+    if (!$trainCode || !$malichtrinh) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Thiếu trainCode hoặc malichtrinh'
+        ], 400);
+    }
 
-    // Lọc theo mã tàu nếu có
+    // Truy vấn các toa, lọc chỗ theo malichtrinh
+    $query = Toa::with([
+        'loaitoa',
+        'tau',
+        'cho' => function ($query) use ($malichtrinh) {
+            $query->where('malichtrinh', $malichtrinh);
+        }
+    ]);
+
     if ($trainCode) {
         $query->whereHas('tau', function ($q) use ($trainCode) {
             $q->where('tentau', $trainCode);
@@ -65,7 +78,6 @@ public function chotoa(Request $request): JsonResponse
 
     $toa = $query->get();
 
-    // Nếu không tìm thấy toa, trả về thông báo lỗi
     if ($toa->isEmpty()) {
         return response()->json([
             'success' => false,
@@ -73,25 +85,26 @@ public function chotoa(Request $request): JsonResponse
         ], 404);
     }
 
-    // Lấy danh sách ghế đã đặt từ bảng `datve` cho mã lịch trình (malichtrinh)
+    // Lấy danh sách ghế đã đặt từ bảng datve
     $gheDaDat = DB::table('datve')
         ->where('malichtrinh', $malichtrinh)
-        ->pluck('macho') // Lấy danh sách mã ghế đã đặt
+        ->pluck('macho')
         ->toArray();
-        
 
-    // Trả về dữ liệu theo định dạng yêu cầu
     return response()->json([
         'success' => true,
-        'data' => $toa->map(function ($toa) use ($gheDaDat) {
-            // Tính toán số ghế trống và ghế đã đặt
+        'data' => $toa->map(function ($toa) use ($gheDaDat, $malichtrinh) {
+            // Lọc lại chỗ để đảm bảo chỉ lấy đúng malichtrinh
+            $cho = $toa->cho->filter(function ($seat) use ($malichtrinh) {
+                return $seat->malichtrinh == $malichtrinh;
+            });
+
             $socho = $toa->cho->count();
             $sochocon = $toa->cho->whereNotIn('macho', $gheDaDat)->count(); // Ghế trống (chưa đặt)
             $sochodadat = $toa->cho->whereIn('macho', $gheDaDat)->count(); // Ghế đã đặt
 
-            $toa->update([
-                'socho' => $socho,
-            ]);
+            // Cập nhật số chỗ trong toa (nếu cần)
+            $toa->update(['socho' => $socho]);
 
             return [
                 'matoa' => $toa->matoa,
@@ -99,20 +112,19 @@ public function chotoa(Request $request): JsonResponse
                 'tenloaitoa' => $toa->loaitoa->tenloaitoa ?? null,
                 'tenloaitau' => $toa->tau->loaitau->tenloaitau ?? null,
                 'tentau' => $toa->tau->tentau ?? null,
-                'socho' => $socho,  // Tổng số ghế
-                'sochocon' => $sochocon,  // Số ghế trống
-                'sochodadat' => $sochodadat,  // Số ghế đã đặt
+                'socho' => $socho,
+                'sochocon' => $sochocon,
+                'sochodadat' => $sochodadat,
                 'cho' => $toa->cho->map(function ($seat) use ($gheDaDat) {
-                    // Kiểm tra trạng thái ghế từ bảng `datve`
                     $trangthai = in_array($seat->macho, $gheDaDat) ? 'dadat' : 'controng';
-
                     return [
                         'macho' => $seat->macho,
                         'sohieu' => $seat->sohieu,
-                        'trangthai' => $trangthai,  // Trạng thái ghế
+                        'trangthai' => $trangthai,
                         'tang' => $seat->tang,
                         'khoang' => $seat->khoang,
                         'gia' => $seat->gia,
+                        'malichtrinh' => $seat->malichtrinh, // Thêm để debug
                     ];
                 }),
             ];

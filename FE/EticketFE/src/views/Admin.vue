@@ -27,7 +27,7 @@
           <template #title>Người dùng</template>
         </el-menu-item>
         <el-menu-item index="/admin/ticket">
-          <el-icon><i class="fas fa-cog"></i></el-icon>
+          <el-icon><i class="fa-solid fa-ticket"></i></el-icon>
           <template #title>Loại vé</template>
         </el-menu-item>
         <el-menu-item index="/admin/status">

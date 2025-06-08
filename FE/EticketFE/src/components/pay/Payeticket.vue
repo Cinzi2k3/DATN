@@ -10,8 +10,7 @@
       <div>
         <div v-for="(ticket, index) in tickets" :key="index" class="passenger-section">
           <h3 class="passenger-type">
-{{ ticket.departure?.ticketType  }}
-
+            {{ ticket.departure?.ticketType  }}
           </h3>
 
           <el-row gutter="0" class="pb-3">

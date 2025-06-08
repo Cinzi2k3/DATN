@@ -30,7 +30,7 @@ CREATE TABLE `tau` (
   PRIMARY KEY (`matau`),
   KEY `LT_idx` (`maloaitau`),
   CONSTRAINT `LT` FOREIGN KEY (`maloaitau`) REFERENCES `loaitau` (`maloaitau`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -39,7 +39,7 @@ CREATE TABLE `tau` (
 
 LOCK TABLES `tau` WRITE;
 /*!40000 ALTER TABLE `tau` DISABLE KEYS */;
-INSERT INTO `tau` VALUES (1,1,'SE','10'),(4,2,'SH','10');
+INSERT INTO `tau` VALUES (1,1,'SE','6'),(4,2,'SH','6'),(5,3,'TN','6');
 /*!40000 ALTER TABLE `tau` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -52,4 +52,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-03-28  0:25:10
+-- Dump completed on 2025-06-08 17:08:11
